@@ -18,7 +18,9 @@
 function _loadHeroLogo() {
   const img = document.getElementById('heroLogo');
   if (!img) return;
-  img.src = 'guaranitour_512.png';
+  img.addEventListener('load', () => img.classList.add('loaded'), { once: true });
+  img.addEventListener('error', () => img.classList.add('loaded'), { once: true });
+  img.src = 'Logo.png';
 }
 
 async function start() {
