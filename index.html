@@ -12,7 +12,6 @@
 <link href="css/home.css" rel="stylesheet"/>
 <link href="css/croquis.css" rel="stylesheet"/>
 <link href="css/reserve.css" rel="stylesheet"/>
-<link href="css/find.css" rel="stylesheet"/>
 <link href="css/panel.css" rel="stylesheet"/>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -82,20 +81,6 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </div>
         </article>
-        <article class="action-card" onclick="goFind()" onkeypress="handleEnter(event, goFind)" role="button" tabindex="0">
-          <div class="action-card-icon find-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/>
-            </svg>
-          </div>
-          <div class="action-card-body">
-            <div class="action-card-title">Ver mi asiento</div>
-            <div class="action-card-desc">Ingresá tu documento para encontrar tu número y ubicación.</div>
-          </div>
-          <div class="action-card-arrow">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </div>
-        </article>
       </div>
       <div class="actions" style="margin-top:14px;">
         <button class="btn ghost" onclick="backToChoose()">Cambiar viaje</button>
@@ -126,36 +111,6 @@
           Actualizar
         </button>
         <span id="selectedCounterLive" aria-live="polite" aria-atomic="true"></span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Mirá tu asiento -->
-  <section aria-label="Mirá tu asiento" class="view" id="view-find">
-    <div class="home-center">
-      <div class="find-wrap">
-        <div class="find-search-card">
-          <label class="find-search-label" for="ciSearch">Número de documento</label>
-          <div class="find-search-row">
-            <input id="ciSearch" type="text" inputmode="numeric" pattern="[0-9]*"
-              placeholder="Ej.: 12345678" autocomplete="off" enterkeyhint="search"/>
-            <button class="btn primary" type="button" onclick="findByCI()">Buscar</button>
-          </div>
-        </div>
-
-        <div id="findResultArea"></div>
-
-        <div id="grid-find" class="grid" aria-live="polite" style="display:none"></div>
-        <p id="findCroquisNote" class="croquis-note" style="display:none">
-          El croquis es referencial. La ubicación exacta puede variar según la unidad.
-        </p>
-
-        <div style="max-width:480px;margin:8px auto 0;">
-          <button type="button" class="btn ghost btn-icon" onclick="goTripMenu()" style="width:100%">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-            Volver al inicio
-          </button>
-        </div>
       </div>
     </div>
   </section>
@@ -343,7 +298,6 @@
 <script src="js/seats-grid.js"></script>
 <script src="js/view-select.js"></script>
 <script src="js/view-reserve.js"></script>
-<script src="js/view-find.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/api-admin.js"></script>
 <script src="js/view-panel.js"></script>
