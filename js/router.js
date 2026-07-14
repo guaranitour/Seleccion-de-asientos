@@ -121,6 +121,23 @@ async function routeTo(hash) {
       return;
     }
 
+    if (head.toLowerCase() === 'panel') {
+      if (!Auth.isAuthorized()) { goStaffLogin(); return; }
+      const sub = (segs[1] || '').toLowerCase();
+      if (sub === 'control' && segs[2]) {
+        const viajes = await ApiAdmin.getAllViajes();
+        const viaje = viajes.find(v => v.nombre === segs[2]);
+        if (viaje) { await goControl(viaje); return; }
+      }
+      if (sub === 'editor' && segs[2]) {
+        const viajes = await ApiAdmin.getAllViajes();
+        const viaje = viajes.find(v => v.nombre === segs[2]);
+        if (viaje) { await goEditor(viaje); return; }
+      }
+      await goPanel();
+      return;
+    }
+
     // Nombre de viaje "plano" (ej: al volver con back del navegador)
     const viaje = await resolveViajeByName(head);
     if (!viaje) { backToChoose(); await loadViajes(); return; }

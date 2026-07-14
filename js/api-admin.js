@@ -1,0 +1,89 @@
+// ============================================================
+// api-admin.js — Capa de acceso a datos del panel staff/admin
+// ============================================================
+
+const ApiAdmin = {
+
+  /** Todos los viajes (activos e inactivos), para el panel. */
+  async getAllViajes() {
+    const { data, error } = await supabase
+      .from('viajes')
+      .select('id, nombre, tipo, start_at, activo, plantas(id, etiqueta, orden)')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    (data || []).forEach(v => {
+      if (Array.isArray(v.plantas)) v.plantas.sort((a, b) => (a.orden || 0) - (b.orden || 0));
+    });
+    return data || [];
+  },
+
+  /** Crea un viaje nuevo con su estructura de asientos. */
+  async crearViaje(nombre, tipo, startAt, filas) {
+    const { data, error } = await supabase.rpc('crear_viaje', {
+      p_nombre: nombre,
+      p_tipo: tipo,
+      p_start_at: startAt || null,
+      p_filas: filas
+    });
+    if (error) throw error;
+    return data; // uuid del nuevo viaje
+  },
+
+  async setViajeActivo(viajeId, activo) {
+    const { error } = await supabase.rpc('set_viaje_activo', { p_viaje_id: viajeId, p_activo: activo });
+    if (error) throw error;
+  },
+
+  /** Asientos de una planta, con estado completo (para el panel de control). */
+  async getAsientosByPlanta(plantaId) {
+    const { data, error } = await supabase
+      .from('asientos')
+      .select('id, code, fila, letra, estado, pasajero, ci')
+      .eq('planta_id', plantaId)
+      .order('fila', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  },
+
+  async moverPasajero(plantaId, sourceCode, targetCode) {
+    const { error } = await supabase.rpc('mover_pasajero', {
+      p_planta_id: plantaId, p_source_code: sourceCode, p_target_code: targetCode
+    });
+    if (error) throw error;
+  },
+
+  async liberarAsiento(plantaId, code) {
+    const { error } = await supabase.rpc('liberar_asiento', { p_planta_id: plantaId, p_code: code });
+    if (error) throw error;
+  },
+
+  async agregarFila(plantaId, fila) {
+    const { error } = await supabase.rpc('agregar_fila', { p_planta_id: plantaId, p_fila: fila });
+    if (error) throw error;
+  },
+
+  async eliminarFila(plantaId, fila) {
+    const { error } = await supabase.rpc('eliminar_fila', { p_planta_id: plantaId, p_fila: fila });
+    if (error) throw error;
+  },
+
+  async setAsientoHabilitado(asientoId, habilitado) {
+    const { error } = await supabase.rpc('set_asiento_habilitado', {
+      p_asiento_id: asientoId, p_habilitado: habilitado
+    });
+    if (error) throw error;
+  },
+
+  /** Búsqueda por CI dentro del panel (todas las plantas de un viaje). */
+  async getAsientosByCi(viajeId, ci) {
+    const { data, error } = await supabase
+      .from('asientos')
+      .select('id, code, estado, pasajero, ci, planta_id, plantas!inner(id, etiqueta, viaje_id)')
+      .eq('plantas.viaje_id', viajeId)
+      .eq('ci', ci.trim());
+    if (error) throw error;
+    return data || [];
+  }
+};
+
+window.ApiAdmin = ApiAdmin;

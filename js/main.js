@@ -29,6 +29,8 @@ function _loadHeroLogo() {
 
 async function start() {
   _loadHeroLogo();
+  await Auth.init();
+  updateStaffEntryPoint();
 
   window.addEventListener('hashchange', () => {
     if (!ROUTER_DRIVING) routeTo(location.hash);
