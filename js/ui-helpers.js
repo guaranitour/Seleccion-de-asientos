@@ -138,3 +138,18 @@ window.markField = markField;
 window.updateTripTags = updateTripTags;
 window.syncSelectedCounter = syncSelectedCounter;
 window.getCountdownText = getCountdownText;
+
+// ── Compensar el alto real de la barra flotante de "Reservar" ──
+// Evita que la nota del croquis o los últimos asientos queden tapados,
+// sin importar cuánto crezca la barra (badge, texto de estado, etc.)
+(function observeActionBarHeight() {
+  const bar = document.getElementById('selectActionBar');
+  const grid = document.getElementById('grid-select');
+  if (!bar || !grid || typeof ResizeObserver === 'undefined') return;
+
+  const apply = () => {
+    grid.style.paddingBottom = (bar.offsetHeight + 16) + 'px';
+  };
+  new ResizeObserver(apply).observe(bar);
+  apply();
+})();
