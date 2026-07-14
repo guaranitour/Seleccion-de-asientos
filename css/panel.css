@@ -5,7 +5,7 @@
 
 /* ===== Acceso staff (botón discreto en home) ===== */
 .staff-entry{
-  position:fixed; right:calc(12px + var(--safe-right)); bottom:calc(12px + var(--safe-bottom));
+  position:fixed; right:calc(12px + var(--safe-right)); bottom:calc(20px + var(--safe-bottom));
   z-index:20; background:rgba(255,255,255,.85); border:1px solid #e5e7eb;
   border-radius:999px; padding:8px 14px; font-size:.78rem; font-weight:700;
   color:var(--muted); box-shadow:0 4px 12px rgba(17,24,39,.08); cursor:pointer;

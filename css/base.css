@@ -48,7 +48,7 @@ body:not(.app-ready) .view{ display:none !important; }
 .view{ display:none; }
 .view.active{ display:block; animation:fadeIn .4s ease both; }
 @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
-.home-center{ min-height:calc(100dvh - 160px); display:grid; place-items:center; }
+.home-center{ display:flex; flex-direction:column; justify-content:center; align-items:center; min-height:calc(100dvh - 260px); }
 
 .view-title{
   margin:0 0 16px 0; font-size:1rem; line-height:1.25; font-weight:800;
