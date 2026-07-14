@@ -42,13 +42,14 @@
 
 .trip-arrow{ flex-shrink:0; color:#9ca3af; display:grid; place-items:center; }
 
-.trip-countdown-wrap{ margin-top:10px; }
+.trip-countdown-wrap{ margin-top:16px; }
 .trip-countdown{
-  display:inline-flex; align-items:center; gap:6px; font-size:.78rem; font-weight:700;
-  padding:5px 10px; border-radius:999px; background:#f3f4f6; color:#4b5563;
+  display:inline-flex; align-items:center; gap:8px; font-size:.78rem; font-weight:700;
+  padding:5px 10px 5px 8px; border-radius:999px; background:#f3f4f6; color:#4b5563;
+  box-shadow: inset 3px 0 0 #9ca3af;
 }
-.trip-countdown.live{ background:#d1fae5; color:#065f46; }
-.trip-countdown.future{ background:#eef2ff; color:#3730a3; }
+.trip-countdown.live{ background:#d1fae5; color:#065f46; box-shadow: inset 3px 0 0 #10b981; }
+.trip-countdown.future{ background:#eef2ff; color:#3730a3; box-shadow: inset 3px 0 0 #6366f1; }
 
 .empty-state{
   text-align:center; padding:40px 16px; color:var(--muted);
