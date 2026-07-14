@@ -29,24 +29,25 @@ body:not(.app-ready) .view{ display:none !important; }
 .topbar{
   position:fixed; top:0; left:0; right:0; z-index:40;
   display:flex; align-items:center; justify-content:center;
-  height:64px; padding-top:env(safe-area-inset-top, 0px);
+  height:76px; padding:0 16px; padding-top:env(safe-area-inset-top, 0px);
 }
 .topbar-logo{
-  height:44px; width:44px; object-fit:contain; flex-shrink:0; border-radius:50%;
+  height:56px; width:auto; max-width:220px; object-fit:contain; flex-shrink:0;
 }
 .topbar-logo.skeleton-round{
+  width:180px; border-radius:14px;
   background: linear-gradient(100deg, #eceef1 30%, #f6f7f9 50%, #eceef1 70%);
   background-size: 200% 100%;
   animation: skeletonShimmer 1.4s ease-in-out infinite;
 }
-.topbar-logo.loaded{ background:none; animation:none; }
+.topbar-logo.loaded{ background:none; animation:none; width:auto; }
 @keyframes skeletonShimmer{
   0%{ background-position:200% 0; }
   100%{ background-position:-200% 0; }
 }
 
 /* Compensar la altura del topbar fijo */
-.app{ padding-top:calc(64px + env(safe-area-inset-top, 0px) + clamp(12px,3vw,20px)); }
+.app{ padding-top:calc(76px + env(safe-area-inset-top, 0px) + clamp(12px,3vw,20px)); }
 .view{ display:none; }
 .view.active{ display:block; animation:fadeIn .4s ease both; }
 @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
