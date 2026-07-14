@@ -17,14 +17,8 @@
 
 function _loadHeroLogo() {
   const img = document.getElementById('heroLogo');
-  const skeleton = document.getElementById('logoSkeleton');
   if (!img) return;
-  img.addEventListener('load', () => {
-    img.classList.add('ready');
-    if (skeleton) skeleton.style.display = 'none';
-  });
-  // TODO: reemplazar por la URL real del logo (Supabase Storage o estático)
-  img.src = 'logo.png';
+  img.src = 'guaranitour_512.png';
 }
 
 async function start() {
