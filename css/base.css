@@ -25,26 +25,28 @@ body{
 /* Bloqueo visual hasta que el router resuelva la vista inicial */
 body:not(.app-ready) .view{ display:none !important; }
 
-/* ===== Topbar ===== */
+/* ===== Header: logo centrado ===== */
 .topbar{
   position:fixed; top:0; left:0; right:0; z-index:40;
-  display:flex; align-items:center; gap:10px;
-  height:56px; padding:0 16px calc(0px) calc(16px + env(safe-area-inset-left, 0px));
-  padding-top:env(safe-area-inset-top, 0px);
-  background:rgba(255,255,255,.92); backdrop-filter:blur(8px);
-  border-bottom:1px solid rgba(17,24,39,.06);
-  box-shadow:0 1px 3px rgba(17,24,39,.04);
+  display:flex; align-items:center; justify-content:center;
+  height:64px; padding-top:env(safe-area-inset-top, 0px);
 }
 .topbar-logo{
-  height:32px; width:32px; object-fit:contain; flex-shrink:0; border-radius:8px;
+  height:44px; width:44px; object-fit:contain; flex-shrink:0; border-radius:50%;
 }
-.topbar-name{
-  font-weight:800; font-size:1rem; letter-spacing:.03em; color:var(--text);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+.topbar-logo.skeleton-round{
+  background: linear-gradient(100deg, #eceef1 30%, #f6f7f9 50%, #eceef1 70%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+.topbar-logo.loaded{ background:none; animation:none; }
+@keyframes skeletonShimmer{
+  0%{ background-position:200% 0; }
+  100%{ background-position:-200% 0; }
 }
 
 /* Compensar la altura del topbar fijo */
-.app{ padding-top:calc(56px + env(safe-area-inset-top, 0px) + clamp(12px,3vw,20px)); }
+.app{ padding-top:calc(64px + env(safe-area-inset-top, 0px) + clamp(12px,3vw,20px)); }
 .view{ display:none; }
 .view.active{ display:block; animation:fadeIn .4s ease both; }
 @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
