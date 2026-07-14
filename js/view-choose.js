@@ -102,8 +102,8 @@ function _buildTripCard(viaje) {
     }
   }
 
-  card.onclick = () => selectViaje(viaje);
-  card.onkeypress = (ev) => { if (ev.key === 'Enter') selectViaje(viaje); };
+  card.onclick = () => selectViaje(viaje).catch(err => alert('ERROR DEBUG: ' + (err && err.message ? err.message : err)));
+  card.onkeypress = (ev) => { if (ev.key === 'Enter') selectViaje(viaje).catch(err => alert('ERROR DEBUG: ' + (err && err.message ? err.message : err))); };
 
   return card;
 }
