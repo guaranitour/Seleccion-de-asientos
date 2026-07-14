@@ -109,3 +109,19 @@
   background:rgba(255,255,255,.25); border-radius:999px; padding:2px 8px;
   font-size:.8rem; font-weight:800; min-width:22px; text-align:center;
 }
+
+/* ===== Header de la vista de selección (viaje/planta + volver) ===== */
+.select-trip-header{
+  display:flex; align-items:center; gap:10px; margin-bottom:12px;
+}
+.select-trip-name{ font-weight:800; font-size:1.05rem; }
+
+/* ===== Bottom-sheet: elegir planta (doble piso) ===== */
+.floor-sheet-options{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+.floor-sheet-options .action-card-icon{ flex-shrink:0; }
+.floor-sheet-option{
+  display:flex; align-items:center; gap:14px; width:100%; text-align:left;
+  background:var(--card); border:1px solid #eef0f3; border-radius:14px;
+  padding:14px; cursor:pointer; font:inherit; color:inherit;
+}
+.floor-sheet-option:hover{ background:#f9fafb; }

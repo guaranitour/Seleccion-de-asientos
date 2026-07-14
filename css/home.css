@@ -53,7 +53,7 @@
 .empty-state h3{ margin:0 0 6px; color:var(--text); }
 .empty-state p{ margin:0; }
 
-/* ===== Cards de acción (view-home / view-floor) ===== */
+/* ===== Cards de acción (bottom-sheet de planta) ===== */
 .action-cards{ display:flex; flex-direction:column; gap:12px; max-width:480px; width:100%; margin:0 auto; }
 
 .action-card{
@@ -96,6 +96,3 @@
 }
 
 .floors{ display:flex; flex-direction:column; gap:12px; }
-
-/* Balance vertical entre título, cards y botón "cambiar viaje" */
-#view-home .action-cards, #view-floor .action-cards{ margin-bottom:14px; }
