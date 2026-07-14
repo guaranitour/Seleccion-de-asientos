@@ -27,7 +27,9 @@ async function start() {
   updateStaffEntryPoint();
 
   window.addEventListener('hashchange', () => {
-    if (!ROUTER_DRIVING) routeTo(location.hash);
+    if (ROUTER_DRIVING) return;
+    if (isProgrammaticHashChange()) return; // ya lo maneja quien llamó a setHash()
+    routeTo(location.hash);
   }, { passive: true });
 
   await routeTo(location.hash);

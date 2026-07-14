@@ -4,6 +4,7 @@
 
 let ROUTER_DRIVING = false;
 let VIAJES_CACHE = [];
+let LAST_PROGRAMMATIC_HASH = null;
 
 function buildHash(segments) {
   return '#/' + (segments || []).map(s => encodeURIComponent(String(s || ''))).join('/');
@@ -13,14 +14,25 @@ function setHash(segments) {
   if (ROUTER_DRIVING) return;
   const next = buildHash(segments);
   if (next === location.hash) return;
-  // La navegación ya la está manejando quien llamó a setHash (ej: chooseFloor,
-  // selectViaje). Sin esto, cambiar location.hash dispara "hashchange" y
-  // main.js vuelve a correr routeTo() en paralelo, duplicando la ejecución
-  // (por eso el bottom-sheet de planta a veces no se cerraba: dos renders
-  // pisándose el showLoading/hideLoading).
-  ROUTER_DRIVING = true;
+  // Recordamos que este cambio de hash lo iniciamos nosotros (no el usuario
+  // tocando atrás/adelante del navegador). El listener de hashchange en
+  // main.js compara contra esto y evita volver a llamar a routeTo() para
+  // este mismo cambio — sin eso, cambiar location.hash dispara "hashchange"
+  // y se dispara una segunda navegación en paralelo (por eso el bottom-sheet
+  // de planta a veces no se cerraba: dos renders pisándose el loading).
+  LAST_PROGRAMMATIC_HASH = next;
   location.hash = next;
-  Promise.resolve().then(() => { ROUTER_DRIVING = false; });
+}
+
+/** Usado por el listener de hashchange en main.js para decidir si este
+ *  cambio de hash ya fue iniciado (y por lo tanto ya está siendo manejado)
+ *  por quien llamó a setHash(). */
+function isProgrammaticHashChange() {
+  if (LAST_PROGRAMMATIC_HASH !== null && LAST_PROGRAMMATIC_HASH === location.hash) {
+    LAST_PROGRAMMATIC_HASH = null;
+    return true;
+  }
+  return false;
 }
 
 function getHashSegments(h) {
@@ -151,6 +163,7 @@ async function routeTo(hash) {
 }
 
 window.setHash = setHash;
+window.isProgrammaticHashChange = isProgrammaticHashChange;
 window.routeTo = routeTo;
 window.ensureViajesCache = ensureViajesCache;
 window.resolveViajeByName = resolveViajeByName;
