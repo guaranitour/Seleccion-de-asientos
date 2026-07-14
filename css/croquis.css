@@ -25,8 +25,10 @@
 /* ===== Grilla (bus 2+2) ===== */
 .grid{
   display:flex; flex-direction:column; gap:6px;
-  /* Espacio para que la barra flotante de "Reservar" no tape los últimos asientos */
-  padding-bottom: calc(84px + var(--safe-bottom));
+  /* Espacio de respaldo para que la barra flotante de "Reservar" (botón +
+     texto de estado) no tape los últimos asientos; ui-helpers.js lo ajusta
+     al valor exacto en tiempo real vía syncActionBarSpacing(). */
+  padding-bottom: calc(120px + var(--safe-bottom));
 }
 .grid[aria-busy="true"]{ pointer-events:none; opacity:.7; }
 
