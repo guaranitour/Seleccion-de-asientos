@@ -11,7 +11,16 @@ function buildHash(segments) {
 
 function setHash(segments) {
   if (ROUTER_DRIVING) return;
-  location.hash = buildHash(segments);
+  const next = buildHash(segments);
+  if (next === location.hash) return;
+  // La navegación ya la está manejando quien llamó a setHash (ej: chooseFloor,
+  // selectViaje). Sin esto, cambiar location.hash dispara "hashchange" y
+  // main.js vuelve a correr routeTo() en paralelo, duplicando la ejecución
+  // (por eso el bottom-sheet de planta a veces no se cerraba: dos renders
+  // pisándose el showLoading/hideLoading).
+  ROUTER_DRIVING = true;
+  location.hash = next;
+  Promise.resolve().then(() => { ROUTER_DRIVING = false; });
 }
 
 function getHashSegments(h) {
