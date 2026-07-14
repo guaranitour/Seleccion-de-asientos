@@ -13,6 +13,7 @@
 <link href="css/croquis.css" rel="stylesheet"/>
 <link href="css/reserve.css" rel="stylesheet"/>
 <link href="css/find.css" rel="stylesheet"/>
+<link href="css/panel.css" rel="stylesheet"/>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -187,9 +188,141 @@
     </div>
   </section>
 
-  <canvas id="confetti-canvas" style="display:none;position:fixed;inset:0;pointer-events:none;z-index:999;"></canvas>
+  <!-- Login staff -->
+  <section class="view" id="view-staff-login">
+    <div class="home-center">
+      <div class="staff-login-card">
+        <div class="staff-login-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <h2 class="view-title">Acceso staff</h2>
+        <p class="staff-login-msg" id="staffLoginMsg">Iniciá sesión con tu cuenta de Google autorizada.</p>
+        <button class="google-btn" id="staffLoginBtn" onclick="Auth.loginWithGoogle()" type="button">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.6 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l6-6C34.5 5.5 29.6 3.5 24 3.5 12.7 3.5 3.5 12.7 3.5 24S12.7 44.5 24 44.5 44.5 35.3 44.5 24c0-1.2-.1-2.4-.9-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3.1 0 5.9 1.2 8 3.1l6-6C34.5 5.5 29.6 3.5 24 3.5c-7.6 0-14.1 4.3-17.7 11.2z"/><path fill="#4CAF50" d="M24 44.5c5.5 0 10.4-1.9 14.1-5.1l-6.5-5.5C29.5 35.5 26.9 36.5 24 36.5c-5.3 0-9.7-3.4-11.3-8.1l-6.6 5.1C9.8 40.1 16.4 44.5 24 44.5z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.2 5.6l6.5 5.5c-.5.4 7-5.1 7-15.6 0-1.2-.1-2.4-.9-3.5z"/></svg>
+          Iniciar sesión con Google
+        </button>
+        <button class="btn ghost" id="staffLogoutBtn" onclick="Auth.logout()" style="display:none;width:100%;margin-top:8px" type="button">Cerrar sesión</button>
+        <div style="margin-top:14px;">
+          <button class="btn ghost" onclick="backToChoose()" type="button" style="width:100%">Volver al inicio</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Panel principal -->
+  <section class="view" id="view-panel">
+    <div class="panel-header">
+      <div>
+        <span class="panel-role-badge" id="panelRoleBadge">Staff</span>
+        <span class="panel-user-info" id="panelUserEmail"></span>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="btnCreateTrip" onclick="openCreateTripForm()" style="display:none" type="button">+ Nuevo viaje</button>
+        <button class="btn ghost" onclick="Auth.logout()" type="button">Salir</button>
+      </div>
+    </div>
+    <h2 class="view-title">Panel de viajes</h2>
+    <div id="panelTripList"></div>
+  </section>
+
+  <!-- Crear viaje -->
+  <section class="view" id="view-create-trip">
+    <div class="home-center">
+      <div style="max-width:480px;width:100%;">
+        <h2 class="view-title">Nuevo viaje</h2>
+        <form class="form create-trip-form" id="createTripForm" onsubmit="submitCreateTrip(event)">
+          <div class="field">
+            <span class="field-label">Nombre del viaje</span>
+            <input id="newTripName" placeholder="Ej.: Encarnación 24/02" required type="text"/>
+          </div>
+          <div class="field">
+            <span class="field-label">Tipo</span>
+            <select id="newTripType">
+              <option value="convencional">Convencional (1 planta)</option>
+              <option value="doble_piso">Doble piso (2 plantas)</option>
+            </select>
+          </div>
+          <div class="field">
+            <span class="field-label">Fecha y hora de salida (opcional)</span>
+            <input id="newTripDate" type="datetime-local"/>
+          </div>
+          <div class="field">
+            <span class="field-label">Cantidad de filas por planta</span>
+            <input id="newTripRows" min="1" placeholder="Ej.: 10" required type="number"/>
+          </div>
+          <div class="actions">
+            <button class="btn ghost" onclick="goPanel()" type="button">Cancelar</button>
+            <button class="btn primary" type="submit">Crear viaje</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Control de ocupación -->
+  <section class="view" id="view-control">
+    <div class="actions" style="margin-bottom:10px;">
+      <button class="btn ghost btn-icon" onclick="goPanel()" type="button">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        Panel
+      </button>
+    </div>
+    <h2 class="view-title" id="controlTripName">—</h2>
+    <div class="planta-tabs" id="controlPlantaTabs"></div>
+    <div class="legend">
+      <span class="badge libre">Libre</span>
+      <span class="badge ocupado">Ocupado (tocar para mover/liberar)</span>
+      <span class="badge inhabilitado">Inhabilitado</span>
+    </div>
+    <div class="grid" id="grid-control"></div>
+  </section>
+
+  <!-- Editor de estructura -->
+  <section class="view" id="view-editor">
+    <div class="actions" style="margin-bottom:10px;">
+      <button class="btn ghost btn-icon" onclick="goPanel()" type="button">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        Panel
+      </button>
+    </div>
+    <h2 class="view-title" id="editorTripName">—</h2>
+    <div class="planta-tabs" id="editorPlantaTabs"></div>
+    <div class="legend">
+      <span class="badge libre">Habilitado (tocar para inhabilitar)</span>
+      <span class="badge inhabilitado">Inhabilitado (tocar para habilitar)</span>
+      <span class="badge ocupado">Ocupado (no editable)</span>
+    </div>
+    <div id="grid-editor"></div>
+    <div class="editor-add-row">
+      <button class="btn primary" onclick="addEditorRow()" type="button">
+        + Agregar fila <span id="editorNextRowNum">1</span>
+      </button>
+    </div>
+  </section>
 
 </main>
+
+<!-- Botón flotante de acceso staff -->
+<button class="staff-entry" id="staffEntryBtn" onclick="goStaffLogin()" type="button">⚙ Acceso staff</button>
+
+<!-- Action sheet: asiento ocupado (mover/liberar) -->
+<div class="action-sheet" id="seatActionSheet">
+  <div class="action-sheet-content">
+    <div class="sheet-seat-code" id="sheetSeatCode">—</div>
+    <div class="sheet-seat-pasajero" id="sheetSeatPasajero">—</div>
+    <button class="btn primary" id="sheetBtnMove" type="button">Mover a otro asiento</button>
+    <button class="btn danger" id="sheetBtnFree" type="button">Liberar asiento</button>
+    <button class="btn ghost" id="sheetBtnCancel" type="button">Cancelar</button>
+  </div>
+</div>
+
+<!-- Barra flotante: modo "moviendo pasajero" -->
+<div class="control-move-bar" id="controlMoveBar">
+  <div class="control-move-bar-inner">
+    <span class="control-move-text">Moviendo…</span>
+    <button class="btn ghost" onclick="cancelMove()" style="color:#fff;border-color:#374151" type="button">Cancelar</button>
+  </div>
+</div>
 
 <!-- Overlay de carga -->
 <div aria-hidden="true" class="overlay" id="overlay">
@@ -213,6 +346,11 @@
 <script src="js/view-select.js"></script>
 <script src="js/view-reserve.js"></script>
 <script src="js/view-find.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/api-admin.js"></script>
+<script src="js/view-panel.js"></script>
+<script src="js/view-control.js"></script>
+<script src="js/view-editor.js"></script>
 <script src="js/main.js"></script>
 
 </body>
