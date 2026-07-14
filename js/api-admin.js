@@ -34,13 +34,9 @@ const ApiAdmin = {
     if (error) throw error;
   },
 
-  /** Asientos de una planta, con estado completo (para el panel de control). */
+  /** Asientos de una planta CON datos de pasajero (vía RPC: join server-side). */
   async getAsientosByPlanta(plantaId) {
-    const { data, error } = await supabase
-      .from('asientos')
-      .select('id, code, fila, letra, estado, pasajero, ci')
-      .eq('planta_id', plantaId)
-      .order('fila', { ascending: true });
+    const { data, error } = await supabase.rpc('get_asientos_con_pasajero', { p_planta_id: plantaId });
     if (error) throw error;
     return data || [];
   },
@@ -74,13 +70,9 @@ const ApiAdmin = {
     if (error) throw error;
   },
 
-  /** Búsqueda por CI dentro del panel (todas las plantas de un viaje). */
+  /** Búsqueda por CI dentro del panel (vía RPC, todas las plantas del viaje). */
   async getAsientosByCi(viajeId, ci) {
-    const { data, error } = await supabase
-      .from('asientos')
-      .select('id, code, estado, pasajero, ci, planta_id, plantas!inner(id, etiqueta, viaje_id)')
-      .eq('plantas.viaje_id', viajeId)
-      .eq('ci', ci.trim());
+    const { data, error } = await supabase.rpc('buscar_por_ci', { p_viaje_id: viajeId, p_ci: ci });
     if (error) throw error;
     return data || [];
   }

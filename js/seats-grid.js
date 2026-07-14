@@ -194,10 +194,10 @@ function subscribeSeatsRealtime() {
       }
     }
 
-    // Re-renderizar el grid visible actualmente (select o find)
+    // Re-renderizar el grid visible actualmente (croquis público)
     const visibleGridId = document.getElementById('grid-select') && document.getElementById('view-select').classList.contains('active')
       ? 'grid-select'
-      : (document.getElementById('grid-find') && document.getElementById('view-find').classList.contains('active') ? 'grid-find' : null);
+      : null;
 
     if (visibleGridId) buildGrid(visibleGridId, { hideMissing: true });
   });

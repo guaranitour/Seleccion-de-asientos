@@ -91,18 +91,6 @@ async function routeTo(hash) {
       return;
     }
 
-    if (head.toLowerCase() === 'mira-tu-asiento') {
-      const nombreViaje = segs[1];
-      const viaje = await resolveViajeByName(nombreViaje);
-      if (!viaje) { toast(`No se encontró el viaje "${nombreViaje}".`); backToChoose(); return; }
-
-      AppState.viaje = viaje;
-      updateTripTags();
-      clearFindView();
-      showView('view-find');
-      return;
-    }
-
     if (head.toLowerCase() === 'formulario') {
       const nombreViaje = segs[1];
       const viaje = await resolveViajeByName(nombreViaje);

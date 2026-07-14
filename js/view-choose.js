@@ -22,12 +22,6 @@ function _arrowSvg() {
   </svg>`;
 }
 
-function _searchSvg() {
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/>
-  </svg>`;
-}
-
 async function loadViajes() {
   showLoading('Cargando viajes…');
   try {
@@ -148,8 +142,7 @@ function _renderFloorCards(viaje) {
 
   const icons = {
     baja: { svg: _busSvg(), cls: 'select-icon' },
-    alta: { svg: _doubleBusSvg(), cls: 'floor-alta-icon' },
-    find: { svg: _searchSvg(), cls: 'find-icon' }
+    alta: { svg: _doubleBusSvg(), cls: 'floor-alta-icon' }
   };
 
   viaje.plantas.forEach((planta, i) => {
@@ -170,22 +163,6 @@ function _renderFloorCards(viaje) {
     card.onkeypress = (ev) => { if (ev.key === 'Enter') chooseFloor(planta); };
     box.appendChild(card);
   });
-
-  const findCard = document.createElement('article');
-  findCard.className = 'action-card';
-  findCard.style.animationDelay = (0.06 + viaje.plantas.length * 0.1) + 's';
-  findCard.setAttribute('role', 'button');
-  findCard.tabIndex = 0;
-  findCard.innerHTML = `
-    <div class="action-card-icon find-icon">${icons.find.svg}</div>
-    <div class="action-card-body">
-      <div class="action-card-title">Ver mi asiento</div>
-      <div class="action-card-desc">Ingresá tu documento para encontrar tu número y ubicación.</div>
-    </div>
-    <div class="action-card-arrow">${_arrowSvg()}</div>`;
-  findCard.onclick = () => goFind();
-  findCard.onkeypress = (ev) => { if (ev.key === 'Enter') goFind(); };
-  box.appendChild(findCard);
 }
 
 async function chooseFloor(planta) {

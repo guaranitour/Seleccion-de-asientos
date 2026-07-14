@@ -25,25 +25,13 @@ const Api = {
     return data || [];
   },
 
-  /** Todos los asientos de una planta. */
+  /** Todos los asientos de una planta (sin datos de pasajero: ya no viven acá). */
   async getAsientosByPlanta(plantaId) {
     const { data, error } = await supabase
       .from('asientos')
-      .select('id, code, fila, letra, estado, pasajero, ci, numero_visible')
+      .select('id, code, fila, letra, estado')
       .eq('planta_id', plantaId)
       .order('fila', { ascending: true });
-
-    if (error) throw error;
-    return data || [];
-  },
-
-  /** Busca asientos por CI en TODAS las plantas de un viaje (Mirá tu asiento). */
-  async getAsientosByCi(viajeId, ci) {
-    const { data, error } = await supabase
-      .from('asientos')
-      .select('id, code, estado, pasajero, ci, planta_id, plantas!inner(id, etiqueta, viaje_id)')
-      .eq('plantas.viaje_id', viajeId)
-      .eq('ci', ci.trim());
 
     if (error) throw error;
     return data || [];
