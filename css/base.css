@@ -57,8 +57,8 @@ body:not(.app-ready) .view{ display:none !important; }
 
 /* Hero title — título con más presencia + bus recorriendo la línea como ruta */
 .hero-title{
-  margin:0 0 26px 0;
-  padding-bottom:14px;
+  margin:0 0 30px 0;
+  padding-bottom:22px;
   font-size:1.45rem;
   font-weight:900;
   color:var(--text);
@@ -66,10 +66,10 @@ body:not(.app-ready) .view{ display:none !important; }
   position:relative;
 }
 .hero-title::before{
-  /* la "ruta": línea sutil pegada al texto */
+  /* la "ruta": línea sutil, separada del texto */
   content:"";
   position:absolute;
-  left:0; right:0; bottom:6px;
+  left:0; right:0; bottom:0;
   height:2px;
   background: linear-gradient(90deg, rgba(44,123,229,.18), rgba(16,185,129,.18));
   border-radius:2px;
@@ -78,19 +78,19 @@ body:not(.app-ready) .view{ display:none !important; }
   /* bus que recorre la ruta, apoyado sobre la línea */
   content:"🚌";
   position:absolute;
-  bottom:6px;
+  bottom:0;
   left:0;
   font-size:16px;
   line-height:1;
-  transform:translate(-50%, -55%) scaleX(1);
+  transform:translate(-50%, 45%) scaleX(1);
   animation: busRide 7s ease-in-out infinite;
 }
 @keyframes busRide{
-  0%   { left:0%;   transform:translate(-50%, -55%) scaleX(1); }
-  48%  { left:100%; transform:translate(-50%, -55%) scaleX(1); }
-  50%  { left:100%; transform:translate(-50%, -55%) scaleX(-1); }
-  98%  { left:0%;   transform:translate(-50%, -55%) scaleX(-1); }
-  100% { left:0%;   transform:translate(-50%, -55%) scaleX(1); }
+  0%   { left:0%;   transform:translate(-50%, 45%) scaleX(1); }
+  48%  { left:100%; transform:translate(-50%, 45%) scaleX(1); }
+  50%  { left:100%; transform:translate(-50%, 45%) scaleX(-1); }
+  98%  { left:0%;   transform:translate(-50%, 45%) scaleX(-1); }
+  100% { left:0%;   transform:translate(-50%, 45%) scaleX(1); }
 }
 @media (prefers-reduced-motion: reduce){
   .hero-title::after{ animation:none; left:50%; }
