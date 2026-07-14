@@ -66,17 +66,12 @@
     </div>
 
     <div aria-busy="true" aria-live="polite" class="grid" id="grid-select"></div>
-    <p class="croquis-note">El croquis es referencial. La ubicación exacta de los asientos puede variar según la unidad.</p>
 
     <div aria-hidden="false" class="select-action-bar" id="selectActionBar">
       <div class="actions">
         <button class="btn primary with-counter" id="btnReservePersistent" onclick="startSelectionPage()" type="button" aria-label="Reservar asientos seleccionados">
           Reservar
           <span id="selectedCounter" class="btn-counter hidden" aria-hidden="true">0</span>
-        </button>
-        <button class="btn ghost btn-icon" id="btnRefreshPersistent" onclick="refreshSelectGrid()" type="button" aria-label="Actualizar disponibilidad">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-          Actualizar
         </button>
         <span id="selectedCounterLive" aria-live="polite" aria-atomic="true"></span>
       </div>
