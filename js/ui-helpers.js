@@ -91,6 +91,22 @@ function syncSelectedCounter() {
     btn.disabled = (count === 0);
     btn.setAttribute('aria-disabled', count === 0 ? 'true' : 'false');
   }
+
+  syncActionBarSpacing();
+}
+
+/** Ajusta el padding-bottom del croquis al alto real de la barra flotante
+ *  de "Reservar", para que la nota y los últimos asientos nunca queden
+ *  tapados sin importar cuánto texto tenga el contador de estado. */
+function syncActionBarSpacing() {
+  const bar = document.getElementById('selectActionBar');
+  const grid = document.getElementById('grid-select');
+  if (!bar || !grid) return;
+  // requestAnimationFrame: esperamos a que el navegador termine de
+  // pintar el nuevo texto del contador antes de medir la altura real.
+  requestAnimationFrame(() => {
+    grid.style.paddingBottom = (bar.offsetHeight + 16) + 'px';
+  });
 }
 
 // ── Countdown de viajes ──
@@ -137,19 +153,5 @@ window.handleEnter = handleEnter;
 window.markField = markField;
 window.updateTripTags = updateTripTags;
 window.syncSelectedCounter = syncSelectedCounter;
+window.syncActionBarSpacing = syncActionBarSpacing;
 window.getCountdownText = getCountdownText;
-
-// ── Compensar el alto real de la barra flotante de "Reservar" ──
-// Evita que la nota del croquis o los últimos asientos queden tapados,
-// sin importar cuánto crezca la barra (badge, texto de estado, etc.)
-(function observeActionBarHeight() {
-  const bar = document.getElementById('selectActionBar');
-  const grid = document.getElementById('grid-select');
-  if (!bar || !grid || typeof ResizeObserver === 'undefined') return;
-
-  const apply = () => {
-    grid.style.paddingBottom = (bar.offsetHeight + 16) + 'px';
-  };
-  new ResizeObserver(apply).observe(bar);
-  apply();
-})();
