@@ -242,7 +242,7 @@ function renderConfirmedPage(pairs) {
   backBtn.type = 'button';
   backBtn.className = 'btn primary';
   backBtn.textContent = 'Volver al inicio';
-  backBtn.addEventListener('click', () => goTripMenu());
+  backBtn.addEventListener('click', () => backToChoose());
   actionsDiv.appendChild(backBtn);
 
   wrap.appendChild(actionsDiv);
