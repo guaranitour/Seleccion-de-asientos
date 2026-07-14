@@ -49,7 +49,6 @@ async function loadViajes() {
 
     viajes.forEach(v => list.appendChild(_buildTripCard(v)));
   } catch (err) {
-    alert('ERROR DEBUG: ' + (err && err.message ? err.message : JSON.stringify(err)));
     toast('No se pudieron cargar los viajes');
   } finally {
     hideLoading();
