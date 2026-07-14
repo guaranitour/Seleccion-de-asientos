@@ -63,15 +63,13 @@ function updateTripTags() {
   const viaje = AppState.viaje;
   if (!viaje) return;
 
-  const titleHome = document.getElementById('tripTitleHome');
-  const titleFloor = document.getElementById('tripTitleFloor');
-  const tagFloor = document.getElementById('tagTripFloor');
-
-  const tipoLabel = viaje.tipo === 'doble_piso' ? 'Doble piso' : 'Convencional';
-
-  if (titleHome) { titleHome.textContent = viaje.nombre; titleHome.dataset.type = tipoLabel; }
-  if (titleFloor) { titleFloor.textContent = viaje.nombre; titleFloor.dataset.type = tipoLabel; }
-  if (tagFloor) tagFloor.textContent = 'Viaje: ' + viaje.nombre;
+  const nameEl = document.getElementById('selectTripName');
+  if (nameEl) {
+    const floorSuffix = (AppState.planta && Array.isArray(viaje.plantas) && viaje.plantas.length > 1)
+      ? ' — ' + getFloorLabelFromEtiqueta(AppState.planta.etiqueta)
+      : '';
+    nameEl.textContent = viaje.nombre + floorSuffix;
+  }
 }
 
 function syncSelectedCounter() {

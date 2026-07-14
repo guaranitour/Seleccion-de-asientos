@@ -114,83 +114,78 @@ function backToChoose() {
   setHash(['Inicio']);
 }
 
-/** Selecciona un viaje: decide si va a elegir planta o directo al menú convencional. */
+/** Tap en una card de viaje: convencional va directo al croquis,
+ *  doble piso abre un bottom-sheet para elegir planta. */
 async function selectViaje(viaje) {
   resetViajeState();
   AppState.viaje = viaje;
+  updateTripTags();
 
   const hasFloors = Array.isArray(viaje.plantas) && viaje.plantas.length > 1;
 
   if (hasFloors) {
-    _renderFloorCards(viaje);
-    updateTripTags();
-    showView('view-floor');
-    setHash([viaje.nombre]);
+    _openFloorSheet(viaje);
   } else {
     AppState.planta = viaje.plantas[0] || null;
-    updateTripTags();
-    showView('view-home');
     setHash([viaje.nombre]);
+    await goSelect();
   }
 }
 
-function _renderFloorCards(viaje) {
-  const box = document.getElementById('floorCards');
-  if (!box) return;
-  box.innerHTML = '';
-  box.className = 'action-cards';
+function _openFloorSheet(viaje) {
+  const sheet = document.getElementById('floorSheet');
+  const box = document.getElementById('floorSheetOptions');
+  if (!sheet || !box) return;
 
+  box.innerHTML = '';
   const icons = {
     baja: { svg: _busSvg(), cls: 'select-icon' },
     alta: { svg: _doubleBusSvg(), cls: 'floor-alta-icon' }
   };
 
-  viaje.plantas.forEach((planta, i) => {
+  viaje.plantas.forEach(planta => {
     const key = planta.etiqueta.toLowerCase().indexOf('alta') >= 0 ? 'alta' : 'baja';
-    const card = document.createElement('article');
-    card.className = 'action-card';
-    card.style.animationDelay = (0.06 + i * 0.1) + 's';
-    card.setAttribute('role', 'button');
-    card.tabIndex = 0;
-    card.innerHTML = `
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'floor-sheet-option';
+    btn.innerHTML = `
       <div class="action-card-icon ${icons[key].cls}">${icons[key].svg}</div>
       <div class="action-card-body">
         <div class="action-card-title">${planta.etiqueta}</div>
         <div class="action-card-desc">${key === 'alta' ? 'Mayor altura y vista panorámica.' : 'Acceso rápido, usualmente cerca del conductor.'}</div>
       </div>
       <div class="action-card-arrow">${_arrowSvg()}</div>`;
-    card.onclick = () => chooseFloor(planta);
-    card.onkeypress = (ev) => { if (ev.key === 'Enter') chooseFloor(planta); };
-    box.appendChild(card);
+    btn.onclick = () => { _closeFloorSheet(); chooseFloor(planta); };
+    box.appendChild(btn);
   });
+
+  document.getElementById('floorSheetTripName').textContent = viaje.nombre;
+  sheet.classList.add('show');
+}
+
+function _closeFloorSheet() {
+  const sheet = document.getElementById('floorSheet');
+  if (sheet) sheet.classList.remove('show');
 }
 
 async function chooseFloor(planta) {
   AppState.planta = planta;
-  updateTripTags();
-  showView('view-home');
-  setHash(['Selección de asientos', AppState.viaje.nombre, getFloorLabelFromEtiqueta(planta.etiqueta)]);
+  setHash([AppState.viaje.nombre, getFloorLabelFromEtiqueta(planta.etiqueta)]);
+  await goSelect();
 }
 
+/** Vuelve a la selección de planta (doble piso) o al croquis (convencional). */
 function goTripMenu() {
   if (!AppState.viaje) { setHash(['Inicio']); showView('view-choose'); return; }
   const hasFloors = Array.isArray(AppState.viaje.plantas) && AppState.viaje.plantas.length > 1;
-  if (hasFloors && !AppState.planta) {
-    _renderFloorCards(AppState.viaje);
-    updateTripTags();
-    showView('view-floor');
+  if (hasFloors) {
+    AppState.planta = null;
+    _openFloorSheet(AppState.viaje);
+    showView('view-choose');
+    setHash([AppState.viaje.nombre]);
   } else {
-    updateTripTags();
-    showView('view-home');
+    backToChoose();
   }
-  setHash([AppState.viaje.nombre]);
-}
-
-function goHome() {
-  if (!AppState.viaje || !AppState.planta) { setHash(['Inicio']); showView('view-choose'); return; }
-  updateTripTags();
-  showView('view-home');
-  setHash([AppState.viaje.nombre]);
 }
 
 window.loadViajes = loadViajes;
@@ -198,4 +193,4 @@ window.backToChoose = backToChoose;
 window.selectViaje = selectViaje;
 window.chooseFloor = chooseFloor;
 window.goTripMenu = goTripMenu;
-window.goHome = goHome;
+window.closeFloorSheet = _closeFloorSheet;

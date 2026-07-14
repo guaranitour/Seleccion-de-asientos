@@ -82,12 +82,17 @@ async function routeTo(hash) {
       if (!viaje) { toast(`No se encontró el viaje "${nombreViaje}".`); backToChoose(); return; }
 
       const targetFloor = segs[2] || null;
+      const hasFloors = Array.isArray(viaje.plantas) && viaje.plantas.length > 1;
+
+      if (hasFloors && targetFloor) {
+        const planta = getPlantaFromFloorLabel(viaje, targetFloor);
+        resetViajeState();
+        AppState.viaje = viaje;
+        updateTripTags();
+        if (planta) { await chooseFloor(planta); return; }
+      }
 
       await selectViaje(viaje);
-      if (targetFloor) {
-        const planta = getPlantaFromFloorLabel(viaje, targetFloor);
-        if (planta) await chooseFloor(planta);
-      }
       return;
     }
 
