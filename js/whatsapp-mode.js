@@ -98,7 +98,7 @@
     WA_ACTIVE = true;
     WA_SELECTED.clear();
     var f = fab(), b = bar();
-    if (f) { f.classList.add('active', 'bar-visible'); f.querySelector('.wa-fab-label').textContent = 'Salir'; }
+    if (f) { f.classList.add('active'); f.querySelector('.wa-fab-label').textContent = 'Salir'; }
     if (b) b.classList.remove('hidden');
     document.body.classList.add('wa-mode-on');
     updateBar();
@@ -110,7 +110,7 @@
     WA_ACTIVE = false;
     WA_SELECTED.clear();
     var f = fab(), b = bar();
-    if (f) { f.classList.remove('active', 'bar-visible'); f.querySelector('.wa-fab-label').textContent = 'WhatsApp'; }
+    if (f) { f.classList.remove('active'); f.querySelector('.wa-fab-label').textContent = 'WhatsApp'; }
     if (b) b.classList.add('hidden');
     document.body.classList.remove('wa-mode-on');
     unpaintSeats();
