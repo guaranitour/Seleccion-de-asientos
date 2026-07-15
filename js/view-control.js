@@ -94,20 +94,21 @@ function _renderControlGrid(seats) {
       }
 
       numByCode.set(seat.code, seatNumber);
-      btn.textContent = seatNumber;
-      seatNumber++;
-
       const isSelected = ControlState.moveSource === seat.code;
       btn.className = 'seat ' + (isSelected ? 'seleccionado' : seat.estado);
+
+      if (seat.estado === 'ocupado' && seat.pasajero) {
+        const firstName = seat.pasajero.trim().split(/\s+/)[0];
+        btn.innerHTML = `<span class="control-seat-num">${seatNumber}</span><span class="control-seat-name">${firstName}</span>`;
+        btn.title = seat.pasajero;
+        btn.setAttribute('aria-label', `Asiento ${seatNumber}, ocupado por ${seat.pasajero}`);
+      } else {
+        btn.textContent = seatNumber;
+      }
+      seatNumber++;
+
       btn.onclick = () => _onControlSeatClick(seat);
       container.appendChild(btn);
-
-      if (seat.estado === 'ocupado') {
-        const label = document.createElement('div');
-        label.className = 'control-seat-label';
-        label.textContent = seat.pasajero || '';
-        container.appendChild(label);
-      }
     });
 
     rowEl.appendChild(left);
