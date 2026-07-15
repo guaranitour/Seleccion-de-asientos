@@ -13,9 +13,13 @@
   }
 
   function getFloorLabel() {
-    // ControlState.planta.etiqueta ya viene como "Planta alta"/"Planta baja"
-    // (ver router.js → getFloorLabelFromEtiqueta), así que la normalizamos igual.
-    var etiqueta = (window.ControlState && ControlState.planta && ControlState.planta.etiqueta) || '';
+    // ControlState está declarado con `const` en el top-level de
+    // view-control.js: eso crea un binding global pero NO una propiedad
+    // en window (a diferencia de var/function). Por eso no podemos
+    // chequear "window.ControlState" — hay que referenciar el identificador
+    // global directo, protegido con typeof por si este script se carga
+    // antes que view-control.js.
+    var etiqueta = (typeof ControlState !== 'undefined' && ControlState.planta && ControlState.planta.etiqueta) || '';
     var s = String(etiqueta).toLowerCase();
     if (s.indexOf('alta') >= 0) return 'Planta alta';
     if (s.indexOf('baja') >= 0) return 'Planta baja';
@@ -203,7 +207,7 @@
   /* ── Mensaje ── */
   function waShare() {
     if (WA_SELECTED.size === 0) return;
-    var trip    = (window.ControlState && ControlState.viaje && ControlState.viaje.nombre) || '';
+    var trip    = (typeof ControlState !== 'undefined' && ControlState.viaje && ControlState.viaje.nombre) || '';
     var entries = Array.from(WA_SELECTED.values());
     var solo    = entries.length === 1;
 
@@ -243,21 +247,36 @@
   }
 
   /* ── Enganche con view-control.js ──
-     En vez de interceptar showView genérico, envolvemos goControl (entrada
-     a la vista) y refreshControlGrid (repintado tras cambiar de planta,
-     mover o liberar un asiento) para no depender de timing con setTimeout. */
+     Observamos #view-control (MutationObserver) para mostrar/ocultar el FAB
+     sin importar quién la muestre, y envolvemos refreshControlGrid para
+     repintar seleccionables tras cada repintado del grid (cambio de planta,
+     mover o liberar un asiento). */
   function hookControlView() {
-    if (typeof window.goControl !== 'function' || typeof window.refreshControlGrid !== 'function') {
+    var vcReady = document.getElementById('view-control');
+    if (!vcReady || typeof window.refreshControlGrid !== 'function') {
       setTimeout(hookControlView, 50);
       return;
     }
 
-    var _origGoControl = window.goControl;
-    window.goControl = async function (viaje) {
-      var result = await _origGoControl(viaje);
-      if (isStaffAuthed()) showFab(); else hideFab();
-      return result;
-    };
+    // Nota: NO envolvemos goControl. view-control.js lo declara con
+    // "async function goControl(viaje){}" en el top-level; ese identificador
+    // global convive con la propiedad window.goControl, y otros scripts
+    // (router.js, view-panel.js) lo invocan como identificador libre
+    // ("goControl(viaje)"), no como "window.goControl(viaje)". Envolver solo
+    // window.goControl no garantiza que esas llamadas pasen por el wrapper.
+    // En cambio, observamos directamente cuándo #view-control pasa a
+    // "active" — funciona sin importar quién ni cómo la mostró.
+    var vcEl = document.getElementById('view-control');
+    if (vcEl) {
+      var observer = new MutationObserver(function () {
+        if (vcEl.classList.contains('active')) {
+          if (isStaffAuthed()) showFab(); else hideFab();
+        } else {
+          hideFab();
+        }
+      });
+      observer.observe(vcEl, { attributes: true, attributeFilter: ['class'] });
+    }
 
     var _origRefresh = window.refreshControlGrid;
     window.refreshControlGrid = async function () {
@@ -272,17 +291,6 @@
       }
       return result;
     };
-
-    // Si se navega a cualquier otra vista, ocultamos el FAB. Como no hay un
-    // único punto de salida de view-control, usamos showView si existe.
-    if (typeof window.showView === 'function') {
-      var _origShowView = window.showView;
-      window.showView = function (id) {
-        var result = _origShowView(id);
-        if (id !== 'view-control') hideFab();
-        return result;
-      };
-    }
   }
 
   /* ── Init ── */
