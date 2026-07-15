@@ -128,7 +128,6 @@ async function selectViaje(viaje) {
     _openFloorSheet(viaje);
   } else {
     AppState.planta = viaje.plantas[0] || null;
-    setHash([viaje.nombre]);
     await goSelect();
   }
 }
@@ -176,7 +175,6 @@ function _closeFloorSheet() {
 
 async function chooseFloor(planta) {
   AppState.planta = planta;
-  setHash([AppState.viaje.nombre, getFloorLabelFromEtiqueta(planta.etiqueta)]);
   await goSelect();
 }
 
@@ -191,9 +189,9 @@ function goTripMenu() {
   const hasFloors = Array.isArray(AppState.viaje.plantas) && AppState.viaje.plantas.length > 1;
   if (hasFloors) {
     AppState.planta = null;
-    _openFloorSheet(AppState.viaje);
     showView('view-choose');
     setHash([AppState.viaje.nombre]);
+    _openFloorSheet(AppState.viaje);
   } else {
     backToChoose();
   }

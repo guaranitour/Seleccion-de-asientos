@@ -6,6 +6,10 @@ function showView(id) {
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
   const el = document.getElementById(id);
   if (el) el.classList.add('active');
+  // Cerrar cualquier bottom-sheet / action-sheet abierto al navegar a una
+  // vista real, para que nunca quede tapando la pantalla (ej. al volver
+  // atrás desde el navegador estando el sheet de planta abierto).
+  document.querySelectorAll('.action-sheet.show').forEach(sheet => sheet.classList.remove('show'));
 }
 
 function toast(msg) {
