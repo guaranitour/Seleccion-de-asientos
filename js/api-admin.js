@@ -17,13 +17,17 @@ const ApiAdmin = {
     return data || [];
   },
 
-  /** Crea un viaje nuevo con su estructura de asientos. */
-  async crearViaje(nombre, tipo, startAt, filas) {
+  /** Crea un viaje nuevo con su estructura de asientos.
+   *  Cantidad de filas fija por tipo: convencional = 11 filas;
+   *  doble piso = 10 filas en planta alta, 5 en planta baja. */
+  async crearViaje(nombre, tipo, startAt) {
     const { data, error } = await supabase.rpc('crear_viaje', {
       p_nombre: nombre,
       p_tipo: tipo,
       p_start_at: startAt || null,
-      p_filas: filas
+      p_filas: 11,
+      p_filas_alta: 10,
+      p_filas_baja: 5
     });
     if (error) throw error;
     return data; // uuid del nuevo viaje

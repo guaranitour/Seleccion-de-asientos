@@ -7,7 +7,6 @@ async function goPanel() {
 
   showView('view-panel');
   document.getElementById('panelRoleBadge').textContent = Auth.isAdmin() ? 'Admin' : 'Staff';
-  document.getElementById('panelUserEmail').textContent = Auth.user.email;
 
   const createBtn = document.getElementById('btnCreateTrip');
   if (createBtn) createBtn.style.display = Auth.isAdmin() ? '' : 'none';
@@ -95,7 +94,17 @@ async function togglePanelViaje(viajeId, nuevoEstado) {
 function openCreateTripForm() {
   if (!Auth.isAdmin()) return;
   document.getElementById('createTripForm').reset();
+  updateTripRowsHint();
   showView('view-create-trip');
+}
+
+function updateTripRowsHint() {
+  const tipo = document.getElementById('newTripType').value;
+  const hint = document.getElementById('tripRowsHint');
+  if (!hint) return;
+  hint.textContent = tipo === 'doble_piso'
+    ? 'Se crearán 10 filas en planta alta (40 asientos) y 5 en planta baja (20 asientos).'
+    : 'Se crearán 11 filas (44 asientos).';
 }
 
 async function submitCreateTrip(ev) {
@@ -103,16 +112,15 @@ async function submitCreateTrip(ev) {
   const nombre = document.getElementById('newTripName').value.trim();
   const tipo = document.getElementById('newTripType').value;
   const fecha = document.getElementById('newTripDate').value;
-  const filas = parseInt(document.getElementById('newTripRows').value, 10);
 
-  if (!nombre || !filas || filas < 1) {
-    toast('Completá nombre y cantidad de filas');
+  if (!nombre) {
+    toast('Completá el nombre del viaje');
     return;
   }
 
   showLoading('Creando viaje…');
   try {
-    await ApiAdmin.crearViaje(nombre, tipo, fecha ? new Date(fecha).toISOString() : null, filas);
+    await ApiAdmin.crearViaje(nombre, tipo, fecha ? new Date(fecha).toISOString() : null);
     toast('Viaje creado correctamente');
     goPanel();
   } catch (e) {
@@ -126,4 +134,5 @@ window.goPanel = goPanel;
 window.loadPanelViajes = loadPanelViajes;
 window.togglePanelViaje = togglePanelViaje;
 window.openCreateTripForm = openCreateTripForm;
+window.updateTripRowsHint = updateTripRowsHint;
 window.submitCreateTrip = submitCreateTrip;
