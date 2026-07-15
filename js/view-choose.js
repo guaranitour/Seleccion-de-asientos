@@ -112,6 +112,7 @@ function backToChoose() {
   resetViajeState();
   showView('view-choose');
   setHash(['Inicio']);
+  loadViajes().catch(err => console.error(err));
 }
 
 /** Tap en una card de viaje: convencional va directo al croquis,
@@ -161,6 +162,11 @@ function _openFloorSheet(viaje) {
 
   document.getElementById('floorSheetTripName').textContent = viaje.nombre;
   sheet.classList.add('show');
+
+  // Cerrar al tocar el fondo oscuro (fuera del contenido del sheet)
+  sheet.onclick = (ev) => {
+    if (ev.target === sheet) _closeFloorSheet();
+  };
 }
 
 function _closeFloorSheet() {
@@ -176,7 +182,12 @@ async function chooseFloor(planta) {
 
 /** Vuelve a la selección de planta (doble piso) o al croquis (convencional). */
 function goTripMenu() {
-  if (!AppState.viaje) { setHash(['Inicio']); showView('view-choose'); return; }
+  if (!AppState.viaje) {
+    setHash(['Inicio']);
+    showView('view-choose');
+    loadViajes().catch(err => console.error(err));
+    return;
+  }
   const hasFloors = Array.isArray(AppState.viaje.plantas) && AppState.viaje.plantas.length > 1;
   if (hasFloors) {
     AppState.planta = null;

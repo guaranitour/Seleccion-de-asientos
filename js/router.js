@@ -92,6 +92,7 @@ async function routeTo(hash) {
 
   try {
     if (head.toLowerCase() === 'inicio') {
+      if (typeof closeFloorSheet === 'function') closeFloorSheet();
       showView('view-choose');
       await loadViajes();
       return;
