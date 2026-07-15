@@ -86,13 +86,21 @@ function updateStaffEntryPoint() {
 async function goStaffLogin() {
   showView('view-staff-login');
 
+  const loginCard  = document.getElementById('staffLoginCard');
+  const deniedCard = document.getElementById('staffDeniedCard');
+
   if (Auth.isLoggedIn() && !Auth.isAuthorized()) {
-    document.getElementById('staffLoginMsg').textContent =
-      `Tu cuenta (${Auth.user.email}) no tiene acceso al panel. Pedile a un administrador que te agregue.`;
-    document.getElementById('staffLoginBtn').style.display = 'none';
-    document.getElementById('staffLogoutBtn').style.display = '';
+    // Logueado en Google pero sin fila en "staff": tarjeta de acceso
+    // denegado dedicada, en vez de reusar el texto del login normal.
+    loginCard.style.display  = 'none';
+    deniedCard.style.display = '';
+    document.getElementById('staffDeniedMsg').textContent =
+      `La cuenta ${Auth.user.email} no tiene permisos para ingresar al panel staff.`;
     return;
   }
+
+  deniedCard.style.display = 'none';
+  loginCard.style.display  = '';
 
   if (Auth.isAuthorized()) {
     goPanel();
@@ -100,8 +108,6 @@ async function goStaffLogin() {
   }
 
   document.getElementById('staffLoginMsg').textContent = 'Iniciá sesión con tu cuenta de Google autorizada.';
-  document.getElementById('staffLoginBtn').style.display = '';
-  document.getElementById('staffLogoutBtn').style.display = 'none';
 }
 
 window.Auth = Auth;
