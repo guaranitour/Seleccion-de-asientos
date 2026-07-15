@@ -96,6 +96,8 @@ function _renderControlGrid(seats) {
       numByCode.set(seat.code, seatNumber);
       const isSelected = ControlState.moveSource === seat.code;
       btn.className = 'seat ' + (isSelected ? 'seleccionado' : seat.estado);
+      btn.setAttribute('data-code', seat.code);
+      btn.setAttribute('data-status', seat.estado);
 
       if (seat.estado === 'ocupado' && seat.pasajero) {
         const firstName = seat.pasajero.trim().split(/\s+/)[0];
