@@ -99,17 +99,18 @@ function syncSelectedCounter() {
   syncActionBarSpacing();
 }
 
-/** Ajusta el padding-bottom del croquis al alto real de la barra flotante
- *  de "Reservar", para que la nota y los últimos asientos nunca queden
- *  tapados sin importar cuánto texto tenga el contador de estado. */
+/** Ajusta el padding-bottom del contenedor del croquis (grid + nota) al alto
+ *  real de la barra flotante de "Reservar", para que la nota y los últimos
+ *  asientos nunca queden tapados sin importar cuánto texto tenga el
+ *  contador de estado. */
 function syncActionBarSpacing() {
   const bar = document.getElementById('selectActionBar');
-  const grid = document.getElementById('grid-select');
-  if (!bar || !grid) return;
+  const wrap = document.getElementById('croquisWrap') || document.getElementById('grid-select');
+  if (!bar || !wrap) return;
   // requestAnimationFrame: esperamos a que el navegador termine de
   // pintar el nuevo texto del contador antes de medir la altura real.
   requestAnimationFrame(() => {
-    grid.style.paddingBottom = (bar.offsetHeight + 16) + 'px';
+    wrap.style.paddingBottom = (bar.offsetHeight + 16) + 'px';
   });
 }
 
