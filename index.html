@@ -64,10 +64,8 @@
       <span class="badge inhabilitado">Gris: Inhabilitado en esta planta</span>
     </div>
 
-    <div class="croquis-wrap" id="croquisWrap">
-      <div aria-busy="true" aria-live="polite" class="grid" id="grid-select"></div>
-      <p class="croquis-note">El croquis es referencial. La ubicación exacta de los asientos puede variar según la unidad.</p>
-    </div>
+    <div aria-busy="true" aria-live="polite" class="grid" id="grid-select"></div>
+    <p class="croquis-note">El croquis es referencial. La ubicación exacta de los asientos puede variar según la unidad.</p>
 
     <div aria-hidden="false" class="select-action-bar" id="selectActionBar">
       <div class="actions">
@@ -132,7 +130,6 @@
     <div class="panel-header">
       <div>
         <span class="panel-role-badge" id="panelRoleBadge">Staff</span>
-        <span class="panel-user-info" id="panelUserEmail"></span>
       </div>
       <div class="actions">
         <button class="btn primary" id="btnCreateTrip" onclick="openCreateTripForm()" style="display:none" type="button">+ Nuevo viaje</button>
@@ -155,18 +152,15 @@
           </div>
           <div class="field">
             <span class="field-label">Tipo</span>
-            <select id="newTripType">
+            <select id="newTripType" onchange="updateTripRowsHint()">
               <option value="convencional">Convencional (1 planta)</option>
               <option value="doble_piso">Doble piso (2 plantas)</option>
             </select>
+            <span class="field-hint" id="tripRowsHint">Se crearán 11 filas (44 asientos).</span>
           </div>
           <div class="field">
             <span class="field-label">Fecha y hora de salida (opcional)</span>
             <input id="newTripDate" type="datetime-local"/>
-          </div>
-          <div class="field">
-            <span class="field-label">Cantidad de filas por planta</span>
-            <input id="newTripRows" min="1" placeholder="Ej.: 10" required type="number"/>
           </div>
           <div class="actions">
             <button class="btn ghost" onclick="goPanel()" type="button">Cancelar</button>
