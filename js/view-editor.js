@@ -79,7 +79,6 @@ function _renderEditorGrid(seats) {
     const right = document.createElement('div'); right.className = 'block';
 
     const seatsInRow = rowsMap.get(fila).sort((a, b) => a.letra.localeCompare(b.letra));
-    const hasOcupado = seatsInRow.some(s => s.estado === 'ocupado');
 
     ['A', 'B', 'C', 'D'].forEach(letra => {
       const seat = seatsInRow.find(s => s.letra === letra);
@@ -108,8 +107,7 @@ function _renderEditorGrid(seats) {
     delBtn.type = 'button';
     delBtn.className = 'btn ghost editor-row-delete';
     delBtn.textContent = '🗑';
-    delBtn.disabled = hasOcupado;
-    delBtn.title = hasOcupado ? 'No se puede eliminar: hay asientos ocupados' : 'Eliminar fila';
+    delBtn.title = 'Eliminar fila';
     delBtn.onclick = () => _confirmEliminarFila(fila);
 
     rowWrap.appendChild(rowLabel);
@@ -151,20 +149,35 @@ async function addEditorRow() {
 
 function _confirmEliminarFila(fila) {
   if (!confirm(`¿Eliminar la fila ${fila} completa? Esta acción no se puede deshacer.`)) return;
-  _eliminarFila(fila);
+  _eliminarFila(fila, false);
 }
 
-async function _eliminarFila(fila) {
+async function _eliminarFila(fila, forzar) {
   showLoading('Eliminando fila…');
   try {
-    await ApiAdmin.eliminarFila(EditorState.planta.id, fila);
+    await ApiAdmin.eliminarFila(EditorState.planta.id, fila, forzar);
     await refreshEditorGrid();
     toast('Fila eliminada');
   } catch (e) {
-    toast('Error: ' + (e.message || ''));
-  } finally {
     hideLoading();
+    const msg = (e && e.message) || '';
+    if (!forzar && /asientos ocupados/i.test(msg)) {
+      _confirmForzarEliminarFila(fila);
+      return;
+    }
+    toast('Error: ' + (msg || 'no se pudo eliminar la fila'));
+    return;
   }
+  hideLoading();
+}
+
+function _confirmForzarEliminarFila(fila) {
+  const ok = confirm(
+    `⚠️ La fila ${fila} tiene asientos OCUPADOS con pasajeros reservados.\n\n` +
+    `Eliminarla de todos modos va a borrar esos asientos y su vínculo con las reservas existentes. Esta acción no se puede deshacer.\n\n` +
+    `¿Forzar la eliminación igualmente?`
+  );
+  if (ok) _eliminarFila(fila, true);
 }
 
 window.goEditor = goEditor;
