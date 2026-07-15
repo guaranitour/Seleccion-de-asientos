@@ -71,6 +71,19 @@
   font-size:.62rem; color:var(--muted); text-align:center; margin-top:2px;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%;
 }
+
+/* Asiento ocupado (solo en el grid de control): número + nombre apilados
+   dentro del mismo botón, sin romper la grilla 2+2 (evita agregar
+   elementos hermanos al lado del botón, que desalineaban las columnas). */
+#grid-control .seat.ocupado{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:1px; line-height:1.1; padding:4px 2px;
+}
+.control-seat-num{ font-size:.85rem; font-weight:800; }
+.control-seat-name{
+  font-size:.62rem; font-weight:600; max-width:100%;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
 .control-move-bar{
   position:fixed; left:0; right:0; bottom:0; z-index:30; display:none;
   padding:12px calc(12px + var(--safe-right)) calc(12px + var(--safe-bottom));
