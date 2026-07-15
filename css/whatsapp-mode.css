@@ -1,0 +1,291 @@
+/* =============================================
+   MODO WHATSAPP — Staff
+   Botón flotante + barra de selección + estados
+   ============================================= */
+
+/* ── Botón flotante (FAB) ── */
+.wa-fab {
+  position: fixed;
+  bottom: calc(24px + var(--safe-bottom, 0px));
+  right: calc(16px + var(--safe-right, 0px));
+  z-index: 50;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 12px 16px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+
+  background: #25D366; /* verde WhatsApp */
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  line-height: 1;
+
+  box-shadow:
+    0 4px 14px rgba(37, 211, 102, .40),
+    0 2px 6px rgba(17, 24, 39, .12);
+
+  transition:
+    background .2s ease,
+    box-shadow .2s ease,
+    transform .15s ease,
+    opacity .2s ease,
+    max-width .3s ease;
+
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 220px;
+}
+
+.wa-fab:hover {
+  background: #1ebe5d;
+  box-shadow:
+    0 6px 20px rgba(37, 211, 102, .50),
+    0 2px 8px rgba(17, 24, 39, .14);
+  transform: translateY(-1px);
+}
+
+.wa-fab:active {
+  transform: scale(.97);
+}
+
+/* Estado activo (modo encendido) */
+.wa-fab.active {
+  background: #ef4444;
+  box-shadow:
+    0 4px 14px rgba(239, 68, 68, .38),
+    0 2px 6px rgba(17, 24, 39, .12);
+}
+
+.wa-fab.active:hover {
+  background: #dc2626;
+  box-shadow:
+    0 6px 20px rgba(239, 68, 68, .48),
+    0 2px 8px rgba(17, 24, 39, .14);
+}
+
+/* Oculto cuando no aplica (vista fuera de control) */
+.wa-fab-hidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(8px) !important;
+}
+
+.wa-fab-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.wa-fab-label {
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+/* ── Barra inferior de selección ── */
+.wa-action-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 49;
+
+  padding: 10px 16px calc(10px + var(--safe-bottom, 0px));
+
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1.5px solid rgba(37, 211, 102, .30);
+  box-shadow: 0 -6px 24px rgba(17, 24, 39, .10);
+  backdrop-filter: blur(8px);
+
+  transition: transform .25s ease, opacity .25s ease;
+}
+
+.wa-action-bar.hidden {
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wa-bar-inner {
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.wa-bar-count {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #374151;
+  flex: 1;
+}
+
+.wa-bar-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Botón Limpiar */
+.wa-btn-clear {
+  background: transparent;
+  border: 1.5px solid #e5e7eb;
+  color: #6b7280;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  min-height: 40px;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
+}
+
+.wa-btn-clear:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+/* Botón Compartir */
+.wa-btn-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  background: #25D366;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  min-height: 40px;
+  cursor: pointer;
+
+  box-shadow: 0 2px 10px rgba(37, 211, 102, .30);
+  transition: background .15s ease, box-shadow .15s ease, transform .1s ease;
+}
+
+.wa-btn-share:hover {
+  background: #1ebe5d;
+  box-shadow: 0 4px 16px rgba(37, 211, 102, .40);
+}
+
+.wa-btn-share:active {
+  transform: scale(.97);
+}
+
+.wa-btn-share:disabled {
+  background: #a7f3d0;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* ── Estados de asientos en modo WA ── */
+
+/* Asientos ocupados: indicar que son seleccionables */
+.wa-selectable {
+  cursor: pointer !important;
+  outline: 2px dashed rgba(37, 211, 102, .5) !important;
+  outline-offset: 2px;
+  transition:
+    outline-color .15s ease,
+    transform .15s ease,
+    box-shadow .15s ease !important;
+}
+
+.wa-selectable:hover {
+  outline-color: #25D366 !important;
+  transform: scale(1.03) !important;
+}
+
+/* Asiento seleccionado para compartir */
+.seat.wa-chosen {
+  background: #dcfce7 !important;
+  color: #065f46 !important;
+  outline: 2.5px solid #25D366 !important;
+  outline-offset: 2px;
+  transform: scale(1.04) !important;
+  box-shadow:
+    0 0 0 4px rgba(37, 211, 102, .18),
+    var(--shadow) !important;
+}
+
+.seat.wa-chosen .control-seat-num {
+  color: #065f46 !important;
+}
+
+.seat.wa-chosen .control-seat-name {
+  color: #047857 !important;
+}
+
+/* Pulso sutil al elegir */
+@keyframes wa-pick {
+  0%   { box-shadow: 0 0 0 0   rgba(37, 211, 102, .45), var(--shadow); }
+  60%  { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0),  var(--shadow); }
+  100% { box-shadow: 0 0 0 0   rgba(37, 211, 102, 0),   var(--shadow); }
+}
+
+.seat.wa-chosen {
+  animation: wa-pick .35s ease forwards;
+}
+
+/* ── Cuando la barra está visible, subir el FAB para que no se solapen ──
+   :has() funciona en Chrome 105+, Safari 15.4+, Firefox 121+            */
+body:has(.wa-action-bar:not(.hidden)) .wa-fab {
+  bottom: calc(80px + var(--safe-bottom, 0px));
+  transition:
+    bottom .25s ease,
+    background .2s ease,
+    box-shadow .2s ease,
+    transform .15s ease,
+    opacity .2s ease;
+}
+
+/* Fallback para browsers sin :has() — clase agregada desde JS */
+.wa-fab.bar-visible {
+  bottom: calc(80px + var(--safe-bottom, 0px));
+}
+
+/* ── Ajuste: cuando la barra WA está visible,
+   dejar espacio para que el panel de control no quede tapado ── */
+body.wa-mode-on #view-control {
+  padding-bottom: 72px;
+}
+
+/* ── En móvil muy estrecho: barra en dos filas ── */
+@media (max-width: 420px) {
+  .wa-bar-inner {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .wa-bar-count {
+    width: 100%;
+    font-size: 0.82rem;
+  }
+  .wa-bar-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .wa-btn-clear,
+  .wa-btn-share {
+    padding: 9px 14px;
+    font-size: 0.82rem;
+  }
+}
+
+/* ── Reducir motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .wa-fab,
+  .wa-action-bar,
+  .wa-selectable,
+  .seat.wa-chosen {
+    transition: none !important;
+    animation: none !important;
+  }
+}
