@@ -27,11 +27,41 @@ const Auth = {
 
   async _resolveRole(user) {
     this.user = { id: user.id, email: user.email };
-    const { data, error } = await supabase
+
+    // 1) Buscar por user_id (caso normal: ya logueó antes al menos una vez).
+    let { data, error } = await supabase
       .from('staff')
-      .select('role')
+      .select('role, user_id')
       .eq('user_id', user.id)
       .maybeSingle();
+
+    // 2) Si no hay fila por user_id, puede que el admin haya dado de alta
+    //    a la persona solo por email (todavía sin user_id). En ese caso
+    //    la buscamos por email y "reclamamos" la fila completando el
+    //    user_id, para que a partir de ahora quede vinculada a esa cuenta.
+    if (!error && !data) {
+      const byEmail = await supabase
+        .from('staff')
+        .select('role, user_id, email')
+        .eq('email', user.email)
+        .is('user_id', null)
+        .maybeSingle();
+
+      if (!byEmail.error && byEmail.data) {
+        const claim = await supabase
+          .from('staff')
+          .update({ user_id: user.id })
+          .eq('email', user.email)
+          .is('user_id', null)
+          .select('role')
+          .maybeSingle();
+
+        if (!claim.error && claim.data) {
+          data = claim.data;
+          error = null;
+        }
+      }
+    }
 
     if (error || !data) {
       this.role = null; // logueado en Google, pero no autorizado en "staff"
