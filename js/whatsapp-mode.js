@@ -13,13 +13,17 @@
   }
 
   function getFloorLabel() {
-    // ControlState está declarado con `const` en el top-level de
-    // view-control.js: eso crea un binding global pero NO una propiedad
-    // en window (a diferencia de var/function). Por eso no podemos
-    // chequear "window.ControlState" — hay que referenciar el identificador
-    // global directo, protegido con typeof por si este script se carga
-    // antes que view-control.js.
-    var etiqueta = (typeof ControlState !== 'undefined' && ControlState.planta && ControlState.planta.etiqueta) || '';
+    // Solo tiene sentido mostrar la planta si el viaje tiene más de una
+    // (mismo criterio que _renderPlantaTabs en view-control.js). En un bus
+    // convencional de una sola planta, esa planta puede llamarse "Asientos"
+    // o cualquier otra cosa que no sea "alta"/"baja" — mostrarla como si
+    // fuera información relevante confunde, porque no hay elección de
+    // planta que aclarar.
+    if (typeof ControlState === 'undefined' || !ControlState.viaje ||
+        !Array.isArray(ControlState.viaje.plantas) || ControlState.viaje.plantas.length <= 1) {
+      return null;
+    }
+    var etiqueta = (ControlState.planta && ControlState.planta.etiqueta) || '';
     var s = String(etiqueta).toLowerCase();
     if (s.indexOf('alta') >= 0) return 'Planta alta';
     if (s.indexOf('baja') >= 0) return 'Planta baja';
