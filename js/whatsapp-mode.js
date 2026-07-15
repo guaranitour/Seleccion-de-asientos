@@ -217,10 +217,15 @@
     else if (nombres.length === 2) saludo = 'Hola ' + nombres[0] + ' y ' + nombres[1] + ',';
     else saludo = 'Hola ' + nombres.slice(0, -1).join(', ') + ' y ' + nombres[nombres.length - 1] + ',';
 
+    // Antes decía "a vos y a tu dupla/duplas", que no tiene sentido: los
+    // pasajeros seleccionados SON el grupo entre sí, no hay un tercero
+    // ("tu dupla") aparte de ellos. Usamos una frase neutra que funciona
+    // igual para 1, 2 o más pasajeros sin asumir relación entre ellos.
     var intro = solo
-      ? 'te facilitamos el asiento que te corresponde'
-      : 'les facilitamos los asientos que les corresponden a vos y a tu' +
-        (entries.length === 2 ? ' dupla' : 's duplas') + ':';
+      ? 'te confirmamos tu asiento'
+      : 'les confirmamos sus asientos';
+
+    var tripPart = trip ? ' para el viaje *' + trip + '*' : ' para tu próximo viaje';
 
     var detalle = entries.map(function (e) {
       var l = '• Asiento ' + e.num + ' — ' + (e.pasajero || '(sin nombre)');
@@ -228,9 +233,7 @@
       return l;
     }).join('\n');
 
-    var msg = saludo + ' ' + intro +
-      (trip ? ' para el viaje *' + trip + '*' : '') +
-      ':\n\n' + detalle + '\n\n¡Buen viaje! 🚌';
+    var msg = saludo + ' ' + intro + tripPart + ':\n\n' + detalle + '\n\n¡Buen viaje! 🚌';
 
     if (navigator.share) {
       navigator.share({ text: msg }).catch(function () {});
