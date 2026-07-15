@@ -153,10 +153,15 @@ async function routeTo(hash) {
       return;
     }
 
-    // Nombre de viaje "plano" (ej: al volver con back del navegador)
-    const viaje = await resolveViajeByName(head);
-    if (!viaje) { backToChoose(); await loadViajes(); return; }
-    await selectViaje(viaje);
+    // Nombre de viaje "plano" — solo puede llegar aquí por una entrada de
+    // historial vieja (de antes de esta corrección) o un enlace directo.
+    // No es una vista real de la app: la intención siempre es volver a
+    // Inicio, así que redirigimos ahí en lugar de reabrir el croquis
+    // (que además reabriría el selector de planta y taparía la pantalla).
+    setHash(['Inicio']);
+    if (typeof closeFloorSheet === 'function') closeFloorSheet();
+    showView('view-choose');
+    await loadViajes();
 
   } finally {
     ROUTER_DRIVING = false;
