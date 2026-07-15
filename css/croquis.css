@@ -23,12 +23,14 @@
 .badge.inhabilitado::before, .badge.inexistente::before{ background:#9ca3af; }
 
 /* ===== Grilla (bus 2+2) ===== */
+.croquis-wrap{
+  /* Espacio de respaldo para que la barra flotante de "Reservar" (botón +
+     texto de estado) no tape la nota ni los últimos asientos; ui-helpers.js
+     lo ajusta al valor exacto en tiempo real vía syncActionBarSpacing(). */
+  padding-bottom: calc(120px + var(--safe-bottom));
+}
 .grid{
   display:flex; flex-direction:column; gap:6px;
-  /* Espacio de respaldo para que la barra flotante de "Reservar" (botón +
-     texto de estado) no tape los últimos asientos; ui-helpers.js lo ajusta
-     al valor exacto en tiempo real vía syncActionBarSpacing(). */
-  padding-bottom: calc(120px + var(--safe-bottom));
 }
 .grid[aria-busy="true"]{ pointer-events:none; opacity:.7; }
 
