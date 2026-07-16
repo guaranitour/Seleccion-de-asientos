@@ -20,8 +20,9 @@
 .trip-card:hover{ transform:translateY(-3px); box-shadow:0 14px 30px rgba(17,24,39,.14); }
 @keyframes cardIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
 
-.trip-head{ display:flex; align-items:flex-start; gap:12px; }
-.trip-head-left{ display:flex; align-items:flex-start; gap:12px; min-width:0; flex:1; }
+.trip-head{ display:flex; align-items:center; gap:12px; }
+.trip-head-left{ display:flex; align-items:center; gap:12px; min-width:0; flex:1; }
+.trip-head-right{ flex-shrink:0; display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
 
 .trip-bus-icon{
   flex-shrink:0; width:44px; height:44px; border-radius:12px;
@@ -36,7 +37,7 @@
 }
 .trip-bus-icon svg{ width:22px; height:22px; }
 
-.trip-card h3{ margin:0 0 6px; font-size:1.05rem; font-weight:800; line-height:1.25; overflow-wrap:break-word; }
+.trip-card h3{ margin:0; font-size:1.05rem; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 .trip-pill{
   display:inline-flex; flex-shrink:0; font-size:.72rem; font-weight:700; padding:4px 9px;
@@ -44,7 +45,7 @@
 }
 .trip-pill.doble{ background:#fde68a; color:#92400e; }
 
-.trip-arrow{ flex-shrink:0; color:#9ca3af; display:grid; place-items:center; align-self:center; }
+.trip-arrow{ flex-shrink:0; color:#9ca3af; display:grid; place-items:center; }
 
 .trip-countdown-wrap{ margin-top:16px; }
 .trip-countdown{
