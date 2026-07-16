@@ -30,7 +30,19 @@ body:not(.app-ready) .view{ display:none !important; }
   position:fixed; top:0; left:0; right:0; z-index:40;
   display:flex; align-items:center; justify-content:center;
   height:76px; padding:0 16px; padding-top:env(safe-area-inset-top, 0px);
+  /* El logo (heroLogo) es PNG transparente: sin un fondo propio acá, al
+     hacer scroll el contenido pasa "detrás" del logo y se mezcla con él.
+     Fondo glass (blur + semitransparente) para que tape el contenido sin
+     verse como un bloque sólido pegado arriba. */
+  background: rgba(247,249,252,.82);
+  backdrop-filter: blur(10px) saturate(1.4);
+  -webkit-backdrop-filter: blur(10px) saturate(1.4);
+  border-bottom:1px solid rgba(17,24,39,.06);
+  transition: background-color .2s ease, box-shadow .2s ease;
 }
+/* Mientras el skeleton todavía muestra su propio fondo shimmer, no hace
+   falta el glass detrás — evita un doble fondo visible en el primer paint. */
+.topbar:has(.topbar-logo.skeleton-round){ background:rgba(247,249,252,.55); }
 .topbar-logo{
   height:56px; width:auto; max-width:220px; object-fit:contain; flex-shrink:0;
 }
