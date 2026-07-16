@@ -2,6 +2,8 @@
 // ui-helpers.js — Helpers de UI compartidos por todas las vistas
 // ============================================================
 
+const STAFF_VIEW_IDS = ['view-staff-login', 'view-panel', 'view-control', 'view-editor'];
+
 function showView(id) {
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
   const el = document.getElementById(id);
@@ -10,6 +12,12 @@ function showView(id) {
   // vista real, para que nunca quede tapando la pantalla (ej. al volver
   // atrás desde el navegador estando el sheet de planta abierto).
   document.querySelectorAll('.action-sheet.show').forEach(sheet => sheet.classList.remove('show'));
+
+  // Fallback por si el navegador no soporta el selector :has() usado en
+  // panel.css para esconder el botón flotante de staff dentro de sus
+  // propias vistas (login/panel/control/editor).
+  const staffBtn = document.getElementById('staffEntryBtn');
+  if (staffBtn) staffBtn.classList.toggle('hidden', STAFF_VIEW_IDS.includes(id));
 }
 
 function toast(msg) {

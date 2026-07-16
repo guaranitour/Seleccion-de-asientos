@@ -76,7 +76,6 @@ function _buildTripCard(viaje) {
   const pillEl = document.createElement('span');
   pillEl.className = 'trip-pill' + (isDouble ? ' doble' : '');
   pillEl.textContent = isDouble ? 'Doble piso' : 'Convencional';
-  nameWrap.appendChild(pillEl);
 
   headLeft.appendChild(iconEl);
   headLeft.appendChild(nameWrap);
@@ -85,8 +84,13 @@ function _buildTripCard(viaje) {
   arrowEl.className = 'trip-arrow';
   arrowEl.innerHTML = _arrowSvg();
 
+  const headRight = document.createElement('div');
+  headRight.className = 'trip-head-right';
+  headRight.appendChild(pillEl);
+  headRight.appendChild(arrowEl);
+
   head.appendChild(headLeft);
-  head.appendChild(arrowEl);
+  head.appendChild(headRight);
   card.appendChild(head);
 
   if (viaje.start_at) {
