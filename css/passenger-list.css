@@ -50,10 +50,11 @@
 .pax-sheet-header img{ width:100%; height:100%; object-fit:contain; object-position:top left; }
 
 .pax-sheet-tripname{
-  position:absolute; left:2.4%; top:21.3%; width:60%; height:4.5%;
+  position:absolute; left:2.47%; top:21.3%; width:95%; height:4.5%;
   font-size:1.75cqw; font-weight:700; color:#3b5998; letter-spacing:.01em;
   font-family: system-ui, -apple-system, sans-serif;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  text-align:center;
 }
 
 /* ===== Tabla (dibujada en CSS puro sobre las coordenadas medidas) ===== */
@@ -81,28 +82,30 @@
 }
 .pax-row:first-child{ border-top:1.5px solid #111; }
 .pax-row .pax-col{
-  display:flex; align-items:center; border-right:1.5px solid #111;
+  display:flex; align-items:center; justify-content:center; border-right:1.5px solid #111;
   font-size:1.35cqw; color:#111; padding:0 6px; overflow:hidden;
   white-space:nowrap; text-overflow:ellipsis; box-sizing:border-box;
+  text-align:center;
 }
 .pax-row .pax-col:first-child{ border-left:1.5px solid #111; }
 
-/* Anchos de columna — proporción exacta de la plantilla original */
+/* Anchos de columna — proporción de la plantilla original, sin la
+   última sub-columna en blanco (sub2) que no tenía propósito visible;
+   su ancho se redistribuyó a nombre/documento, las columnas más útiles. */
 .pax-col-num{      width:4.31%;  justify-content:center; font-weight:700; }
-.pax-col-doc{      width:13.73%; }
-.pax-col-nombre{   width:27.45%; }
+.pax-col-doc{      width:18.02%; }
+.pax-col-nombre{   width:37.47%; }
 .pax-col-abonado{  width:10.31%; }
-.pax-col-porabonar{width:11.61%; font-size:1.1cqw; text-align:center; justify-content:center; }
+.pax-col-porabonar{width:11.61%; font-size:1.1cqw; }
 .pax-col-sub1{      width:13.25%; }
-.pax-col-sub2{      width:14.31%; }
 
 .pax-row.empty .pax-col-doc,
 .pax-row.empty .pax-col-nombre{ color:#c9ced6; font-style:italic; }
 
 .pax-sheet-footer{
-  position:absolute; left:0; bottom:0; width:100%; height:8.29%;
+  position:absolute; left:0; top:84.31%; width:100%; height:9.57%;
 }
-.pax-sheet-footer img{ width:100%; height:100%; object-fit:cover; object-position:bottom; }
+.pax-sheet-footer img{ width:100%; height:100%; object-fit:fill; }
 
 /* Pequeño indicador de hoja (no forma parte de la plantilla, se recorta
    antes de exportar — ver JS) */
