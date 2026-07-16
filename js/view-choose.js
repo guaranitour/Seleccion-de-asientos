@@ -35,6 +35,7 @@ async function loadViajes() {
     if (!viajes.length) {
       list.innerHTML = `
         <div class="empty-state">
+          <div class="empty-state-icon" aria-hidden="true">${_busSvg()}</div>
           <h3>No hay viajes disponibles en este momento</h3>
           <p>Nos estaremos viendo próximamente en nuevos destinos 🌍</p>
         </div>`;
@@ -72,19 +73,19 @@ function _buildTripCard(viaje) {
   nameEl.textContent = viaje.nombre;
   nameWrap.appendChild(nameEl);
 
-  headLeft.appendChild(iconEl);
-  headLeft.appendChild(nameWrap);
-
   const pillEl = document.createElement('span');
   pillEl.className = 'trip-pill' + (isDouble ? ' doble' : '');
   pillEl.textContent = isDouble ? 'Doble piso' : 'Convencional';
+  nameWrap.appendChild(pillEl);
+
+  headLeft.appendChild(iconEl);
+  headLeft.appendChild(nameWrap);
 
   const arrowEl = document.createElement('div');
   arrowEl.className = 'trip-arrow';
   arrowEl.innerHTML = _arrowSvg();
 
   head.appendChild(headLeft);
-  head.appendChild(pillEl);
   head.appendChild(arrowEl);
   card.appendChild(head);
 
