@@ -9,18 +9,24 @@
   border:1.5px solid rgba(17,24,39,.06); box-shadow:0 1px 6px rgba(17,24,39,.05);
 }
 .badge{
-  display:inline-flex; align-items:center; gap:6px; border-radius:999px;
-  padding:5px 11px; font-size:.78rem; font-weight:700; letter-spacing:.01em;
+  display:inline-flex; align-items:center; gap:7px; border-radius:999px;
+  padding:5px 11px 5px 6px; font-size:.78rem; font-weight:700; letter-spacing:.01em;
 }
-.badge::before{ content:""; width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+/* El indicador ahora es un mini-asiento con el mismo gradiente/borde que
+   .seat en la grilla real, para que el mapeo leyenda→croquis sea directo
+   en vez de depender de recordar qué color de punto es cuál. */
+.badge::before{
+  content:""; width:14px; height:14px; border-radius:4px; flex-shrink:0;
+  box-shadow:0 1px 2px rgba(17,24,39,.12);
+}
 .badge.libre{ background:#d1fae5; color:#065f46; }
-.badge.libre::before{ background:#10b981; }
+.badge.libre::before{ background: linear-gradient(145deg, #ecfdf5, #a7f3d0); border:1.5px solid rgba(16,185,129,.35); }
 .badge.ocupado{ background:#fee2e2; color:#7f1d1d; }
-.badge.ocupado::before{ background:#ef4444; }
+.badge.ocupado::before{ background: linear-gradient(145deg, #fff1f2, #fda4af); border:1.5px solid rgba(239,68,68,.35); }
 .badge.seleccionado{ background:#dbeafe; color:#1e40af; }
-.badge.seleccionado::before{ background:#3b82f6; }
+.badge.seleccionado::before{ background: linear-gradient(145deg, #eff6ff, #93c5fd); border:1.5px solid rgba(59,130,246,.4); }
 .badge.inexistente, .badge.inhabilitado{ background:#f3f4f6; color:#6b7280; }
-.badge.inhabilitado::before, .badge.inexistente::before{ background:#9ca3af; }
+.badge.inhabilitado::before, .badge.inexistente::before{ background:#f3f4f6; border:1.5px solid #d1d5db; }
 
 /* ===== Grilla (bus 2+2) ===== */
 .croquis-wrap{
@@ -29,6 +35,29 @@
      lo ajusta al valor exacto en tiempo real vía syncActionBarSpacing(). */
   padding-bottom: calc(120px + var(--safe-bottom));
 }
+
+/* Carrocería: enmarca la grilla para que se lea como "interior de un bus"
+   en vez de una grilla de botones suelta. El frente (parabrisas + volante)
+   da orientación espacial inmediata: acá arriba está el conductor. */
+.bus-body{
+  background: linear-gradient(180deg, #fbfcfe 0%, var(--card) 60px, var(--card) 100%);
+  border:1.5px solid rgba(17,24,39,.07);
+  border-radius:22px;
+  padding:14px 12px 16px;
+  box-shadow:0 1px 6px rgba(17,24,39,.05);
+}
+.bus-front{
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  padding-bottom:12px; margin-bottom:12px;
+  border-bottom:1.5px dashed rgba(17,24,39,.09);
+  color:#9ca3af;
+}
+.bus-front svg{ width:22px; height:22px; }
+.bus-front-label{
+  font-size:.72rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+  color:#9ca3af;
+}
+
 .grid{
   display:flex; flex-direction:column; gap:6px;
 }
@@ -36,7 +65,13 @@
 
 .row{ display:grid; grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr); gap:6px; align-items:center; width:100%; }
 .block{ display:grid; grid-template-columns:repeat(2, 1fr); gap:6px; }
-.aisle{ width:14px; }
+/* El pasillo se dibuja como espacio real (línea sutil) en vez de solo un
+   gap invisible entre bloques — refuerza la lectura 2+2 del bus. */
+.aisle{
+  width:14px; align-self:stretch;
+  background: linear-gradient(180deg, transparent, rgba(17,24,39,.05) 15%, rgba(17,24,39,.05) 85%, transparent);
+  border-radius:2px;
+}
 
 .seat{
   border:none; border-radius:12px; padding:0; font-weight:800; font-size:1rem;
@@ -63,6 +98,20 @@
   background: linear-gradient(145deg, #eff6ff, #bfdbfe);
   color:#1d4ed8; border:1.5px solid rgba(59,130,246,.3);
   transform:scale(1.03); box-shadow:0 3px 14px rgba(59,130,246,.2);
+}
+/* Icono de estado además del color: no depender solo del rojo/verde para
+   distinguir libre/ocupado/seleccionado (daltonismo, sol directo en
+   pantalla). El número se corre para dejarle lugar al ícono. */
+.seat.ocupado, .seat.seleccionado{ gap:3px; }
+.seat.ocupado::before, .seat.seleccionado::before{
+  content:""; width:12px; height:12px; flex-shrink:0;
+  background-repeat:no-repeat; background-position:center; background-size:contain;
+}
+.seat.ocupado::before{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239f1239' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='9' rx='2'/%3E%3Cpath d='M8 11V7a4 4 0 0 1 8 0v4'/%3E%3C/svg%3E");
+}
+.seat.seleccionado::before{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231d4ed8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E");
 }
 .seat.inhabilitado, .seat.inexistente{
   background:#f9fafb; color:#c9ced6; border:1.5px solid #f3f4f6;
