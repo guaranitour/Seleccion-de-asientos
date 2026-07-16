@@ -12,6 +12,12 @@ const PaxListState = {
 };
 
 const PAX_ROWS_PER_SHEET = 30;
+// Ancho fijo (px) del contenedor offscreen usado para exportar cada hoja.
+// 8.5in @150dpi. Con container queries (cqw en passenger-list.css), el
+// tamaño de fuente se calcula contra ESTE ancho real sin importar cuán
+// angosto sea el viewport del dispositivo — antes usaba vw (relativo al
+// viewport), lo que producía texto ilegible al exportar desde mobile.
+const PAX_EXPORT_WIDTH_PX = 1275;
 
 async function goPassengerList(viaje) {
   if (!Auth.isAuthorized()) { goStaffLogin(); return; }
@@ -196,7 +202,7 @@ async function _exportSheetIndex(index) {
     // alta resolución (no el tamaño responsive de la preview), para que
     // el PNG exportado tenga buena nitidez sin importar el viewport.
     const offscreen = document.createElement('div');
-    offscreen.style.cssText = 'position:fixed; left:-99999px; top:0; width:1275px;'; // 8.5in @150dpi
+    offscreen.style.cssText = `position:fixed; left:-99999px; top:0; width:${PAX_EXPORT_WIDTH_PX}px;`;
     const sheetEl = _buildSheetEl(sheet, index, total);
     sheetEl.id = 'paxSheetExport-' + index;
     offscreen.appendChild(sheetEl);
