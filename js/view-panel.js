@@ -2,6 +2,9 @@
 // view-panel.js — Panel principal staff/admin: lista de viajes
 // ============================================================
 
+let _panelViajesCache = [];
+let _panelShowArchived = false;
+
 async function goPanel() {
   if (!Auth.isAuthorized()) { goStaffLogin(); return; }
 
@@ -11,6 +14,7 @@ async function goPanel() {
   const createBtn = document.getElementById('btnCreateTrip');
   if (createBtn) createBtn.style.display = Auth.isAdmin() ? 'inline-flex' : 'none';
 
+  _panelShowArchived = false; // el panel siempre arranca mostrando solo activos
   await loadPanelViajes();
   setHash(['Panel']);
 }
@@ -18,31 +22,77 @@ async function goPanel() {
 async function loadPanelViajes() {
   showLoading('Cargando viajes…');
   try {
-    const viajes = await ApiAdmin.getAllViajes();
-    const list = document.getElementById('panelTripList');
-    list.innerHTML = '';
-
-    _renderPanelStats(viajes);
-
-    if (!viajes.length) {
-      list.innerHTML = `
-        <div class="empty-state">
-          <div class="empty-state-icon">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6M16 6v6M2 12h20M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><path d="M2 12V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4"/></svg>
-          </div>
-          <h3>No hay viajes cargados</h3>
-          <p>Todavía no se creó ningún viaje.</p>
-        </div>`;
-      return;
-    }
-
-    viajes.forEach(v => list.appendChild(_buildPanelTripCard(v)));
+    _panelViajesCache = await ApiAdmin.getAllViajes();
+    _renderPanelStats(_panelViajesCache);
+    _renderPanelTripList();
   } catch (e) {
     console.error(e);
     toast('Error al cargar viajes del panel');
   } finally {
     hideLoading();
   }
+}
+
+function togglePanelArchivedView() {
+  _panelShowArchived = !_panelShowArchived;
+  _renderPanelTripList();
+}
+
+function _renderPanelTripList() {
+  const list = document.getElementById('panelTripList');
+  list.innerHTML = '';
+
+  const activos = _panelViajesCache.filter(v => v.activo);
+  const archivados = _panelViajesCache.filter(v => !v.activo);
+
+  _renderArchivedToggle(archivados.length);
+
+  if (!_panelViajesCache.length) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6M16 6v6M2 12h20M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><path d="M2 12V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4"/></svg>
+        </div>
+        <h3>No hay viajes cargados</h3>
+        <p>Todavía no se creó ningún viaje.</p>
+      </div>`;
+    return;
+  }
+
+  if (!activos.length && !_panelShowArchived) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6M16 6v6M2 12h20M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><path d="M2 12V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4"/></svg>
+        </div>
+        <h3>No hay viajes activos</h3>
+        <p>Todos los viajes están archivados. Tocá "Ver archivados" para verlos.</p>
+      </div>`;
+    return;
+  }
+
+  activos.forEach(v => list.appendChild(_buildPanelTripCard(v)));
+
+  if (_panelShowArchived && archivados.length) {
+    const sep = document.createElement('div');
+    sep.className = 'panel-section-sep';
+    sep.innerHTML = `<span>Archivados</span>`;
+    list.appendChild(sep);
+    archivados.forEach(v => list.appendChild(_buildPanelTripCard(v)));
+  }
+}
+
+function _renderArchivedToggle(archivedCount) {
+  const box = document.getElementById('panelArchivedToggle');
+  if (!box) return;
+
+  if (!archivedCount) { box.innerHTML = ''; return; }
+
+  box.innerHTML = `
+    <button class="panel-archived-chip ${_panelShowArchived ? 'active' : ''}" onclick="togglePanelArchivedView()" type="button">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+      ${_panelShowArchived ? 'Ocultar archivados' : 'Ver archivados'} (${archivedCount})
+    </button>`;
 }
 
 function _renderPanelStats(viajes) {
@@ -193,6 +243,7 @@ async function submitCreateTrip(ev) {
 window.goPanel = goPanel;
 window.loadPanelViajes = loadPanelViajes;
 window.togglePanelViaje = togglePanelViaje;
+window.togglePanelArchivedView = togglePanelArchivedView;
 window.openCreateTripForm = openCreateTripForm;
 window.updateTripRowsHint = updateTripRowsHint;
 window.submitCreateTrip = submitCreateTrip;
