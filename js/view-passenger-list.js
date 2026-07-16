@@ -1,6 +1,6 @@
 // ============================================================
 // view-passenger-list.js — Lista de pasajeros exportable (panel admin)
-// Replica el diseño de la plantilla Word oficial. Pagina de a 30
+// Replica el diseño de la plantilla Word oficial. Pagina de a 35
 // filas por hoja; si un viaje tiene más de una planta, la numeración
 // de filas continúa entre plantas (no reinicia).
 // ============================================================
@@ -11,7 +11,7 @@ const PaxListState = {
   activeSheet: 0
 };
 
-const PAX_ROWS_PER_SHEET = 30;
+const PAX_ROWS_PER_SHEET = 35;
 // Ancho fijo (px) del contenedor offscreen usado para exportar cada hoja.
 // 8.5in @150dpi. Con container queries (cqw en passenger-list.css), el
 // tamaño de fuente se calcula contra ESTE ancho real sin importar cuán
@@ -44,7 +44,7 @@ async function goPassengerList(viaje) {
 }
 
 /** Trae los asientos ocupados de TODAS las plantas del viaje (en orden),
- *  arma una lista continua de pasajeros y la pagina de a 30. */
+ *  arma una lista continua de pasajeros y la pagina de a 35. */
 async function _loadAllPassengers() {
   const viaje = PaxListState.viaje;
   const plantas = Array.isArray(viaje.plantas) ? viaje.plantas : [];
@@ -210,7 +210,22 @@ async function _exportSheetIndex(index) {
     // de capturar, si no el PNG sale con esos huecos en blanco.
     await _waitForImages(sheetEl);
 
-    const canvas = await html2canvas(sheetEl, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+    const canvas = await html2canvas(sheetEl, {
+      scale: 2,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      // Sin esto, html2canvas usa el viewport real del navegador (angosto
+      // en mobile) para decidir qué se ve y qué queda "fuera de pantalla",
+      // aunque el elemento offscreen mida PAX_EXPORT_WIDTH_PX de ancho real
+      // — por eso la última columna se cortaba en el PNG exportado desde
+      // el celular. windowWidth/width le dicen explícitamente el tamaño
+      // real a capturar, ignorando el viewport del dispositivo.
+      width: sheetEl.offsetWidth,
+      height: sheetEl.offsetHeight,
+      windowWidth: PAX_EXPORT_WIDTH_PX,
+      x: 0,
+      y: 0
+    });
     document.body.removeChild(offscreen);
 
     const viajeSlug = (PaxListState.viaje.nombre || 'viaje').trim().replace(/[^\p{L}\p{N}]+/gu, '-').toLowerCase();
