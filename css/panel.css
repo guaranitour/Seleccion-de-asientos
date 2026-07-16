@@ -83,6 +83,24 @@ main:has(#view-passenger-list.active) ~ .staff-entry{
 
 .panel-create-btn{ width:100%; justify-content:center; }
 
+/* ===== Toggle "Ver archivados" ===== */
+#panelArchivedToggle{ margin-bottom:12px; }
+.panel-archived-chip{
+  display:inline-flex; align-items:center; gap:7px; background:#fff; border:1.5px solid #e5e7eb;
+  border-radius:999px; padding:7px 13px; font-size:.78rem; font-weight:700; color:var(--muted);
+  cursor:pointer; transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.panel-archived-chip:hover{ border-color:#d1d5db; color:var(--text); }
+.panel-archived-chip.active{ background:#111827; border-color:#111827; color:#fff; }
+
+.panel-section-sep{
+  display:flex; align-items:center; gap:10px; margin:18px 0 10px; color:var(--muted);
+  font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em;
+}
+.panel-section-sep::before, .panel-section-sep::after{
+  content:""; flex:1; height:1px; background:#e5e7eb;
+}
+
 /* ===== Tarjeta de viaje ===== */
 .panel-trip-card{
   background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
