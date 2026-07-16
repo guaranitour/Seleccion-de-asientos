@@ -177,6 +177,62 @@
   color: #c4c9d4;
 }
 
+/* Autocomplete de pasajeros (solo staff logueado) */
+.reserve-autocomplete-wrap {
+  position: relative;
+}
+
+.reserve-autocomplete-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(17,24,39,.12);
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.reserve-autocomplete-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 10px;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.reserve-autocomplete-item:hover,
+.reserve-autocomplete-item.active {
+  background: #eff6ff;
+}
+
+.reserve-autocomplete-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reserve-autocomplete-ci {
+  font-size: 0.78rem;
+  color: var(--muted);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Acciones del formulario */
 .reserve-actions {
   display: flex;
