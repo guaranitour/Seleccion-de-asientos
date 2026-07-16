@@ -59,7 +59,7 @@
 
 /* ===== Tabla (dibujada en CSS puro sobre las coordenadas medidas) ===== */
 .pax-table-header{
-  position:absolute; left:2.47%; top:26.5%; width:95%; height:2.36%;
+  position:absolute; left:2.47%; top:26.5%; width:90%; height:2.36%;
   display:flex; border-top:1.5px solid #111; border-bottom:1.5px solid #111;
   box-sizing:border-box;
 }
@@ -72,7 +72,7 @@
 .pax-table-header .pax-col:first-child{ border-left:1.5px solid #111; }
 
 .pax-table-body{
-  position:absolute; left:2.47%; top:28.86%; width:95%; height:52.83%;
+  position:absolute; left:2.47%; top:28.86%; width:90%; height:52.83%;
 }
 .pax-row{
   position:relative; width:100%; height:2.8571%;
@@ -90,11 +90,15 @@
 .pax-row .pax-col:first-child{ border-left:1.5px solid #111; }
 
 /* Anchos de columna — proporción de la plantilla original, sin la
-   última sub-columna en blanco (sub2) que no tenía propósito visible;
-   su ancho se redistribuyó a nombre/documento, las columnas más útiles. */
+   última sub-columna en blanco (sub2) que no tenía propósito visible.
+   Documento se achicó (pedido explícito) y el ancho total de la tabla
+   se redujo de 95% a 90% de la hoja, dejando más margen de seguridad a
+   la derecha: algunos navegadores mobile recortan un poco el borde del
+   canvas exportado, y así la última columna (sub1) queda con margen de
+   sobra en vez de justo al límite. */
 .pax-col-num{      width:4.31%;  justify-content:center; font-weight:700; }
-.pax-col-doc{      width:18.02%; }
-.pax-col-nombre{   width:37.47%; }
+.pax-col-doc{      width:14%; }
+.pax-col-nombre{   width:41.49%; }
 .pax-col-abonado{  width:10.31%; }
 .pax-col-porabonar{width:11.61%; font-size:1.1cqw; }
 .pax-col-sub1{      width:13.25%; }
