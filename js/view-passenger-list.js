@@ -196,37 +196,54 @@ async function _exportSheetIndex(index) {
 
   showLoading(`Generando imagen ${index + 1}/${total}…`);
   try {
-    // Renderizamos la hoja pedida fuera de pantalla a tamaño fijo de
-    // alta resolución (no el tamaño responsive de la preview), para que
-    // el PNG exportado tenga buena nitidez sin importar el viewport.
+    // Renderizamos la hoja pedida a tamaño fijo de alta resolución (no
+    // el tamaño responsive de la preview), para que el PNG exportado
+    // tenga buena nitidez sin importar el viewport del dispositivo.
+    //
+    // Importante: NO usamos coordenadas negativas (left:-99999px) para
+    // ocultarlo. html2canvas recorta cualquier contenido que quede fuera
+    // de los límites reales del documento (ver github.com/niklasvh/
+    // html2canvas/issues/117) — eso es lo que cortaba la última columna
+    // en mobile. En su lugar lo dejamos en el flujo normal (top:0/left:0)
+    // pero invisible e inerte, así queda "dentro de la página" para que
+    // html2canvas lo capture completo, sin que el usuario lo vea ni
+    // pueda tocarlo.
     const offscreen = document.createElement('div');
-    offscreen.style.cssText = `position:fixed; left:-99999px; top:0; width:${PAX_EXPORT_WIDTH_PX}px;`;
+    offscreen.style.cssText = `position:absolute; left:0; top:0; width:${PAX_EXPORT_WIDTH_PX}px; opacity:0; z-index:-1; pointer-events:none;`;
     const sheetEl = _buildSheetEl(sheet, index, total);
     sheetEl.id = 'paxSheetExport-' + index;
     offscreen.appendChild(sheetEl);
+
+    // Al estar en el flujo normal del documento (no en coordenadas
+    // negativas), el elemento de 1275px puede ensanchar/alargar el body
+    // mientras se captura. Bloqueamos el scroll del body para que el
+    // usuario no vea un salto ni una barra de scroll gigante momentánea.
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     document.body.appendChild(offscreen);
 
-    // Esperar a que las imágenes de fondo (header/footer) carguen antes
-    // de capturar, si no el PNG sale con esos huecos en blanco.
-    await _waitForImages(sheetEl);
+    let canvas;
+    try {
+      // Esperar a que las imágenes de fondo (header/footer) carguen antes
+      // de capturar, si no el PNG sale con esos huecos en blanco.
+      await _waitForImages(sheetEl);
 
-    const canvas = await html2canvas(sheetEl, {
-      scale: 2,
-      backgroundColor: '#ffffff',
-      useCORS: true,
-      // Sin esto, html2canvas usa el viewport real del navegador (angosto
-      // en mobile) para decidir qué se ve y qué queda "fuera de pantalla",
-      // aunque el elemento offscreen mida PAX_EXPORT_WIDTH_PX de ancho real
-      // — por eso la última columna se cortaba en el PNG exportado desde
-      // el celular. windowWidth/width le dicen explícitamente el tamaño
-      // real a capturar, ignorando el viewport del dispositivo.
-      width: sheetEl.offsetWidth,
-      height: sheetEl.offsetHeight,
-      windowWidth: PAX_EXPORT_WIDTH_PX,
-      x: 0,
-      y: 0
-    });
-    document.body.removeChild(offscreen);
+      canvas = await html2canvas(sheetEl, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        width: sheetEl.offsetWidth,
+        height: sheetEl.offsetHeight,
+        windowWidth: PAX_EXPORT_WIDTH_PX,
+        x: 0,
+        y: 0
+      });
+    } finally {
+      // Pase lo que pase con la captura, nunca dejamos el elemento
+      // temporal en el DOM ni el scroll del body bloqueado.
+      document.body.removeChild(offscreen);
+      document.body.style.overflow = prevOverflow;
+    }
 
     const viajeSlug = (PaxListState.viaje.nombre || 'viaje').trim().replace(/[^\p{L}\p{N}]+/gu, '-').toLowerCase();
     const fileName = total > 1
