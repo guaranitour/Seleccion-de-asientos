@@ -60,6 +60,12 @@ function _buildPanelTripCard(viaje) {
   controlBtn.onclick = () => goControl(viaje);
   actions.appendChild(controlBtn);
 
+  const paxBtn = document.createElement('button');
+  paxBtn.className = 'btn ghost';
+  paxBtn.textContent = 'Lista de pasajeros';
+  paxBtn.onclick = () => goPassengerList(viaje);
+  actions.appendChild(paxBtn);
+
   if (Auth.isAdmin()) {
     const editBtn = document.createElement('button');
     editBtn.className = 'btn ghost';

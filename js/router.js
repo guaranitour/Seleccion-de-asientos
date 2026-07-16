@@ -149,6 +149,11 @@ async function routeTo(hash) {
         const viaje = viajes.find(v => v.nombre === segs[2]);
         if (viaje) { await goEditor(viaje); return; }
       }
+      if (sub === 'lista' && segs[2]) {
+        const viajes = await ApiAdmin.getAllViajes();
+        const viaje = viajes.find(v => v.nombre === segs[2]);
+        if (viaje) { await goPassengerList(viaje); return; }
+      }
       await goPanel();
       return;
     }
