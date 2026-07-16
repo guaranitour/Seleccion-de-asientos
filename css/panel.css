@@ -20,7 +20,8 @@
 main:has(#view-staff-login.active) ~ .staff-entry,
 main:has(#view-panel.active) ~ .staff-entry,
 main:has(#view-control.active) ~ .staff-entry,
-main:has(#view-editor.active) ~ .staff-entry{
+main:has(#view-editor.active) ~ .staff-entry,
+main:has(#view-passenger-list.active) ~ .staff-entry{
   opacity:0; transform:translateY(8px); pointer-events:none;
 }
 

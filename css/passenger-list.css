@@ -1,0 +1,114 @@
+/* ============================================================
+   passenger-list.css — Lista de pasajeros (panel admin)
+   Replica pixel-perfect de la plantilla Word original.
+   Coordenadas medidas directamente sobre el render de la
+   plantilla (hoja Legal 8.5in x 14in, @300dpi = 2550x4200px)
+   y expresadas como fracción de página para escalar sin perder
+   precisión sin importar el tamaño final de exportación.
+   ============================================================ */
+
+/* ===== Navegación / selector de viaje-planta ===== */
+.pax-toolbar{
+  display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:16px;
+}
+.pax-toolbar select{
+  border:1px solid #e5e7eb; border-radius:10px; padding:10px 12px;
+  font-size:.92rem; background:#fff; color:var(--text); min-height:44px;
+}
+.pax-meta{
+  font-size:.85rem; color:var(--muted); margin-bottom:16px;
+}
+.pax-sheets-nav{
+  display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;
+}
+.pax-sheets-nav button{
+  border:1px solid #e5e7eb; background:#fff; border-radius:10px;
+  padding:8px 14px; font-weight:700; font-size:.85rem; cursor:pointer; color:var(--muted);
+}
+.pax-sheets-nav button.active{ background:var(--primary); color:#fff; border-color:var(--primary); }
+
+/* ===== Contenedor de vista previa (escala la hoja al ancho disponible) ===== */
+.pax-preview-wrap{
+  max-width:520px; margin:0 auto 18px; overflow:auto;
+  border-radius:14px; box-shadow:var(--shadow); background:#e5e7eb;
+  padding:14px;
+}
+
+/* La hoja: proporción fija Legal 8.5x14in. Todo el contenido interno
+   se posiciona en % (derivados de fracciones de página medidas sobre
+   la plantilla real), así que escala sin distorsión a cualquier ancho. */
+.pax-sheet{
+  position:relative; width:100%; aspect-ratio: 8.5 / 14;
+  background:#fff; overflow:hidden;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.pax-sheet-header{
+  position:absolute; left:0; top:0; width:100%; height:26.5%;
+}
+.pax-sheet-header img{ width:100%; height:100%; object-fit:contain; object-position:top left; }
+
+.pax-sheet-tripname{
+  position:absolute; left:2.4%; top:21.3%; width:60%; height:4.5%;
+  font-size:1.75vw; font-weight:700; color:#3b5998; letter-spacing:.01em;
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+/* ===== Tabla (dibujada en CSS puro sobre las coordenadas medidas) ===== */
+.pax-table-header{
+  position:absolute; left:2.47%; top:26.5%; width:95%; height:2.36%;
+  display:flex; border-top:1.5px solid #111; border-bottom:1.5px solid #111;
+}
+.pax-table-header .pax-col{
+  display:flex; align-items:center; justify-content:center; text-align:center;
+  font-weight:700; font-size:1.35vw; color:#111; line-height:1.05;
+  border-right:1.5px solid #111; font-family: system-ui, -apple-system, sans-serif;
+  padding:0 2px;
+}
+.pax-table-header .pax-col:first-child{ border-left:1.5px solid #111; }
+
+.pax-table-body{
+  position:absolute; left:2.47%; top:28.86%; width:95%; height:52.83%;
+}
+.pax-row{
+  position:relative; width:100%; height:5.867%;
+  display:flex; border-bottom:1.5px solid #111;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+.pax-row:first-child{ border-top:1.5px solid #111; }
+.pax-row .pax-col{
+  display:flex; align-items:center; border-right:1.5px solid #111;
+  font-size:1.35vw; color:#111; padding:0 6px; overflow:hidden;
+  white-space:nowrap; text-overflow:ellipsis;
+}
+.pax-row .pax-col:first-child{ border-left:1.5px solid #111; }
+
+/* Anchos de columna — proporción exacta de la plantilla original */
+.pax-col-num{      width:4.31%;  justify-content:center; font-weight:700; }
+.pax-col-doc{      width:13.73%; }
+.pax-col-nombre{   width:27.45%; }
+.pax-col-abonado{  width:10.31%; }
+.pax-col-porabonar{width:11.61%; font-size:1.1vw; text-align:center; justify-content:center; }
+.pax-col-sub1{      width:13.25%; }
+.pax-col-sub2{      width:14.31%; }
+
+.pax-row.empty .pax-col-doc,
+.pax-row.empty .pax-col-nombre{ color:#c9ced6; font-style:italic; }
+
+.pax-sheet-footer{
+  position:absolute; left:0; bottom:0; width:100%; height:8.29%;
+}
+.pax-sheet-footer img{ width:100%; height:100%; object-fit:cover; object-position:bottom; }
+
+/* Pequeño indicador de hoja (no forma parte de la plantilla, se recorta
+   antes de exportar — ver JS) */
+.pax-sheet-pageflag{
+  position:absolute; right:2.4%; top:22%; font-size:1.4vw; font-weight:700;
+  color:#9ca3af; font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* ===== Acciones ===== */
+.pax-actions{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:20px; }
+
+@media (prefers-reduced-motion: reduce){ .pax-sheet *{ transition:none !important; } }
