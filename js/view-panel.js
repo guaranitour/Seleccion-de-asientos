@@ -9,7 +9,7 @@ async function goPanel() {
   document.getElementById('panelRoleBadge').textContent = Auth.isAdmin() ? 'Admin' : 'Staff';
 
   const createBtn = document.getElementById('btnCreateTrip');
-  if (createBtn) createBtn.style.display = Auth.isAdmin() ? '' : 'none';
+  if (createBtn) createBtn.style.display = Auth.isAdmin() ? 'inline-flex' : 'none';
 
   await loadPanelViajes();
   setHash(['Panel']);
@@ -22,8 +22,17 @@ async function loadPanelViajes() {
     const list = document.getElementById('panelTripList');
     list.innerHTML = '';
 
+    _renderPanelStats(viajes);
+
     if (!viajes.length) {
-      list.innerHTML = '<div class="empty-state"><p>No hay viajes cargados todavía.</p></div>';
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6M16 6v6M2 12h20M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><path d="M2 12V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4"/></svg>
+          </div>
+          <h3>No hay viajes cargados</h3>
+          <p>Todavía no se creó ningún viaje.</p>
+        </div>`;
       return;
     }
 
@@ -36,17 +45,53 @@ async function loadPanelViajes() {
   }
 }
 
+function _renderPanelStats(viajes) {
+  const box = document.getElementById('panelStats');
+  if (!box) return;
+
+  const activos = viajes.filter(v => v.activo).length;
+  const dobles = viajes.filter(v => v.tipo === 'doble_piso' && v.activo).length;
+
+  box.innerHTML = `
+    <div class="panel-stat accent">
+      <span class="panel-stat-value">${activos}</span>
+      <span class="panel-stat-label">Viajes activos</span>
+    </div>
+    <div class="panel-stat">
+      <span class="panel-stat-value">${viajes.length}</span>
+      <span class="panel-stat-label">Total viajes</span>
+    </div>
+    <div class="panel-stat">
+      <span class="panel-stat-value">${dobles}</span>
+      <span class="panel-stat-label">Doble piso activos</span>
+    </div>`;
+}
+
 function _buildPanelTripCard(viaje) {
   const card = document.createElement('div');
-  card.className = 'panel-trip-card' + (viaje.activo ? '' : ' inactive');
+  const esDoble = viaje.tipo === 'doble_piso';
+  card.className = 'panel-trip-card' + (esDoble ? ' doble-piso' : '') + (viaje.activo ? '' : ' inactive');
 
   const plantasLabel = viaje.plantas.map(p => p.etiqueta).join(' / ');
+  const fechaLabel = viaje.start_at
+    ? new Date(viaje.start_at).toLocaleString('es-PY', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+    : null;
+
+  const busIconPaths = esDoble
+    ? '<path d="M4 17h1a2 2 0 0 0 4 0h6a2 2 0 0 0 4 0h1"/><path d="M4 17V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v11"/><path d="M4 11h16"/>'
+    : '<path d="M4 17h1a2 2 0 0 0 4 0h6a2 2 0 0 0 4 0h1"/><path d="M18 17H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h9l3 5v5a2 2 0 0 1-2 2Z"/>';
 
   card.innerHTML = `
     <div class="panel-trip-head">
-      <div>
+      <div class="panel-trip-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${busIconPaths}</svg>
+      </div>
+      <div class="panel-trip-info">
         <div class="panel-trip-name">${viaje.nombre}</div>
-        <div class="panel-trip-meta">${viaje.tipo === 'doble_piso' ? 'Doble piso' : 'Convencional'} — ${plantasLabel}</div>
+        <div class="panel-trip-meta">
+          <span>${esDoble ? 'Doble piso' : 'Convencional'} — ${plantasLabel}</span>
+          ${fechaLabel ? `<span class="dot-sep">${fechaLabel}</span>` : ''}
+        </div>
       </div>
       <span class="panel-trip-status ${viaje.activo ? 'active' : 'inactive'}">${viaje.activo ? 'Activo' : 'Archivado'}</span>
     </div>
@@ -54,28 +99,37 @@ function _buildPanelTripCard(viaje) {
 
   const actions = card.querySelector('.panel-trip-actions');
 
+  // Acción principal: la más usada día a día, con presencia visual propia.
   const controlBtn = document.createElement('button');
-  controlBtn.className = 'btn ghost';
-  controlBtn.textContent = 'Ver ocupación';
+  controlBtn.className = 'btn primary btn-icon btn-primary-action';
+  controlBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Ver ocupación';
   controlBtn.onclick = () => goControl(viaje);
   actions.appendChild(controlBtn);
 
   const paxBtn = document.createElement('button');
-  paxBtn.className = 'btn ghost';
-  paxBtn.textContent = 'Lista de pasajeros';
+  paxBtn.className = 'btn ghost icon-only';
+  paxBtn.title = 'Lista de pasajeros';
+  paxBtn.setAttribute('aria-label', 'Lista de pasajeros');
+  paxBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
   paxBtn.onclick = () => goPassengerList(viaje);
   actions.appendChild(paxBtn);
 
   if (Auth.isAdmin()) {
     const editBtn = document.createElement('button');
-    editBtn.className = 'btn ghost';
-    editBtn.textContent = 'Editar estructura';
+    editBtn.className = 'btn ghost icon-only';
+    editBtn.title = 'Editar estructura';
+    editBtn.setAttribute('aria-label', 'Editar estructura');
+    editBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>';
     editBtn.onclick = () => goEditor(viaje);
     actions.appendChild(editBtn);
 
     const toggleBtn = document.createElement('button');
-    toggleBtn.className = 'btn ghost';
-    toggleBtn.textContent = viaje.activo ? 'Archivar' : 'Reactivar';
+    toggleBtn.className = 'btn ghost icon-only';
+    toggleBtn.title = viaje.activo ? 'Archivar' : 'Reactivar';
+    toggleBtn.setAttribute('aria-label', viaje.activo ? 'Archivar' : 'Reactivar');
+    toggleBtn.innerHTML = viaje.activo
+      ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>'
+      : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
     toggleBtn.onclick = () => togglePanelViaje(viaje.id, !viaje.activo);
     actions.appendChild(toggleBtn);
   }
