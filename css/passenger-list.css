@@ -41,6 +41,7 @@
   position:relative; width:100%; aspect-ratio: 8.5 / 14;
   background:#fff; overflow:hidden;
   font-family: Georgia, 'Times New Roman', serif;
+  container-type: inline-size;
 }
 
 .pax-sheet-header{
@@ -50,7 +51,7 @@
 
 .pax-sheet-tripname{
   position:absolute; left:2.4%; top:21.3%; width:60%; height:4.5%;
-  font-size:1.75vw; font-weight:700; color:#3b5998; letter-spacing:.01em;
+  font-size:1.75cqw; font-weight:700; color:#3b5998; letter-spacing:.01em;
   font-family: system-ui, -apple-system, sans-serif;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
@@ -59,12 +60,13 @@
 .pax-table-header{
   position:absolute; left:2.47%; top:26.5%; width:95%; height:2.36%;
   display:flex; border-top:1.5px solid #111; border-bottom:1.5px solid #111;
+  box-sizing:border-box;
 }
 .pax-table-header .pax-col{
   display:flex; align-items:center; justify-content:center; text-align:center;
-  font-weight:700; font-size:1.35vw; color:#111; line-height:1.05;
+  font-weight:700; font-size:1.35cqw; color:#111; line-height:1.05;
   border-right:1.5px solid #111; font-family: system-ui, -apple-system, sans-serif;
-  padding:0 2px;
+  padding:0 2px; box-sizing:border-box;
 }
 .pax-table-header .pax-col:first-child{ border-left:1.5px solid #111; }
 
@@ -72,15 +74,16 @@
   position:absolute; left:2.47%; top:28.86%; width:95%; height:52.83%;
 }
 .pax-row{
-  position:relative; width:100%; height:5.867%;
+  position:relative; width:100%; height:3.3333%;
   display:flex; border-bottom:1.5px solid #111;
   font-family: system-ui, -apple-system, sans-serif;
+  box-sizing:border-box;
 }
 .pax-row:first-child{ border-top:1.5px solid #111; }
 .pax-row .pax-col{
   display:flex; align-items:center; border-right:1.5px solid #111;
-  font-size:1.35vw; color:#111; padding:0 6px; overflow:hidden;
-  white-space:nowrap; text-overflow:ellipsis;
+  font-size:1.35cqw; color:#111; padding:0 6px; overflow:hidden;
+  white-space:nowrap; text-overflow:ellipsis; box-sizing:border-box;
 }
 .pax-row .pax-col:first-child{ border-left:1.5px solid #111; }
 
@@ -89,7 +92,7 @@
 .pax-col-doc{      width:13.73%; }
 .pax-col-nombre{   width:27.45%; }
 .pax-col-abonado{  width:10.31%; }
-.pax-col-porabonar{width:11.61%; font-size:1.1vw; text-align:center; justify-content:center; }
+.pax-col-porabonar{width:11.61%; font-size:1.1cqw; text-align:center; justify-content:center; }
 .pax-col-sub1{      width:13.25%; }
 .pax-col-sub2{      width:14.31%; }
 
@@ -104,7 +107,7 @@
 /* Pequeño indicador de hoja (no forma parte de la plantilla, se recorta
    antes de exportar — ver JS) */
 .pax-sheet-pageflag{
-  position:absolute; right:2.4%; top:22%; font-size:1.4vw; font-weight:700;
+  position:absolute; right:2.4%; top:22%; font-size:1.4cqw; font-weight:700;
   color:#9ca3af; font-family: system-ui, -apple-system, sans-serif;
 }
 
@@ -112,3 +115,20 @@
 .pax-actions{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:20px; }
 
 @media (prefers-reduced-motion: reduce){ .pax-sheet *{ transition:none !important; } }
+
+/* Fallback para navegadores sin soporte de container queries (cqw).
+   Sin esto, si el navegador ignora `container-type`, las reglas en cqw
+   simplemente no aplican y los tamaños de fuente colapsan a su valor
+   inicial — mismo bug de texto ilegible que motivó este archivo.
+   Usamos px fijos calculados contra el ancho de captura real (1275px,
+   ver EXPORT_WIDTH_PX en view-passenger-list.js) como red de seguridad;
+   en preview responsive se verán algo grandes en pantallas chicas, pero
+   nunca ilegibles — priorizamos que la exportación (el resultado que se
+   comparte) siempre sea legible. */
+@supports not (container-type: inline-size){
+  .pax-sheet-tripname{ font-size:22px; }
+  .pax-table-header .pax-col{ font-size:17px; }
+  .pax-row .pax-col{ font-size:17px; }
+  .pax-col-porabonar{ font-size:14px; }
+  .pax-sheet-pageflag{ font-size:18px; }
+}
