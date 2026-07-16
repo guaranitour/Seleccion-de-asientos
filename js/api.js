@@ -65,6 +65,37 @@ const Api = {
         console.log('[Realtime] Estado de la suscripcion:', status, err || ''); // TEMP: quitar luego del diagnostico
       });
     return channel;
+  },
+
+  /**
+   * Busca pasajeros ya cargados en la base de clientes (public.pasajeros)
+   * para autocompletar el formulario de reserva cuando el staff está
+   * logueado. Depende 100% de RLS: la tabla solo es visible para
+   * auth.email() presente en staff con status 'enabled' — no filtramos
+   * nada acá, Postgres ya lo hace. Si quien llama no es staff válido,
+   * simplemente vuelve una lista vacía (o error de permiso), nunca datos.
+   *
+   * No se llama nunca si Auth.isAuthorized() es false: el input de
+   * autocomplete ni siquiera se muestra a un visitante anónimo.
+   */
+  async buscarPasajeros(query) {
+    const q = (query || '').trim();
+    if (q.length < 3) return []; // evita ida y vuelta por cada tecla + scrape letra a letra
+
+    const { data, error } = await supabase
+      .schema('public')
+      .from('pasajeros')
+      .select('"Pasajero", "Documento de Identidad"') // comillas dobles obligatorias: PostgREST
+                                                        // recorta espacios de nombres de columna
+                                                        // si no van entre comillas dentro del string
+      .ilike('Pasajero', `%${q}%`)
+      .limit(8);
+
+    if (error) {
+      console.error('[buscarPasajeros]', error);
+      return []; // fallo silencioso: el autocomplete es una ayuda, no algo crítico
+    }
+    return data || [];
   }
 };
 

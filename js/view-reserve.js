@@ -59,6 +59,8 @@ function renderReservePage() {
   seats.forEach(s => {
     const norm = normalize(s);
     const num = AppState.numLabels.get(norm) || norm;
+    const nameInputId = single ? 'singleName' : '';
+    const ciInputId = single ? 'singleCI' : '';
 
     const card = document.createElement('div');
     card.className = 'reserve-card';
@@ -74,13 +76,16 @@ function renderReservePage() {
       <div class="reserve-fields">
         <label class="reserve-field">
           <span class="reserve-field-label">Nombre y Apellido</span>
-          <input class="${single ? '' : 'assign-name'}" id="${single ? 'singleName' : ''}"
-            type="text" placeholder="Ej.: María González"
-            autocapitalize="words" autocomplete="name" autocorrect="off"/>
+          <div class="reserve-autocomplete-wrap">
+            <input class="${single ? '' : 'assign-name'}" id="${nameInputId}"
+              type="text" placeholder="Ej.: María González"
+              autocapitalize="words" autocomplete="off" autocorrect="off"/>
+            <div class="reserve-autocomplete-list" hidden></div>
+          </div>
         </label>
         <label class="reserve-field">
           <span class="reserve-field-label">Documento</span>
-          <input class="${single ? '' : 'assign-ci'}" id="${single ? 'singleCI' : ''}"
+          <input class="${single ? '' : 'assign-ci'}" id="${ciInputId}"
             type="text" placeholder="Ej.: 12345678"
             inputmode="numeric" pattern="[0-9]*"/>
         </label>
@@ -88,6 +93,14 @@ function renderReservePage() {
 
     const ciInput = card.querySelector(single ? '#singleCI' : '.assign-ci');
     if (ciInput) ciInput.addEventListener('input', function () { onlyDigits(this); });
+
+    // Autocomplete contra la base de clientes: exclusivo para staff logueado.
+    // Un visitante anónimo nunca ve ni dispara esta búsqueda — el input
+    // sigue siendo un campo de texto libre común y corriente para él.
+    if (Auth.isAuthorized()) {
+      const nameInput = card.querySelector(single ? '#singleName' : '.assign-name');
+      _wirePassengerAutocomplete(nameInput, ciInput);
+    }
 
     wrap.appendChild(card);
   });
@@ -103,6 +116,109 @@ function renderReservePage() {
   requestAnimationFrame(() => {
     const first = body.querySelector('input');
     if (first) try { first.focus(); } catch (_) {}
+  });
+}
+
+/**
+ * Conecta un input de nombre a la búsqueda en public.pasajeros y muestra
+ * un desplegable de sugerencias. Al elegir una, completa nombre + CI.
+ * Debounce de 300ms para no disparar una consulta por cada tecla.
+ */
+function _wirePassengerAutocomplete(nameInput, ciInput) {
+  if (!nameInput) return;
+  const wrap = nameInput.closest('.reserve-autocomplete-wrap');
+  const list = wrap ? wrap.querySelector('.reserve-autocomplete-list') : null;
+  if (!list) return;
+
+  let debounceTimer = null;
+  let activeIndex = -1;
+  let currentResults = [];
+
+  function closeList() {
+    list.hidden = true;
+    list.innerHTML = '';
+    activeIndex = -1;
+    currentResults = [];
+  }
+
+  function pick(item) {
+    nameInput.value = item['Pasajero'] || '';
+    if (ciInput) {
+      ciInput.value = item['Documento de Identidad'] || '';
+      onlyDigits(ciInput);
+    }
+    closeList();
+    markField(nameInput, false);
+    if (ciInput) markField(ciInput, false);
+  }
+
+  function renderList(items) {
+    currentResults = items;
+    activeIndex = -1;
+    if (!items.length) { closeList(); return; }
+
+    list.innerHTML = items.map((item, i) => `
+      <button type="button" class="reserve-autocomplete-item" data-idx="${i}">
+        <span class="reserve-autocomplete-name">${item['Pasajero'] || ''}</span>
+        <span class="reserve-autocomplete-ci">${item['Documento de Identidad'] || ''}</span>
+      </button>`).join('');
+    list.hidden = false;
+
+    list.querySelectorAll('.reserve-autocomplete-item').forEach(btn => {
+      // mousedown en vez de click: dispara antes del blur del input,
+      // así el valor se completa antes de que el dropdown se cierre por blur
+      btn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        const idx = Number(btn.dataset.idx);
+        pick(currentResults[idx]);
+      });
+    });
+  }
+
+  nameInput.addEventListener('input', function () {
+    const q = this.value;
+    clearTimeout(debounceTimer);
+    if (q.trim().length < 3) { closeList(); return; }
+
+    debounceTimer = setTimeout(async () => {
+      try {
+        const results = await Api.buscarPasajeros(q);
+        renderList(results);
+      } catch (e) {
+        console.error(e);
+        closeList();
+      }
+    }, 300);
+  });
+
+  nameInput.addEventListener('keydown', function (e) {
+    if (list.hidden || !currentResults.length) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      activeIndex = Math.min(activeIndex + 1, currentResults.length - 1);
+      _highlightAutocompleteItem(list, activeIndex);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIndex = Math.max(activeIndex - 1, 0);
+      _highlightAutocompleteItem(list, activeIndex);
+    } else if (e.key === 'Enter' && activeIndex >= 0) {
+      e.preventDefault();
+      pick(currentResults[activeIndex]);
+    } else if (e.key === 'Escape') {
+      closeList();
+    }
+  });
+
+  nameInput.addEventListener('blur', function () {
+    // pequeño delay para permitir que el mousedown del item procese primero
+    setTimeout(closeList, 120);
+  });
+}
+
+function _highlightAutocompleteItem(list, activeIndex) {
+  list.querySelectorAll('.reserve-autocomplete-item').forEach((el, i) => {
+    el.classList.toggle('active', i === activeIndex);
   });
 }
 
