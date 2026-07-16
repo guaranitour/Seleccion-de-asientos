@@ -137,7 +137,6 @@ function _buildSheetEl(sheet, sheetIndex, totalSheets) {
       <div class="pax-col pax-col-abonado">Abonado</div>
       <div class="pax-col pax-col-porabonar">Por abonar</div>
       <div class="pax-col pax-col-sub1"></div>
-      <div class="pax-col pax-col-sub2"></div>
     </div>
 
     <div class="pax-table-body"></div>
@@ -158,7 +157,6 @@ function _buildSheetEl(sheet, sheetIndex, totalSheets) {
       <div class="pax-col pax-col-abonado"></div>
       <div class="pax-col pax-col-porabonar"></div>
       <div class="pax-col pax-col-sub1"></div>
-      <div class="pax-col pax-col-sub2"></div>
     `;
     body.appendChild(rowEl);
   }
