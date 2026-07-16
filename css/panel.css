@@ -56,26 +56,93 @@ main:has(#view-passenger-list.active) ~ .staff-entry{
 .staff-denied-hint{ color:var(--muted); font-size:.82rem; margin-bottom:18px; line-height:1.5; }
 
 /* ===== Panel principal ===== */
-.panel-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:8px; }
+.panel-header{ margin-bottom:20px; }
+.panel-header-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
 .panel-user-info{ font-size:.82rem; color:var(--muted); }
 .panel-role-badge{
-  display:inline-block; background:#e0e7ff; color:#3730a3; font-weight:700;
-  font-size:.72rem; padding:3px 9px; border-radius:999px; margin-right:6px;
+  display:inline-flex; align-items:center; gap:5px; background:#e0e7ff; color:#3730a3; font-weight:700;
+  font-size:.72rem; padding:5px 11px; border-radius:999px;
+}
+.panel-role-badge::before{
+  content:""; width:6px; height:6px; border-radius:50%; background:#4f46e5;
+}
+.panel-logout{ padding:8px 12px; font-size:.8rem; }
+
+.panel-title{ text-align:left; margin-bottom:14px; font-size:1.2rem; }
+
+/* Franja de KPIs rápidos (se llena desde JS) */
+.panel-stats{ display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+.panel-stat{
+  flex:1; min-width:110px; background:var(--card); border-radius:14px; box-shadow:var(--shadow);
+  padding:12px 14px; display:flex; flex-direction:column; gap:2px;
+  animation: cardIn .35s ease both;
+}
+.panel-stat-value{ font-size:1.3rem; font-weight:800; line-height:1.1; color:var(--text); }
+.panel-stat-label{ font-size:.72rem; color:var(--muted); font-weight:600; }
+.panel-stat.accent .panel-stat-value{ color:#4f46e5; }
+
+.panel-create-btn{ width:100%; justify-content:center; }
+
+/* ===== Tarjeta de viaje ===== */
+.panel-trip-card{
+  background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
+  border-radius:16px; box-shadow:var(--shadow);
+  padding:16px; margin-bottom:12px;
+  border-left:4px solid #60a5fa;
+  animation: cardIn .35s ease both;
+  transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+}
+.panel-trip-card:hover{ transform:translateY(-2px); box-shadow:0 14px 30px rgba(17,24,39,.12); }
+.panel-trip-card.doble-piso{ border-left-color:#f59e0b; }
+.panel-trip-card.inactive{ opacity:.58; }
+.panel-trip-card.inactive:hover{ transform:none; box-shadow:var(--shadow); }
+
+.panel-trip-head{ display:flex; align-items:flex-start; gap:12px; margin-bottom:14px; }
+
+.panel-trip-icon{
+  flex-shrink:0; width:42px; height:42px; border-radius:12px; display:grid; place-items:center;
+  background: linear-gradient(145deg, #eef2ff, #e0e7ff); color:#4f46e5;
+  box-shadow: 0 3px 10px rgba(79,70,229,.16), inset 0 1px 0 rgba(255,255,255,.6);
+}
+.panel-trip-icon svg{ width:20px; height:20px; }
+.panel-trip-card.doble-piso .panel-trip-icon{
+  background: linear-gradient(145deg, #fef3c7, #fde68a); color:#92400e;
+  box-shadow: 0 3px 10px rgba(180,131,3,.16), inset 0 1px 0 rgba(255,255,255,.6);
 }
 
-.panel-trip-card{
-  background:var(--card); border-radius:14px; box-shadow:var(--shadow);
-  padding:14px 16px; margin-bottom:10px;
+.panel-trip-info{ flex:1; min-width:0; }
+.panel-trip-name{
+  font-weight:800; font-size:1rem; overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap; margin-bottom:2px;
 }
-.panel-trip-card.inactive{ opacity:.6; }
-.panel-trip-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px; }
-.panel-trip-name{ font-weight:800; font-size:1rem; }
-.panel-trip-meta{ font-size:.8rem; color:var(--muted); margin-top:2px; }
-.panel-trip-status{ font-size:.72rem; font-weight:700; padding:4px 9px; border-radius:999px; flex-shrink:0; }
+.panel-trip-meta{ font-size:.8rem; color:var(--muted); display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.panel-trip-meta .dot-sep::before{ content:"·"; margin-right:6px; color:#d1d5db; }
+
+.panel-trip-status{
+  flex-shrink:0; display:inline-flex; align-items:center; gap:5px;
+  font-size:.72rem; font-weight:700; padding:5px 10px; border-radius:999px;
+}
 .panel-trip-status.active{ background:#d1fae5; color:#065f46; }
+.panel-trip-status.active::before{
+  content:""; width:6px; height:6px; border-radius:50%; background:#10b981;
+  animation: statusPulse 2s ease-in-out infinite;
+}
 .panel-trip-status.inactive{ background:#f3f4f6; color:#6b7280; }
+.panel-trip-status.inactive::before{ content:""; width:6px; height:6px; border-radius:50%; background:#9ca3af; }
+@keyframes statusPulse{
+  0%,100%{ box-shadow:0 0 0 0 rgba(16,185,129,.45); }
+  50%{ box-shadow:0 0 0 4px rgba(16,185,129,0); }
+}
+
 .panel-trip-actions{ display:flex; gap:8px; flex-wrap:wrap; }
-.panel-trip-actions .btn{ padding:8px 12px; font-size:.85rem; }
+.panel-trip-actions .btn{ padding:9px 13px; font-size:.83rem; }
+.panel-trip-actions .btn-primary-action{ flex:1 1 auto; min-width:140px; }
+.panel-trip-actions .btn.icon-only{ padding:9px 10px; flex-shrink:0; }
+.panel-trip-actions .btn.icon-only svg{ display:block; }
+
+@media (prefers-reduced-motion: reduce){
+  .panel-trip-status.active::before{ animation:none; }
+}
 
 /* ===== Crear viaje ===== */
 .create-trip-form .field{ margin-bottom:14px; }
