@@ -13,6 +13,7 @@
 <link href="css/croquis.css" rel="stylesheet"/>
 <link href="css/reserve.css" rel="stylesheet"/>
 <link href="css/panel.css" rel="stylesheet"/>
+<link href="css/passenger-list.css" rel="stylesheet"/>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -65,13 +66,7 @@
     </div>
 
     <div class="croquis-wrap" id="croquisWrap">
-      <div class="bus-body">
-        <div class="bus-front" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/></svg>
-          <span class="bus-front-label">Frente / Conductor</span>
-        </div>
-        <div aria-busy="true" aria-live="polite" class="grid" id="grid-select"></div>
-      </div>
+      <div aria-busy="true" aria-live="polite" class="grid" id="grid-select"></div>
       <p class="croquis-note">El croquis es referencial. La ubicación exacta de los asientos puede variar según la unidad.</p>
     </div>
 
@@ -236,6 +231,33 @@
     </div>
   </section>
 
+  <!-- Lista de pasajeros exportable -->
+  <section class="view" id="view-passenger-list">
+    <div class="actions" style="margin-bottom:10px;">
+      <button class="btn ghost btn-icon" onclick="goPanel()" type="button">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        Panel
+      </button>
+    </div>
+    <h2 class="view-title" id="paxTripName">—</h2>
+    <p class="pax-meta" id="paxMeta">—</p>
+
+    <div class="pax-sheets-nav" id="paxSheetsNav"></div>
+
+    <div class="pax-preview-wrap">
+      <div id="paxSheetContainer"></div>
+    </div>
+
+    <div class="pax-actions">
+      <button class="btn primary" onclick="exportActiveSheetAsPng()" type="button">
+        ⬇ Exportar esta hoja (PNG)
+      </button>
+      <button class="btn ghost" id="paxExportAllBtn" onclick="exportAllSheetsAsPng()" type="button">
+        ⬇ Exportar todas las hojas
+      </button>
+    </div>
+  </section>
+
 </main>
 
 <!-- Botón flotante de acceso staff -->
@@ -289,6 +311,8 @@
 <script src="js/view-panel.js"></script>
 <script src="js/view-control.js"></script>
 <script src="js/view-editor.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="js/view-passenger-list.js"></script>
 <script src="js/main.js"></script>
 
 </body>
