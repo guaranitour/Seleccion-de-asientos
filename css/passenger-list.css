@@ -1,141 +1,14 @@
 /* ============================================================
    passenger-list.css — Lista de pasajeros (panel admin)
-   Replica pixel-perfect de la plantilla Word original.
-   Coordenadas medidas directamente sobre el render de la
-   plantilla (hoja Legal 8.5in x 14in, @300dpi = 2550x4200px)
-   y expresadas como fracción de página para escalar sin perder
-   precisión sin importar el tamaño final de exportación.
+   La imagen final ahora se genera del lado del servidor (Apps
+   Script + plantilla de Google Slides), así que este archivo ya
+   no dibuja la hoja en el navegador — solo estiliza el resumen
+   y el botón de generación.
    ============================================================ */
 
-/* ===== Navegación / selector de viaje-planta ===== */
-.pax-toolbar{
-  display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:16px;
-}
-.pax-toolbar select{
-  border:1px solid #e5e7eb; border-radius:10px; padding:10px 12px;
-  font-size:.92rem; background:#fff; color:var(--text); min-height:44px;
-}
 .pax-meta{
-  font-size:.85rem; color:var(--muted); margin-bottom:16px;
-}
-.pax-sheets-nav{
-  display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px;
-}
-.pax-sheets-nav button{
-  border:1px solid #e5e7eb; background:#fff; border-radius:10px;
-  padding:8px 14px; font-weight:700; font-size:.85rem; cursor:pointer; color:var(--muted);
-}
-.pax-sheets-nav button.active{ background:var(--primary); color:#fff; border-color:var(--primary); }
-
-/* ===== Contenedor de vista previa (escala la hoja al ancho disponible) ===== */
-.pax-preview-wrap{
-  max-width:520px; margin:0 auto 18px; overflow:auto;
-  border-radius:14px; box-shadow:var(--shadow); background:#e5e7eb;
-  padding:14px;
-}
-
-/* La hoja: proporción fija Legal 8.5x14in. Todo el contenido interno
-   se posiciona en % (derivados de fracciones de página medidas sobre
-   la plantilla real), así que escala sin distorsión a cualquier ancho. */
-.pax-sheet{
-  position:relative; width:100%; aspect-ratio: 8.5 / 14;
-  background:#fff; overflow:hidden;
-  font-family: Georgia, 'Times New Roman', serif;
-  container-type: inline-size;
-}
-
-.pax-sheet-header{
-  position:absolute; left:0; top:0; width:100%; height:26.5%;
-}
-.pax-sheet-header img{ width:100%; height:100%; object-fit:contain; object-position:top left; }
-
-.pax-sheet-tripname{
-  position:absolute; left:2.47%; top:21.3%; width:95%; height:4.5%;
-  font-size:1.75cqw; font-weight:700; color:#3b5998; letter-spacing:.01em;
-  font-family: system-ui, -apple-system, sans-serif;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-  text-align:center;
-}
-
-/* ===== Tabla (dibujada en CSS puro sobre las coordenadas medidas) ===== */
-.pax-table-header{
-  position:absolute; left:2.47%; top:26.5%; width:90%; height:2.36%;
-  display:flex; border-top:1.5px solid #111; border-bottom:1.5px solid #111;
-  box-sizing:border-box;
-}
-.pax-table-header .pax-col{
-  display:flex; align-items:center; justify-content:center; text-align:center;
-  font-weight:700; font-size:1.35cqw; color:#111; line-height:1.05;
-  border-right:1.5px solid #111; font-family: system-ui, -apple-system, sans-serif;
-  padding:0 2px; box-sizing:border-box;
-}
-.pax-table-header .pax-col:first-child{ border-left:1.5px solid #111; }
-
-.pax-table-body{
-  position:absolute; left:2.47%; top:28.86%; width:90%; height:52.83%;
-}
-.pax-row{
-  position:relative; width:100%; height:2.8571%;
-  display:flex; border-bottom:1.5px solid #111;
-  font-family: system-ui, -apple-system, sans-serif;
-  box-sizing:border-box;
-}
-.pax-row:first-child{ border-top:1.5px solid #111; }
-.pax-row .pax-col{
-  display:flex; align-items:center; justify-content:center; border-right:1.5px solid #111;
-  font-size:1.15cqw; color:#111; padding:0 6px; overflow:hidden;
-  white-space:nowrap; text-overflow:ellipsis; box-sizing:border-box;
-  text-align:center;
-}
-.pax-row .pax-col:first-child{ border-left:1.5px solid #111; }
-
-/* Anchos de columna — proporción de la plantilla original, sin la
-   última sub-columna en blanco (sub2) que no tenía propósito visible.
-   Documento se achicó (pedido explícito) y el ancho total de la tabla
-   se redujo de 95% a 90% de la hoja, dejando más margen de seguridad a
-   la derecha: algunos navegadores mobile recortan un poco el borde del
-   canvas exportado, y así la última columna (sub1) queda con margen de
-   sobra en vez de justo al límite. */
-.pax-col-num{      width:4.31%;  justify-content:center; font-weight:700; }
-.pax-col-doc{      width:14%; }
-.pax-col-nombre{   width:41.49%; }
-.pax-col-abonado{  width:10.31%; }
-.pax-col-porabonar{width:11.61%; font-size:1.1cqw; }
-.pax-col-sub1{      width:13.25%; }
-
-.pax-row.empty .pax-col-doc,
-.pax-row.empty .pax-col-nombre{ color:#c9ced6; font-style:italic; }
-
-.pax-sheet-footer{
-  position:absolute; left:0; top:84.31%; width:100%; height:9.57%;
-}
-.pax-sheet-footer img{ width:100%; height:100%; object-fit:fill; }
-
-/* Pequeño indicador de hoja (no forma parte de la plantilla, se recorta
-   antes de exportar — ver JS) */
-.pax-sheet-pageflag{
-  position:absolute; right:2.4%; top:22%; font-size:1.4cqw; font-weight:700;
-  color:#9ca3af; font-family: system-ui, -apple-system, sans-serif;
+  font-size:.9rem; color:var(--muted); margin-bottom:22px;
 }
 
 /* ===== Acciones ===== */
 .pax-actions{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:20px; }
-
-@media (prefers-reduced-motion: reduce){ .pax-sheet *{ transition:none !important; } }
-
-/* Fallback para navegadores sin soporte de container queries (cqw).
-   Sin esto, si el navegador ignora `container-type`, las reglas en cqw
-   simplemente no aplican y los tamaños de fuente colapsan a su valor
-   inicial — mismo bug de texto ilegible que motivó este archivo.
-   Usamos px fijos calculados contra el ancho de captura real (1275px,
-   ver EXPORT_WIDTH_PX en view-passenger-list.js) como red de seguridad;
-   en preview responsive se verán algo grandes en pantallas chicas, pero
-   nunca ilegibles — priorizamos que la exportación (el resultado que se
-   comparte) siempre sea legible. */
-@supports not (container-type: inline-size){
-  .pax-sheet-tripname{ font-size:22px; }
-  .pax-table-header .pax-col{ font-size:17px; }
-  .pax-row .pax-col{ font-size:15px; }
-  .pax-col-porabonar{ font-size:14px; }
-  .pax-sheet-pageflag{ font-size:18px; }
-}
