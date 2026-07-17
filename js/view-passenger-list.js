@@ -7,7 +7,7 @@
 
 // URL del Apps Script desplegado como Web App (terminación /exec).
 // Ver appscript/Code.gs para el código del backend.
-const PAX_APPSCRIPT_URL = 'PEGAR_AQUI_LA_URL_/exec_DEL_APPS_SCRIPT';
+const PAX_APPSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyog8SJ5SEgKbWG-qj0iGV2YBbCcwRfxV6oNkOigC_Ptk-TYPNYoeB5dk-sNbLkGPwkQw/exec';
 
 const PaxListState = {
   viaje: null,
