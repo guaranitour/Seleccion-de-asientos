@@ -248,18 +248,9 @@
     <h2 class="view-title" id="paxTripName">—</h2>
     <p class="pax-meta" id="paxMeta">—</p>
 
-    <div class="pax-sheets-nav" id="paxSheetsNav"></div>
-
-    <div class="pax-preview-wrap">
-      <div id="paxSheetContainer"></div>
-    </div>
-
     <div class="pax-actions">
-      <button class="btn primary" onclick="exportActiveSheetAsPng()" type="button">
-        ⬇ Exportar esta hoja (PNG)
-      </button>
-      <button class="btn ghost" id="paxExportAllBtn" onclick="exportAllSheetsAsPng()" type="button">
-        ⬇ Exportar todas las hojas
+      <button class="btn primary" onclick="exportPassengerListImages()" type="button">
+        ⬇ Generar lista de pasajeros
       </button>
     </div>
   </section>
@@ -317,7 +308,6 @@
 <script src="js/view-panel.js"></script>
 <script src="js/view-control.js"></script>
 <script src="js/view-editor.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="js/view-passenger-list.js"></script>
 <script src="js/main.js"></script>
 
