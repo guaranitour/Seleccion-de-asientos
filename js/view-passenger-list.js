@@ -1,30 +1,28 @@
 // ============================================================
 // view-passenger-list.js — Lista de pasajeros exportable (panel admin)
-// Replica el diseño de la plantilla Word oficial. Pagina de a 35
-// filas por hoja; si un viaje tiene más de una planta, la numeración
-// de filas continúa entre plantas (no reinicia).
+// Genera las imágenes vía Apps Script (plantilla de Google Slides),
+// que arma la tabla y devuelve un PNG por cada hoja de PAX_ROWS_PER_SHEET
+// pasajeros. Reemplaza al flujo anterior basado en html2canvas.
 // ============================================================
+
+// URL del Apps Script desplegado como Web App (terminación /exec).
+// Ver appscript/Code.gs para el código del backend.
+const PAX_APPSCRIPT_URL = 'PEGAR_AQUI_LA_URL_/exec_DEL_APPS_SCRIPT';
 
 const PaxListState = {
   viaje: null,
-  sheets: [],     // [{ rows: [...], startNumber }]
-  activeSheet: 0
+  passengers: [],   // lista continua [{ numero, documento, nombre }]
+  sheetsCount: 0     // cuántas hojas va a generar el Apps Script (solo informativo)
 };
 
-const PAX_ROWS_PER_SHEET = 35;
-// Ancho fijo (px) del contenedor offscreen usado para exportar cada hoja.
-// 8.5in @150dpi. Con container queries (cqw en passenger-list.css), el
-// tamaño de fuente se calcula contra ESTE ancho real sin importar cuán
-// angosto sea el viewport del dispositivo — antes usaba vw (relativo al
-// viewport), lo que producía texto ilegible al exportar desde mobile.
-const PAX_EXPORT_WIDTH_PX = 1275;
+const PAX_ROWS_PER_SHEET = 32;
 
 async function goPassengerList(viaje) {
   if (!Auth.isAuthorized()) { goStaffLogin(); return; }
 
   PaxListState.viaje = viaje;
-  PaxListState.sheets = [];
-  PaxListState.activeSheet = 0;
+  PaxListState.passengers = [];
+  PaxListState.sheetsCount = 0;
 
   showView('view-passenger-list');
   document.getElementById('paxTripName').textContent = viaje.nombre;
@@ -32,8 +30,7 @@ async function goPassengerList(viaje) {
   showLoading('Cargando pasajeros…');
   try {
     await _loadAllPassengers();
-    _renderSheetNav();
-    _renderActiveSheet();
+    _renderSummary();
   } catch (e) {
     console.error(e);
     toast('Error al cargar la lista de pasajeros');
@@ -43,8 +40,8 @@ async function goPassengerList(viaje) {
   setHash(['Panel', 'Lista', viaje.nombre]);
 }
 
-/** Trae los asientos ocupados de TODAS las plantas del viaje (en orden),
- *  arma una lista continua de pasajeros y la pagina de a 35. */
+/** Trae los asientos ocupados de TODAS las plantas del viaje (en orden)
+ *  y arma una lista continua de pasajeros numerada. */
 async function _loadAllPassengers() {
   const viaje = PaxListState.viaje;
   const plantas = Array.isArray(viaje.plantas) ? viaje.plantas : [];
@@ -63,225 +60,80 @@ async function _loadAllPassengers() {
     allPassengers = allPassengers.concat(ocupados);
   }
 
-  const sheets = [];
-  for (let i = 0; i < allPassengers.length; i += PAX_ROWS_PER_SHEET) {
-    sheets.push({
-      rows: allPassengers.slice(i, i + PAX_ROWS_PER_SHEET),
-      startNumber: i + 1
-    });
-  }
-  // Si no hay pasajeros todavía, mostramos igual una hoja vacía para
-  // que el staff pueda ver/exportar la plantilla lista para completar a mano.
-  if (!sheets.length) sheets.push({ rows: [], startNumber: 1 });
-
-  PaxListState.sheets = sheets;
+  PaxListState.passengers = allPassengers.map((p, i) => ({
+    numero: i + 1,
+    documento: p.documento,
+    nombre: p.nombre
+  }));
+  PaxListState.sheetsCount = Math.max(1, Math.ceil(allPassengers.length / PAX_ROWS_PER_SHEET));
 }
 
-function _renderSheetNav() {
-  const nav = document.getElementById('paxSheetsNav');
-  nav.innerHTML = '';
-
-  const total = PaxListState.sheets.length;
-  if (total <= 1) { nav.style.display = 'none'; return; }
-
-  nav.style.display = '';
-  PaxListState.sheets.forEach((sheet, idx) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    const from = sheet.startNumber;
-    const to = sheet.startNumber + sheet.rows.length - 1;
-    btn.textContent = `Hoja ${idx + 1} (${from}–${sheet.startNumber + PAX_ROWS_PER_SHEET - 1})`;
-    btn.className = idx === PaxListState.activeSheet ? 'active' : '';
-    btn.onclick = () => {
-      PaxListState.activeSheet = idx;
-      _renderSheetNav();
-      _renderActiveSheet();
-    };
-    nav.appendChild(btn);
-  });
-}
-
-function _renderActiveSheet() {
-  const container = document.getElementById('paxSheetContainer');
-  container.innerHTML = '';
-
-  const total = PaxListState.sheets.length;
-  const sheet = PaxListState.sheets[PaxListState.activeSheet];
-  container.appendChild(_buildSheetEl(sheet, PaxListState.activeSheet, total));
-
+function _renderSummary() {
+  const total = PaxListState.passengers.length;
   document.getElementById('paxMeta').textContent =
-    `${_totalPassengers()} pasajero${_totalPassengers() === 1 ? '' : 's'} — ${total} hoja${total === 1 ? '' : 's'} para exportar`;
+    `${total} pasajero${total === 1 ? '' : 's'} — se generará${PaxListState.sheetsCount === 1 ? '' : 'n'} ${PaxListState.sheetsCount} imagen${PaxListState.sheetsCount === 1 ? '' : 'es'} (${PAX_ROWS_PER_SHEET} por hoja)`;
 }
 
-function _totalPassengers() {
-  return PaxListState.sheets.reduce((sum, s) => sum + s.rows.length, 0);
-}
-
-/** Construye el DOM de una hoja (para preview Y para exportar son el mismo nodo). */
-function _buildSheetEl(sheet, sheetIndex, totalSheets) {
-  const viaje = PaxListState.viaje;
-
-  const el = document.createElement('div');
-  el.className = 'pax-sheet';
-  el.id = 'paxSheetExport';
-
-  el.innerHTML = `
-    <div class="pax-sheet-header"><img src="assets/lista-header.png" alt=""></div>
-    <div class="pax-sheet-tripname">${_escapeHtml(viaje.nombre)}</div>
-    ${totalSheets > 1 ? `<div class="pax-sheet-pageflag">Hoja ${sheetIndex + 1}/${totalSheets}</div>` : ''}
-
-    <div class="pax-table-header">
-      <div class="pax-col pax-col-num"></div>
-      <div class="pax-col pax-col-doc">Documento</div>
-      <div class="pax-col pax-col-nombre">Nombre y apellido</div>
-      <div class="pax-col pax-col-abonado">Abonado</div>
-      <div class="pax-col pax-col-porabonar">Por abonar</div>
-      <div class="pax-col pax-col-sub1"></div>
-    </div>
-
-    <div class="pax-table-body"></div>
-
-    <div class="pax-sheet-footer"><img src="assets/lista-footer.png" alt=""></div>
-  `;
-
-  const body = el.querySelector('.pax-table-body');
-  for (let i = 0; i < PAX_ROWS_PER_SHEET; i++) {
-    const rowNumber = sheet.startNumber + i;
-    const data = sheet.rows[i];
-    const rowEl = document.createElement('div');
-    rowEl.className = 'pax-row' + (data ? '' : ' empty');
-    rowEl.innerHTML = `
-      <div class="pax-col pax-col-num">${rowNumber}</div>
-      <div class="pax-col pax-col-doc">${data ? _escapeHtml(data.documento) : ''}</div>
-      <div class="pax-col pax-col-nombre">${data ? _escapeHtml(data.nombre) : ''}</div>
-      <div class="pax-col pax-col-abonado"></div>
-      <div class="pax-col pax-col-porabonar"></div>
-      <div class="pax-col pax-col-sub1"></div>
-    `;
-    body.appendChild(rowEl);
-  }
-
-  return el;
-}
-
-function _escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str || '';
-  return div.innerHTML;
-}
-
-/** Exporta la hoja actualmente visible como PNG. */
-async function exportActiveSheetAsPng() {
-  await _exportSheetIndex(PaxListState.activeSheet);
-}
-
-/** Exporta TODAS las hojas del viaje como PNG (una descarga por hoja). */
-async function exportAllSheetsAsPng() {
-  for (let i = 0; i < PaxListState.sheets.length; i++) {
-    await _exportSheetIndex(i);
-    // Pequeña pausa entre descargas: algunos navegadores mobile
-    // (Samsung Browser incluido) descartan descargas disparadas
-    // demasiado rápido una tras otra.
-    await new Promise(r => setTimeout(r, 400));
-  }
-}
-
-async function _exportSheetIndex(index) {
-  if (typeof html2canvas === 'undefined') {
-    toast('No se pudo cargar el motor de exportación. Revisá tu conexión.');
+/** Pide al Apps Script que genere las imágenes y las descarga. */
+async function exportPassengerListImages() {
+  if (!PAX_APPSCRIPT_URL || PAX_APPSCRIPT_URL.includes('PEGAR_AQUI')) {
+    toast('Falta configurar la URL del Apps Script (PAX_APPSCRIPT_URL)');
     return;
   }
-  const sheet = PaxListState.sheets[index];
-  const total = PaxListState.sheets.length;
 
-  showLoading(`Generando imagen ${index + 1}/${total}…`);
+  const viaje = PaxListState.viaje;
+  showLoading('Generando lista de pasajeros…');
   try {
-    // Renderizamos la hoja pedida a tamaño fijo de alta resolución (no
-    // el tamaño responsive de la preview), para que el PNG exportado
-    // tenga buena nitidez sin importar el viewport del dispositivo.
-    //
-    // Importante: NO usamos coordenadas negativas (left:-99999px) para
-    // ocultarlo. html2canvas recorta cualquier contenido que quede fuera
-    // de los límites reales del documento (ver github.com/niklasvh/
-    // html2canvas/issues/117) — eso es lo que cortaba la última columna
-    // en mobile. En su lugar lo dejamos en el flujo normal (top:0/left:0)
-    // pero invisible e inerte, así queda "dentro de la página" para que
-    // html2canvas lo capture completo, sin que el usuario lo vea ni
-    // pueda tocarlo.
-    const offscreen = document.createElement('div');
-    offscreen.style.cssText = `position:absolute; left:0; top:0; width:${PAX_EXPORT_WIDTH_PX}px; opacity:0; z-index:-1; pointer-events:none;`;
-    const sheetEl = _buildSheetEl(sheet, index, total);
-    sheetEl.id = 'paxSheetExport-' + index;
-    offscreen.appendChild(sheetEl);
+    const response = await fetch(PAX_APPSCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // evita preflight CORS contra Apps Script
+      body: JSON.stringify({
+        viaje: viaje.nombre,
+        pasajeros: PaxListState.passengers
+      })
+    });
 
-    // Al estar en el flujo normal del documento (no en coordenadas
-    // negativas), el elemento de 1275px puede ensanchar/alargar el body
-    // mientras se captura. Bloqueamos el scroll del body para que el
-    // usuario no vea un salto ni una barra de scroll gigante momentánea.
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    document.body.appendChild(offscreen);
+    if (!response.ok) throw new Error('Respuesta HTTP ' + response.status);
 
-    let canvas;
-    try {
-      // Esperar a que las imágenes de fondo (header/footer) carguen antes
-      // de capturar, si no el PNG sale con esos huecos en blanco.
-      await _waitForImages(sheetEl);
+    const data = await response.json();
+    if (!data.ok) throw new Error(data.error || 'Error desconocido del generador');
 
-      canvas = await html2canvas(sheetEl, {
-        scale: 2,
-        backgroundColor: '#ffffff',
-        useCORS: true,
-        width: sheetEl.offsetWidth,
-        height: sheetEl.offsetHeight,
-        windowWidth: PAX_EXPORT_WIDTH_PX,
-        x: 0,
-        y: 0
-      });
-    } finally {
-      // Pase lo que pase con la captura, nunca dejamos el elemento
-      // temporal en el DOM ni el scroll del body bloqueado.
-      document.body.removeChild(offscreen);
-      document.body.style.overflow = prevOverflow;
+    const hojas = data.hojas || [];
+    if (!hojas.length) throw new Error('El generador no devolvió imágenes');
+
+    for (const hoja of hojas) {
+      _descargarBase64Png(hoja.base64, hoja.filename);
+      // Pequeña pausa entre descargas: algunos navegadores mobile
+      // (Samsung Browser incluido) descartan descargas disparadas
+      // demasiado rápido una tras otra.
+      await new Promise(r => setTimeout(r, 400));
     }
 
-    const viajeSlug = (PaxListState.viaje.nombre || 'viaje').trim().replace(/[^\p{L}\p{N}]+/gu, '-').toLowerCase();
-    const fileName = total > 1
-      ? `lista-pasajeros-${viajeSlug}-hoja${index + 1}.png`
-      : `lista-pasajeros-${viajeSlug}.png`;
-
-    canvas.toBlob(blob => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 'image/png');
+    toast(hojas.length === 1 ? 'Imagen generada' : `${hojas.length} imágenes generadas`);
   } catch (e) {
     console.error(e);
-    const isTainted = String(e && e.message || '').toLowerCase().includes('tainted');
-    toast(isTainted
-      ? 'No se pudo generar la imagen (el logo debe servirse desde el mismo sitio, no como archivo local).'
-      : 'Error al generar la imagen');
+    toast('Error al generar la lista: ' + (e.message || ''));
   } finally {
     hideLoading();
   }
 }
 
-function _waitForImages(root) {
-  const imgs = Array.from(root.querySelectorAll('img'));
-  return Promise.all(imgs.map(img => {
-    if (img.complete) return Promise.resolve();
-    return new Promise(resolve => {
-      img.addEventListener('load', resolve, { once: true });
-      img.addEventListener('error', resolve, { once: true });
-    });
-  }));
+function _descargarBase64Png(base64, filename) {
+  const byteChars = atob(base64);
+  const byteNumbers = new Array(byteChars.length);
+  for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+  const byteArray = new Uint8Array(byteNumbers);
+  const blob = new Blob([byteArray], { type: 'image/png' });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 window.goPassengerList = goPassengerList;
-window.exportActiveSheetAsPng = exportActiveSheetAsPng;
-window.exportAllSheetsAsPng = exportAllSheetsAsPng;
+window.exportPassengerListImages = exportPassengerListImages;
