@@ -1,13 +1,13 @@
 // ============================================================
 // view-passenger-list.js — Lista de pasajeros exportable (panel admin)
-// Genera las imágenes vía Apps Script (plantilla de Google Slides),
-// que arma la tabla y devuelve un PNG por cada hoja de PAX_ROWS_PER_SHEET
+// Genera los PDFs vía Apps Script (plantilla de Google Docs), que
+// arma la tabla y devuelve un PDF por cada hoja de PAX_ROWS_PER_SHEET
 // pasajeros. Reemplaza al flujo anterior basado en html2canvas.
 // ============================================================
 
 // URL del Apps Script desplegado como Web App (terminación /exec).
 // Ver appscript/Code.gs para el código del backend.
-const PAX_APPSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyog8SJ5SEgKbWG-qj0iGV2YBbCcwRfxV6oNkOigC_Ptk-TYPNYoeB5dk-sNbLkGPwkQw/exec';
+const PAX_APPSCRIPT_URL = 'PEGAR_AQUI_LA_URL_/exec_DEL_APPS_SCRIPT';
 
 const PaxListState = {
   viaje: null,
@@ -71,10 +71,10 @@ async function _loadAllPassengers() {
 function _renderSummary() {
   const total = PaxListState.passengers.length;
   document.getElementById('paxMeta').textContent =
-    `${total} pasajero${total === 1 ? '' : 's'} — se generará${PaxListState.sheetsCount === 1 ? '' : 'n'} ${PaxListState.sheetsCount} imagen${PaxListState.sheetsCount === 1 ? '' : 'es'} (${PAX_ROWS_PER_SHEET} por hoja)`;
+    `${total} pasajero${total === 1 ? '' : 's'} — se generará${PaxListState.sheetsCount === 1 ? '' : 'n'} ${PaxListState.sheetsCount} PDF${PaxListState.sheetsCount === 1 ? '' : 's'} (${PAX_ROWS_PER_SHEET} por hoja)`;
 }
 
-/** Pide al Apps Script que genere las imágenes y las descarga. */
+/** Pide al Apps Script que genere los PDFs y los descarga. */
 async function exportPassengerListImages() {
   if (!PAX_APPSCRIPT_URL || PAX_APPSCRIPT_URL.includes('PEGAR_AQUI')) {
     toast('Falta configurar la URL del Apps Script (PAX_APPSCRIPT_URL)');
@@ -103,10 +103,10 @@ async function exportPassengerListImages() {
     if (!data.ok) throw new Error((data.error || 'Error desconocido del generador') + (data.stack ? '\n' + data.stack : ''));
 
     const hojas = data.hojas || [];
-    if (!hojas.length) throw new Error('El generador no devolvió imágenes');
+    if (!hojas.length) throw new Error('El generador no devolvió PDFs');
 
     for (const hoja of hojas) {
-      _descargarBase64Png(hoja.base64, hoja.filename);
+      _descargarBase64Pdf(hoja.base64, hoja.filename);
       // Pequeña pausa entre descargas: algunos navegadores mobile
       // (Samsung Browser incluido) descartan descargas disparadas
       // demasiado rápido una tras otra.
@@ -114,7 +114,7 @@ async function exportPassengerListImages() {
     }
 
     const diag = (data.diagnostico || []).join(' | ');
-    toast((hojas.length === 1 ? 'Imagen generada' : `${hojas.length} imágenes generadas`) + (diag ? ' — ' + diag : ''));
+    toast((hojas.length === 1 ? 'PDF generado' : `${hojas.length} PDFs generados`) + (diag ? ' — ' + diag : ''));
   } catch (e) {
     console.error(e);
     const esErrorDeRed = e instanceof TypeError; // fetch lanza TypeError puro cuando el request es bloqueado (CORS, mixed content, sin conexión) antes de llegar al servidor
@@ -127,12 +127,12 @@ async function exportPassengerListImages() {
   }
 }
 
-function _descargarBase64Png(base64, filename) {
+function _descargarBase64Pdf(base64, filename) {
   const byteChars = atob(base64);
   const byteNumbers = new Array(byteChars.length);
   for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
   const byteArray = new Uint8Array(byteNumbers);
-  const blob = new Blob([byteArray], { type: 'image/png' });
+  const blob = new Blob([byteArray], { type: 'application/pdf' });
 
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
