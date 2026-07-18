@@ -7,7 +7,7 @@
 
 // URL del Apps Script desplegado como Web App (terminación /exec).
 // Ver appscript/Code.gs para el código del backend.
-const PAX_APPSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyog8SJ5SEgKbWG-qj0iGV2YBbCcwRfxV6oNkOigC_Ptk-TYPNYoeB5dk-sNbLkGPwkQw/exec';
+const PAX_APPSCRIPT_URL = 'https://script.google.com/macros/library/d/1KQcVRh1EtIqYTev4NBT_4LyXk1SKjMRBRHJ8xtHBvy-FXJ4qagJ2u58t/4';
 
 const PaxListState = {
   viaje: null,
@@ -96,7 +96,7 @@ async function exportPassengerListImages() {
     if (!response.ok) throw new Error('Respuesta HTTP ' + response.status);
 
     const data = await response.json();
-    if (!data.ok) throw new Error(data.error || 'Error desconocido del generador');
+    if (!data.ok) throw new Error((data.error || 'Error desconocido del generador') + (data.stack ? '\n' + data.stack : ''));
 
     const hojas = data.hojas || [];
     if (!hojas.length) throw new Error('El generador no devolvió imágenes');
