@@ -7,7 +7,7 @@
 
 // URL del Apps Script desplegado como Web App (terminación /exec).
 // Ver appscript/Code.gs para el código del backend.
-const PAX_APPSCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyog8SJ5SEgKbWG-qj0iGV2YBbCcwRfxV6oNkOigC_Ptk-TYPNYoeB5dk-sNbLkGPwkQw/exec';
+const PAX_APPSCRIPT_URL = 'PEGAR_AQUI_LA_URL_/exec_DEL_APPS_SCRIPT';
 
 const PaxListState = {
   viaje: null,
@@ -86,7 +86,11 @@ async function exportPassengerListImages() {
   try {
     const response = await fetch(PAX_APPSCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // evita preflight CORS contra Apps Script
+      redirect: 'follow',
+      // Sin Content-Type explícito: al mandar un string como body, fetch
+      // usa "text/plain;charset=UTF-8" por defecto, que es justamente el
+      // patrón recomendado para Apps Script — evita el preflight CORS de
+      // forma más consistente entre navegadores que fijarlo a mano.
       body: JSON.stringify({
         viaje: viaje.nombre,
         pasajeros: PaxListState.passengers
@@ -109,10 +113,15 @@ async function exportPassengerListImages() {
       await new Promise(r => setTimeout(r, 400));
     }
 
-    toast(hojas.length === 1 ? 'Imagen generada' : `${hojas.length} imágenes generadas`);
+    const diag = (data.diagnostico || []).join(' | ');
+    toast((hojas.length === 1 ? 'Imagen generada' : `${hojas.length} imágenes generadas`) + (diag ? ' — ' + diag : ''));
   } catch (e) {
     console.error(e);
-    toast('Error al generar la lista: ' + (e.message || ''));
+    const esErrorDeRed = e instanceof TypeError; // fetch lanza TypeError puro cuando el request es bloqueado (CORS, mixed content, sin conexión) antes de llegar al servidor
+    const mensaje = esErrorDeRed
+      ? 'No se pudo conectar con el generador. Revisá que la URL del Apps Script sea correcta y que la implementación esté publicada como "Cualquier usuario".'
+      : 'Error al generar la lista: ' + (e.message || '');
+    toast(mensaje);
   } finally {
     hideLoading();
   }
