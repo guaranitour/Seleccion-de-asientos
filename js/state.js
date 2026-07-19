@@ -16,6 +16,10 @@ const AppState = {
   // Numeración visible (code -> número secuencial mostrado al público)
   numLabels: new Map(),
 
+  // Offset de numeración de la planta activa (asientos numerables de las
+  // plantas anteriores del mismo viaje, según orden) — ver seats-grid.js
+  seatNumberOffset: 0,
+
   // Resultados de "Mirá tu asiento"
   highlightCodes: new Set(),
 
@@ -36,6 +40,7 @@ function resetViajeState() {
   AppState.planta = null;
   AppState.seatsByCode = new Map();
   AppState.numLabels = new Map();
+  AppState.seatNumberOffset = 0;
   AppState.highlightCodes = new Set();
   resetSelection();
   unsubscribeRealtime();

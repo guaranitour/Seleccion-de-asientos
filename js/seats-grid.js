@@ -3,6 +3,56 @@
 // numeración y sincronización en tiempo real (Supabase Realtime)
 // ============================================================
 
+/**
+ * Cuenta cuántos "lugares numerables" (asientos no inhabilitados, uno por
+ * casillero A/B/C/D de cada fila) tiene una planta, para poder correr la
+ * numeración de la siguiente planta. Mismo criterio que usa
+ * view-passenger-list.js para la lista de pasajeros.
+ */
+function _countNumerableSeats(rows) {
+  const rowsMap = new Map();
+  rows.forEach(r => {
+    if (!rowsMap.has(r.fila)) rowsMap.set(r.fila, []);
+    rowsMap.get(r.fila).push(r);
+  });
+  let count = 0;
+  rowsMap.forEach(seatsInRow => {
+    ['A', 'B', 'C', 'D'].forEach(letra => {
+      const seat = seatsInRow.find(s => String(s.letra) === letra);
+      if (!seat) return;
+      if ((seat.estado || '').toLowerCase() === 'inhabilitado') return;
+      count++;
+    });
+  });
+  return count;
+}
+
+/**
+ * Offset de numeración para la planta activa: suma de lugares numerables
+ * de todas las plantas anteriores (según `orden`) del mismo viaje. Así
+ * "Planta baja" continúa la numeración donde termina "Planta alta" en
+ * vez de arrancar de nuevo en 1.
+ */
+async function _computeSeatNumberOffset() {
+  const viaje = AppState.viaje;
+  const planta = AppState.planta;
+  if (!viaje || !planta || !Array.isArray(viaje.plantas) || viaje.plantas.length <= 1) return 0;
+
+  const previas = viaje.plantas.filter(p => (p.orden || 0) < (planta.orden || 0));
+  if (!previas.length) return 0;
+
+  let offset = 0;
+  for (const p of previas) {
+    try {
+      const rows = await Api.getAsientosByPlanta(p.id);
+      offset += _countNumerableSeats(rows);
+    } catch (e) {
+      console.error('_computeSeatNumberOffset error:', e);
+    }
+  }
+  return offset;
+}
+
 /** Trae los asientos de la planta activa y arma el mapa local. */
 async function refreshSeats(targetId, gridOptions) {
   if (!AppState.planta) return;
@@ -11,13 +61,17 @@ async function refreshSeats(targetId, gridOptions) {
   if (gridEl) gridEl.setAttribute('aria-busy', 'true');
 
   try {
-    const rows = await Api.getAsientosByPlanta(AppState.planta.id);
+    const [rows, offset] = await Promise.all([
+      Api.getAsientosByPlanta(AppState.planta.id),
+      _computeSeatNumberOffset()
+    ]);
     AppState.seatsByCode = new Map();
     rows.forEach(r => {
       AppState.seatsByCode.set(normalize(r.code), {
         id: r.id, estado: r.estado, pasajero: r.pasajero || '', ci: r.ci || ''
       });
     });
+    AppState.seatNumberOffset = offset;
     if (gridEl) buildGrid(targetId, gridOptions);
   } catch (err) {
     console.error('refreshSeats error:', err);
@@ -73,7 +127,7 @@ function buildGrid(targetId, options) {
   }
 
   AppState.numLabels = new Map();
-  let seatNumber = 1;
+  let seatNumber = 1 + (AppState.seatNumberOffset || 0);
 
   rows.forEach(row => {
     const rowEl = document.createElement('div');

@@ -44,11 +44,59 @@ function _renderPlantaTabs() {
   });
 }
 
+/**
+ * Cuenta lugares numerables (no inhabilitados, uno por casillero A/B/C/D
+ * de cada fila) — mismo criterio que seats-grid.js y view-passenger-list.js,
+ * para que la numeración que ve el staff coincida con la que vio el pasajero.
+ */
+function _countNumerableSeatsControl(rows) {
+  const rowsMap = new Map();
+  rows.forEach(r => {
+    if (!rowsMap.has(r.fila)) rowsMap.set(r.fila, []);
+    rowsMap.get(r.fila).push(r);
+  });
+  let count = 0;
+  rowsMap.forEach(seatsInRow => {
+    ['A', 'B', 'C', 'D'].forEach(letra => {
+      const seat = seatsInRow.find(s => String(s.letra) === letra);
+      if (!seat) return;
+      if ((seat.estado || '').toLowerCase() === 'inhabilitado') return;
+      count++;
+    });
+  });
+  return count;
+}
+
+/** Offset de numeración: suma de lugares numerables de las plantas
+ *  anteriores (según `orden`) del mismo viaje. */
+async function _computeControlSeatOffset() {
+  const viaje = ControlState.viaje;
+  const planta = ControlState.planta;
+  if (!viaje || !planta || !Array.isArray(viaje.plantas) || viaje.plantas.length <= 1) return 0;
+
+  const previas = viaje.plantas.filter(p => (p.orden || 0) < (planta.orden || 0));
+  if (!previas.length) return 0;
+
+  let offset = 0;
+  for (const p of previas) {
+    try {
+      const rows = await ApiAdmin.getAsientosByPlanta(p.id);
+      offset += _countNumerableSeatsControl(rows);
+    } catch (e) {
+      console.error('_computeControlSeatOffset error:', e);
+    }
+  }
+  return offset;
+}
+
 async function refreshControlGrid() {
   showLoading('Cargando ocupación…');
   try {
-    const rows = await ApiAdmin.getAsientosByPlanta(ControlState.planta.id);
-    _renderControlGrid(rows);
+    const [rows, offset] = await Promise.all([
+      ApiAdmin.getAsientosByPlanta(ControlState.planta.id),
+      _computeControlSeatOffset()
+    ]);
+    _renderControlGrid(rows, offset);
   } catch (e) {
     toast('Error al cargar asientos');
   } finally {
@@ -56,7 +104,7 @@ async function refreshControlGrid() {
   }
 }
 
-function _renderControlGrid(seats) {
+function _renderControlGrid(seats, seatOffset) {
   const grid = document.getElementById('grid-control');
   grid.innerHTML = '';
 
@@ -67,7 +115,7 @@ function _renderControlGrid(seats) {
   });
 
   const filas = Array.from(rowsMap.keys()).sort((a, b) => a - b);
-  let seatNumber = 1;
+  let seatNumber = 1 + (seatOffset || 0);
   const numByCode = new Map();
 
   filas.forEach(fila => {
