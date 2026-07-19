@@ -330,29 +330,32 @@ function renderConfirmedPage(pairs) {
 
   const hint = document.createElement('div');
   hint.className = 'confirmed-hint';
-  hint.textContent = '📸 Guardá una captura como comprobante';
+  hint.textContent = '📲 Tocá "Compartir reserva" para guardar tu comprobante';
   wrap.appendChild(hint);
 
   const actionsDiv = document.createElement('div');
   actionsDiv.className = 'confirmed-actions';
 
-  if (navigator.share) {
-    const shareBtn = document.createElement('button');
-    shareBtn.type = 'button';
-    shareBtn.className = 'btn success';
-    shareBtn.innerHTML = '↑ Compartir reserva';
-    shareBtn.addEventListener('click', () => {
-      const lines = pairs.map(p => {
-        const num = AppState.numLabels.get(p.code) || p.code;
-        return `Asiento ${num} — ${p.pasajero}`;
-      }).join('\n');
-      navigator.share({
-        title: tripName ? 'Reserva ' + tripName : 'Reserva confirmada',
-        text: (tripName ? tripName + '\n' : '') + lines
-      }).catch(() => {});
-    });
-    actionsDiv.appendChild(shareBtn);
-  }
+  // Antes esto solo aparecía si navigator.share existía (compartía texto
+  // plano). Ahora genera una imagen de la tarjeta: comparte el archivo si
+  // el navegador lo soporta, y si no, la descarga directamente — así el
+  // botón es útil en cualquier navegador, no solo los que tienen Web Share.
+  const shareBtn = document.createElement('button');
+  shareBtn.type = 'button';
+  shareBtn.className = 'btn success';
+  shareBtn.innerHTML = '↑ Compartir reserva';
+  shareBtn.addEventListener('click', async () => {
+    shareBtn.disabled = true;
+    const originalLabel = shareBtn.innerHTML;
+    shareBtn.innerHTML = 'Generando imagen…';
+    try {
+      await shareOrDownloadConfirmedCard(pairs);
+    } finally {
+      shareBtn.disabled = false;
+      shareBtn.innerHTML = originalLabel;
+    }
+  });
+  actionsDiv.appendChild(shareBtn);
 
   const backBtn = document.createElement('button');
   backBtn.type = 'button';
