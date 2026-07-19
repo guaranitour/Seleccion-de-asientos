@@ -40,32 +40,52 @@ async function goPassengerList(viaje) {
   setHash(['Panel', 'Lista', viaje.nombre]);
 }
 
-/** Trae los asientos ocupados de TODAS las plantas del viaje (en orden)
- *  y arma una lista continua de pasajeros numerada. */
+/** Trae los asientos de TODAS las plantas del viaje y calcula, para
+ *  cada pasajero, el número de asiento real (1..N continuo entre
+ *  plantas) — el mismo número que se ve en la grilla de asientos del
+ *  panel de control: se agrupan por fila, se recorren en el orden
+ *  A,B,C,D, y los asientos inhabilitados no cuentan (no consumen
+ *  número). Los pasajeros quedan ubicados en la fila de la lista que
+ *  corresponde a SU número de asiento, no de forma secuencial. */
 async function _loadAllPassengers() {
   const viaje = PaxListState.viaje;
   const plantas = Array.isArray(viaje.plantas) ? viaje.plantas : [];
-  let allPassengers = [];
+  const passengers = []; // [{ numero, documento, nombre }] — numero = asiento real
+  let seatNumber = 1;
 
   for (const planta of plantas) {
     const rows = await ApiAdmin.getAsientosByPlanta(planta.id);
-    const ocupados = rows
-      .filter(r => (r.estado || '').toLowerCase() === 'ocupado')
-      .sort((a, b) => (a.fila - b.fila) || String(a.letra).localeCompare(String(b.letra)))
-      .map(r => ({
-        documento: r.ci || '',
-        nombre: r.pasajero || '',
-        planta: planta.etiqueta
-      }));
-    allPassengers = allPassengers.concat(ocupados);
+
+    const rowsMap = new Map();
+    rows.forEach(r => {
+      if (!rowsMap.has(r.fila)) rowsMap.set(r.fila, []);
+      rowsMap.get(r.fila).push(r);
+    });
+
+    const filas = Array.from(rowsMap.keys()).sort((a, b) => a - b);
+
+    filas.forEach(fila => {
+      const seatsInRow = rowsMap.get(fila).sort((a, b) => String(a.letra).localeCompare(String(b.letra)));
+      ['A', 'B', 'C', 'D'].forEach(letra => {
+        const seat = seatsInRow.find(s => s.letra === letra);
+        if (!seat) return; // posición sin asiento físico en esa fila: no consume número
+        if ((seat.estado || '').toLowerCase() === 'inhabilitado') return; // no consume número, igual que en la grilla
+
+        if ((seat.estado || '').toLowerCase() === 'ocupado') {
+          passengers.push({
+            numero: seatNumber,
+            documento: seat.ci || '',
+            nombre: seat.pasajero || ''
+          });
+        }
+        seatNumber++;
+      });
+    });
   }
 
-  PaxListState.passengers = allPassengers.map((p, i) => ({
-    numero: i + 1,
-    documento: p.documento,
-    nombre: p.nombre
-  }));
-  PaxListState.sheetsCount = Math.max(1, Math.ceil(allPassengers.length / PAX_ROWS_PER_SHEET));
+  PaxListState.passengers = passengers;
+  const maxNumero = seatNumber - 1; // total de lugares numerables (ocupados o no) del viaje
+  PaxListState.sheetsCount = Math.max(1, Math.ceil(maxNumero / PAX_ROWS_PER_SHEET));
 }
 
 function _renderSummary() {
