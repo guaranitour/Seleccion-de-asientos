@@ -41,9 +41,10 @@ const ApiAdmin = {
     return data || [];
   },
 
-  async moverPasajero(plantaId, sourceCode, targetCode) {
+  async moverPasajero(plantaId, sourceCode, targetCode, targetPlantaId) {
     const { error } = await supabase.rpc('mover_pasajero', {
-      p_planta_id: plantaId, p_source_code: sourceCode, p_target_code: targetCode
+      p_planta_id: plantaId, p_source_code: sourceCode, p_target_code: targetCode,
+      p_target_planta_id: targetPlantaId || null
     });
     if (error) throw error;
   },

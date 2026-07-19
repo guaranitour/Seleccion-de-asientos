@@ -6,7 +6,8 @@
 const ControlState = {
   viaje: null,
   planta: null,
-  moveSource: null // code del asiento origen cuando se está moviendo
+  moveSource: null,       // code del asiento origen cuando se está moviendo
+  moveSourcePlantaId: null // planta_id del asiento origen (puede ser distinta a la que se está viendo)
 };
 
 async function goControl(viaje) {
@@ -15,6 +16,7 @@ async function goControl(viaje) {
   ControlState.viaje = viaje;
   ControlState.planta = viaje.plantas[0] || null;
   ControlState.moveSource = null;
+  ControlState.moveSourcePlantaId = null;
 
   showView('view-control');
   document.getElementById('controlTripName').textContent = viaje.nombre;
@@ -36,7 +38,10 @@ function _renderPlantaTabs() {
     btn.textContent = p.etiqueta;
     btn.onclick = async () => {
       ControlState.planta = p;
-      ControlState.moveSource = null;
+      // No se cancela ControlState.moveSource acá: si el staff ya eligió
+      // un asiento origen para mover, cambiar de pestaña de planta debe
+      // dejarlo elegir el destino en ESA otra planta, no abortar el
+      // movimiento. moveSourcePlantaId guarda de dónde vino el origen.
       _renderPlantaTabs();
       await refreshControlGrid();
     };
@@ -142,7 +147,7 @@ function _renderControlGrid(seats, seatOffset) {
       }
 
       numByCode.set(seat.code, seatNumber);
-      const isSelected = ControlState.moveSource === seat.code;
+      const isSelected = ControlState.moveSource === seat.code && ControlState.moveSourcePlantaId === ControlState.planta.id;
       btn.className = 'seat ' + (isSelected ? 'seleccionado' : seat.estado);
       btn.setAttribute('data-code', seat.code);
       btn.setAttribute('data-status', seat.estado);
@@ -173,13 +178,15 @@ function _renderControlGrid(seats, seatOffset) {
 
 function _onControlSeatClick(seat) {
   if (ControlState.moveSource) {
-    if (ControlState.moveSource === seat.code) {
+    const isSameSeat = ControlState.moveSource === seat.code && ControlState.moveSourcePlantaId === ControlState.planta.id;
+    if (isSameSeat) {
       ControlState.moveSource = null; // deseleccionar
+      ControlState.moveSourcePlantaId = null;
       refreshControlGrid();
       return;
     }
     if (seat.estado === 'libre') {
-      _confirmMove(ControlState.moveSource, seat.code);
+      _confirmMove(ControlState.moveSource, ControlState.moveSourcePlantaId, seat.code, ControlState.planta.id);
       return;
     }
     toast('El destino debe ser un asiento libre');
@@ -200,9 +207,10 @@ function _openSeatActionSheet(seat) {
 
   document.getElementById('sheetBtnMove').onclick = () => {
     ControlState.moveSource = seat.code;
+    ControlState.moveSourcePlantaId = ControlState.planta.id;
     _closeSeatActionSheet();
     refreshControlGrid();
-    toast('Elegí el asiento destino');
+    toast('Elegí el asiento destino (podés cambiar de planta)');
   };
   document.getElementById('sheetBtnFree').onclick = () => {
     _closeSeatActionSheet();
@@ -211,22 +219,30 @@ function _openSeatActionSheet(seat) {
   document.getElementById('sheetBtnCancel').onclick = _closeSeatActionSheet;
 
   sheet.classList.add('show');
+
+  // Cerrar al tocar el fondo oscuro (fuera del contenido del sheet) —
+  // mismo patrón que el bottom-sheet de planta en view-choose.js.
+  sheet.onclick = (ev) => {
+    if (ev.target === sheet) _closeSeatActionSheet();
+  };
 }
 
 function _closeSeatActionSheet() {
   document.getElementById('seatActionSheet').classList.remove('show');
 }
 
-async function _confirmMove(sourceCode, targetCode) {
+async function _confirmMove(sourceCode, sourcePlantaId, targetCode, targetPlantaId) {
   showLoading('Moviendo pasajero…');
   try {
-    await ApiAdmin.moverPasajero(ControlState.planta.id, sourceCode, targetCode);
+    await ApiAdmin.moverPasajero(sourcePlantaId, sourceCode, targetCode, targetPlantaId);
     toast('Pasajero movido correctamente');
     ControlState.moveSource = null;
+    ControlState.moveSourcePlantaId = null;
     await refreshControlGrid();
   } catch (e) {
     toast('Error: ' + (e.message || 'no se pudo mover'));
     ControlState.moveSource = null;
+    ControlState.moveSourcePlantaId = null;
     await refreshControlGrid();
   } finally {
     hideLoading();
@@ -250,8 +266,10 @@ function _renderMoveBar() {
   const bar = document.getElementById('controlMoveBar');
   if (ControlState.moveSource) {
     bar.style.display = '';
-    bar.querySelector('.control-move-text').textContent =
-      `Moviendo asiento ${ControlState.moveSource} — elegí el destino`;
+    const otraPlanta = ControlState.moveSourcePlantaId && ControlState.moveSourcePlantaId !== ControlState.planta.id;
+    bar.querySelector('.control-move-text').textContent = otraPlanta
+      ? `Moviendo asiento ${ControlState.moveSource} (otra planta) — elegí el destino acá`
+      : `Moviendo asiento ${ControlState.moveSource} — elegí el destino`;
   } else {
     bar.style.display = 'none';
   }
@@ -259,6 +277,7 @@ function _renderMoveBar() {
 
 function cancelMove() {
   ControlState.moveSource = null;
+  ControlState.moveSourcePlantaId = null;
   refreshControlGrid();
 }
 
