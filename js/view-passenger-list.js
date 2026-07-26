@@ -147,6 +147,56 @@ async function exportPassengerListImages() {
   }
 }
 
+/** Pide al Apps Script que genere los PDFs de la lista del chofer
+ *  (formato resumido, 64 pasajeros por hoja) y los descarga.
+ *  Reutiliza PaxListState.passengers, ya calculado por _loadAllPassengers
+ *  con el mismo criterio de numeración que usa el croquis. */
+async function exportChoferListImages() {
+  if (!PAX_APPSCRIPT_URL || PAX_APPSCRIPT_URL.includes('PEGAR_AQUI')) {
+    toast('Falta configurar la URL del Apps Script (PAX_APPSCRIPT_URL)');
+    return;
+  }
+
+  const viaje = PaxListState.viaje;
+  showLoading('Generando lista del chofer…');
+  try {
+    const response = await fetch(PAX_APPSCRIPT_URL, {
+      method: 'POST',
+      redirect: 'follow',
+      body: JSON.stringify({
+        tipo: 'chofer',
+        viaje: viaje.nombre,
+        pasajeros: PaxListState.passengers
+      })
+    });
+
+    if (!response.ok) throw new Error('Respuesta HTTP ' + response.status);
+
+    const data = await response.json();
+    if (!data.ok) throw new Error((data.error || 'Error desconocido del generador') + (data.stack ? '\n' + data.stack : ''));
+
+    const hojas = data.hojas || [];
+    if (!hojas.length) throw new Error('El generador no devolvió PDFs');
+
+    for (const hoja of hojas) {
+      _descargarBase64Pdf(hoja.base64, hoja.filename);
+      await new Promise(r => setTimeout(r, 400));
+    }
+
+    const diag = (data.diagnostico || []).join(' | ');
+    toast((hojas.length === 1 ? 'PDF generado' : `${hojas.length} PDFs generados`) + (diag ? ' — ' + diag : ''));
+  } catch (e) {
+    console.error(e);
+    const esErrorDeRed = e instanceof TypeError;
+    const mensaje = esErrorDeRed
+      ? 'No se pudo conectar con el generador. Revisá que la URL del Apps Script sea correcta y que la implementación esté publicada como "Cualquier usuario".'
+      : 'Error al generar la lista del chofer: ' + (e.message || '');
+    toast(mensaje);
+  } finally {
+    hideLoading();
+  }
+}
+
 function _descargarBase64Pdf(base64, filename) {
   const byteChars = atob(base64);
   const byteNumbers = new Array(byteChars.length);
@@ -166,3 +216,4 @@ function _descargarBase64Pdf(base64, filename) {
 
 window.goPassengerList = goPassengerList;
 window.exportPassengerListImages = exportPassengerListImages;
+window.exportChoferListImages = exportChoferListImages;
