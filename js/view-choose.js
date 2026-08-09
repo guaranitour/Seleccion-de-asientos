@@ -116,7 +116,7 @@ function _buildTripCard(viaje) {
 function backToChoose() {
   resetViajeState();
   showView('view-choose');
-  setHash(['Inicio']);
+  setHash(['Reservas']);
   loadViajes().catch(err => console.error(err));
 }
 
@@ -186,7 +186,7 @@ async function chooseFloor(planta) {
 /** Vuelve a la selección de planta (doble piso) o al croquis (convencional). */
 function goTripMenu() {
   if (!AppState.viaje) {
-    setHash(['Inicio']);
+    setHash(['Reservas']);
     showView('view-choose');
     loadViajes().catch(err => console.error(err));
     return;

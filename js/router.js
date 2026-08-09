@@ -1,5 +1,5 @@
 // ============================================================
-// router.js — Router por hash (#/Inicio, #/ViajeX, etc.)
+// router.js — Router por hash (#/Reservas, #/ViajeX, etc.)
 // ============================================================
 
 let ROUTER_DRIVING = false;
@@ -81,7 +81,7 @@ function getPlantaFromFloorLabel(viaje, floorLabel) {
 async function routeTo(hash) {
   const segs = getHashSegments(hash);
   if (!segs.length) {
-    setHash(['Inicio']);
+    setHash(['Reservas']);
     showView('view-choose');
     await loadViajes();
     return;
@@ -91,7 +91,7 @@ async function routeTo(hash) {
   ROUTER_DRIVING = true;
 
   try {
-    if (head.toLowerCase() === 'inicio') {
+    if (head.toLowerCase() === 'reservas' || head.toLowerCase() === 'inicio') {
       if (typeof closeFloorSheet === 'function') closeFloorSheet();
       showView('view-choose');
       await loadViajes();
@@ -161,9 +161,9 @@ async function routeTo(hash) {
     // Nombre de viaje "plano" — solo puede llegar aquí por una entrada de
     // historial vieja (de antes de esta corrección) o un enlace directo.
     // No es una vista real de la app: la intención siempre es volver a
-    // Inicio, así que redirigimos ahí en lugar de reabrir el croquis
+    // Reservas, así que redirigimos ahí en lugar de reabrir el croquis
     // (que además reabriría el selector de planta y taparía la pantalla).
-    setHash(['Inicio']);
+    setHash(['Reservas']);
     if (typeof closeFloorSheet === 'function') closeFloorSheet();
     showView('view-choose');
     await loadViajes();

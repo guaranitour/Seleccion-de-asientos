@@ -86,9 +86,9 @@ const Auth = {
     await supabase.auth.signOut();
     this.user = null;
     this.role = null;
-    setHash(['Inicio']);
+    setHash(['Reservas']);
     showView('view-choose');
-    await loadViajes(); // sin esto, setHash('Inicio') no dispara routeTo() (hash "programático")
+    await loadViajes(); // sin esto, setHash('Reservas') no dispara routeTo() (hash "programático")
                          // y view-choose queda vacía en vez de recargar la lista de viajes
   }
 };
