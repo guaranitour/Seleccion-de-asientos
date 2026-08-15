@@ -95,15 +95,25 @@ body:not(.app-ready) .view{ display:none !important; }
 
 /* Hero title — título con más presencia + bus recorriendo la línea como ruta */
 .hero-title{
-  margin:2px 0 30px 0;
-  padding-bottom:22px;
+  margin:2px 0 10px 0;
   font-size:1.45rem;
   font-weight:900;
   color:var(--text);
   text-align:left;
   position:relative;
 }
-.hero-title::before{
+
+/* Subtítulo descriptivo debajo del título, antes de la línea-ruta */
+.trip-list-subtitle{
+  margin:0 0 22px 0;
+  padding-bottom:22px;
+  font-size:.9rem;
+  line-height:1.4;
+  color:var(--muted);
+  text-align:left;
+  position:relative;
+}
+.trip-list-subtitle::before{
   /* la "ruta": línea sutil, separada del texto */
   content:"";
   position:absolute;
@@ -112,7 +122,7 @@ body:not(.app-ready) .view{ display:none !important; }
   background: linear-gradient(90deg, rgba(44,123,229,.18), rgba(16,185,129,.18));
   border-radius:2px;
 }
-.hero-title::after{
+.trip-list-subtitle::after{
   /* bus que recorre la ruta, apoyado sobre la línea */
   content:"🚌";
   position:absolute;
@@ -131,7 +141,7 @@ body:not(.app-ready) .view{ display:none !important; }
   100% { left:0%;   transform:translate(-50%, 45%) scaleX(1); }
 }
 @media (prefers-reduced-motion: reduce){
-  .hero-title::after{ animation:none; left:50%; }
+  .trip-list-subtitle::after{ animation:none; left:50%; }
 }
 
 /* ===== Botones ===== */
