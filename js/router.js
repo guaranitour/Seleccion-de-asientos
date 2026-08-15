@@ -6,8 +6,20 @@ let ROUTER_DRIVING = false;
 let VIAJES_CACHE = [];
 let LAST_PROGRAMMATIC_PATH = null;
 
+// Codifica un segmento de ruta escapando solo lo que rompería la URL
+// (/, ?, #, %) para que quede legible: sin %20 en vez de espacios ni
+// %C3%B3 en vez de tildes/ñ. Los navegadores muestran Unicode y espacios
+// directamente en la barra de direcciones sin problema.
+function encodePathSegment(s) {
+  return String(s || '')
+    .replace(/%/g, '%25')
+    .replace(/\//g, '%2F')
+    .replace(/\?/g, '%3F')
+    .replace(/#/g, '%23');
+}
+
 function buildPath(segments) {
-  return '/' + (segments || []).map(s => encodeURIComponent(String(s || ''))).join('/');
+  return '/' + (segments || []).map(s => encodePathSegment(s)).join('/');
 }
 
 function setHash(segments) {
