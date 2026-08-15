@@ -25,11 +25,12 @@ body{
 /* Bloqueo visual hasta que el router resuelva la vista inicial */
 body:not(.app-ready) .view{ display:none !important; }
 
-/* ===== Header: logo centrado ===== */
+/* ===== Header: menú + logo centrado ===== */
 .topbar{
   position:fixed; top:0; left:0; right:0; z-index:40;
   display:flex; align-items:center; justify-content:center;
-  height:76px; padding:0 16px; padding-top:env(safe-area-inset-top, 0px);
+  gap:4px;
+  height:76px; padding:0 10px; padding-top:env(safe-area-inset-top, 0px);
   /* El logo (heroLogo) es PNG transparente: sin un fondo propio acá, al
      hacer scroll el contenido pasa "detrás" del logo y se mezcla con él.
      Fondo glass (blur + semitransparente) para que tape el contenido sin
@@ -43,6 +44,25 @@ body:not(.app-ready) .view{ display:none !important; }
 /* Mientras el skeleton todavía muestra su propio fondo shimmer, no hace
    falta el glass detrás — evita un doble fondo visible en el primer paint. */
 .topbar:has(.topbar-logo.skeleton-round){ background:rgba(247,249,252,.55); }
+
+/* Botón hamburguesa (izq.) y spacer (der.) del mismo tamaño para que el
+   logo, dentro de un contenedor flex:1, quede perfectamente centrado sin
+   importar su ancho real. */
+.topbar-menu-btn{
+  flex-shrink:0; width:42px; height:42px; border:none; border-radius:12px;
+  background:transparent; color:var(--text); cursor:pointer;
+  display:grid; place-items:center;
+  transition: background-color .15s ease;
+}
+.topbar-menu-btn:hover{ background:rgba(17,24,39,.06); }
+.topbar-menu-btn:active{ background:rgba(17,24,39,.1); }
+.topbar-menu-btn svg{ width:22px; height:22px; }
+
+.topbar-spacer{ flex-shrink:0; width:42px; height:42px; }
+
+.topbar-logo-wrap{
+  flex:1; min-width:0; display:flex; align-items:center; justify-content:center;
+}
 .topbar-logo{
   height:56px; width:auto; max-width:220px; object-fit:contain; flex-shrink:0;
 }
@@ -153,16 +173,49 @@ input{ border:1px solid #e5e7eb; border-radius:10px; padding:12px; font-size:1re
 
 .hidden{ display:none !important; }
 
+/* ===== Menú lateral (drawer) ===== */
+.nav-drawer{
+  position:fixed; inset:0; z-index:300; pointer-events:none;
+}
+.nav-drawer.show{ pointer-events:auto; }
+
+.nav-drawer-backdrop{
+  position:absolute; inset:0; background:rgba(17,24,39,.4);
+  opacity:0; transition:opacity .2s ease;
+}
+.nav-drawer.show .nav-drawer-backdrop{ opacity:1; }
+
+.nav-drawer-panel{
+  position:absolute; top:0; left:0; bottom:0; width:min(78vw, 300px);
+  background:var(--card); box-shadow:8px 0 28px rgba(17,24,39,.18);
+  padding:calc(14px + env(safe-area-inset-top, 0px)) 14px 14px;
+  padding-bottom:calc(14px + env(safe-area-inset-bottom, 0px));
+  display:flex; flex-direction:column; gap:2px;
+  transform:translateX(-100%);
+  transition:transform .25s cubic-bezier(.34,1.15,.64,1);
+}
+.nav-drawer.show .nav-drawer-panel{ transform:translateX(0); }
+
+.nav-drawer-close{
+  align-self:flex-end; width:36px; height:36px; margin-bottom:6px;
+  border:none; border-radius:10px; background:transparent; color:var(--muted);
+  display:grid; place-items:center; cursor:pointer;
+}
+.nav-drawer-close:hover{ background:#f3f4f6; }
+
+.nav-drawer-item{
+  display:flex; align-items:center; gap:12px; width:100%;
+  border:none; background:transparent; border-radius:12px;
+  padding:12px 10px; font:inherit; font-size:.95rem; font-weight:700;
+  color:var(--text); text-align:left; cursor:pointer;
+}
+.nav-drawer-item:hover{ background:#f3f4f6; }
+.nav-drawer-item svg{ flex-shrink:0; width:20px; height:20px; color:var(--muted); }
+
 @media (prefers-reduced-motion: reduce){
   .view.active{ animation:none; }
   .spinner{ animation:none; }
+  .nav-drawer-backdrop, .nav-drawer-panel{ transition:none; }
 }
 
-/* ── Píldora BYC (aviso Bases y Condiciones) ── */
-.byc-pill{
-  display:block; margin:14px auto 0; max-width:680px; padding:10px 16px;
-  background:#fff8e1; border:1.5px solid #f9a825; border-radius:999px;
-  color:#e65100; font-size:.82rem; font-weight:600; text-align:center;
-  text-decoration:none; line-height:1.4; transition:background .18s, transform .12s;
-}
-.byc-pill:hover, .byc-pill:active{ background:#fff3cd; transform:scale(.98); }
+
