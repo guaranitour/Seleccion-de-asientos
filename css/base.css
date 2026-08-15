@@ -66,6 +66,9 @@ body:not(.app-ready) .view{ display:none !important; }
 .topbar-logo{
   height:56px; width:auto; max-width:220px; object-fit:contain; flex-shrink:0;
 }
+@media (max-width:380px){
+  .topbar-logo{ max-width:180px; height:48px; }
+}
 .topbar-logo.skeleton-round{
   width:180px; border-radius:14px;
   background: linear-gradient(100deg, #eceef1 30%, #f6f7f9 50%, #eceef1 70%);
@@ -92,7 +95,7 @@ body:not(.app-ready) .view{ display:none !important; }
 
 /* Hero title — título con más presencia + bus recorriendo la línea como ruta */
 .hero-title{
-  margin:0 0 30px 0;
+  margin:2px 0 30px 0;
   padding-bottom:22px;
   font-size:1.45rem;
   font-weight:900;
