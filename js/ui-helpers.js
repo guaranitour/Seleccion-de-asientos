@@ -12,6 +12,7 @@ function showView(id) {
   // vista real, para que nunca quede tapando la pantalla (ej. al volver
   // atrás desde el navegador estando el sheet de planta abierto).
   document.querySelectorAll('.action-sheet.show').forEach(sheet => sheet.classList.remove('show'));
+  if (typeof closeNavDrawer === 'function') closeNavDrawer();
 
   // Fallback por si el navegador no soporta el selector :has() usado en
   // panel.css para esconder el botón flotante de staff dentro de sus
@@ -156,6 +157,21 @@ setInterval(() => {
   });
 }, 1000);
 
+// ── Saludo corto según hora del día (sin asumir visitas previas) ──
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 6) return 'Buenas noches';
+  if (hour < 12) return 'Buenos días';
+  if (hour < 20) return 'Buenas tardes';
+  return 'Buenas noches';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const el = document.getElementById('helloGreeting');
+  if (el) el.textContent = getGreeting();
+});
+
+window.getGreeting = getGreeting;
 window.showView = showView;
 window.toast = toast;
 window.showLoading = showLoading;
