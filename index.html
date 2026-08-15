@@ -3,10 +3,27 @@
 <head>
 <meta charset="utf-8"/>
 <title>Selección de Asientos</title>
-<link rel="icon" href="./favicon.ico">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="manifest" href="/manifest.json">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+
+<!-- GitHub Pages no soporta rewrites del lado del servidor para History API.
+     Este script recupera la ruta real que 404.html guardó en sessionStorage
+     antes de redirigir acá, y la restaura con replaceState ANTES de que
+     arranque el router — así la app carga en la ruta correcta sin flicker
+     ni ida-vuelta visible en la URL. Debe ir antes de cualquier otro script. -->
+<script>
+(function () {
+  var redirect = sessionStorage.getItem('gh-pages-redirect');
+  if (redirect) {
+    sessionStorage.removeItem('gh-pages-redirect');
+    if (redirect !== location.pathname + location.search + location.hash) {
+      history.replaceState(null, '', redirect);
+    }
+  }
+})();
+</script>
 
 <!-- Previsualización al compartir el link (WhatsApp, Facebook, Telegram, etc.) -->
 <meta property="og:type" content="website">
@@ -19,12 +36,12 @@
 <meta name="twitter:description" content="Elegí tu asiento y reservá tu lugar para el viaje.">
 <meta name="twitter:image" content="https://www.guaranitour.com/Preview.png">
 
-<link href="css/base.css" rel="stylesheet"/>
-<link href="css/home.css" rel="stylesheet"/>
-<link href="css/croquis.css" rel="stylesheet"/>
-<link href="css/reserve.css" rel="stylesheet"/>
-<link href="css/panel.css" rel="stylesheet"/>
-<link href="css/passenger-list.css" rel="stylesheet"/>
+<link href="/css/base.css" rel="stylesheet"/>
+<link href="/css/home.css" rel="stylesheet"/>
+<link href="/css/croquis.css" rel="stylesheet"/>
+<link href="/css/reserve.css" rel="stylesheet"/>
+<link href="/css/panel.css" rel="stylesheet"/>
+<link href="/css/passenger-list.css" rel="stylesheet"/>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -308,23 +325,23 @@
 <canvas aria-hidden="true" id="confetti-canvas"></canvas>
 
 <!-- Scripts (orden importa: dependencias primero) -->
-<script src="js/supabase-client.js"></script>
-<script src="js/state.js"></script>
-<script src="js/api.js"></script>
-<script src="js/ui-helpers.js"></script>
-<script src="js/router.js"></script>
-<script src="js/view-choose.js"></script>
-<script src="js/seats-grid.js"></script>
-<script src="js/view-select.js"></script>
-<script src="js/share-card.js"></script>
-<script src="js/view-reserve.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/api-admin.js"></script>
-<script src="js/view-panel.js"></script>
-<script src="js/view-control.js"></script>
-<script src="js/view-editor.js"></script>
-<script src="js/view-passenger-list.js"></script>
-<script src="js/main.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/state.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/ui-helpers.js"></script>
+<script src="/js/router.js"></script>
+<script src="/js/view-choose.js"></script>
+<script src="/js/seats-grid.js"></script>
+<script src="/js/view-select.js"></script>
+<script src="/js/share-card.js"></script>
+<script src="/js/view-reserve.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/api-admin.js"></script>
+<script src="/js/view-panel.js"></script>
+<script src="/js/view-control.js"></script>
+<script src="/js/view-editor.js"></script>
+<script src="/js/view-passenger-list.js"></script>
+<script src="/js/main.js"></script>
 
 </body>
 </html>
