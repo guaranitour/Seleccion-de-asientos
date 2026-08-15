@@ -30,7 +30,7 @@ function _loadLogoImage() {
     img.crossOrigin = 'anonymous';
     img.onload = () => resolve(img);
     img.onerror = () => resolve(null); // sin logo, la tarjeta se genera igual
-    img.src = 'Logo.png';
+    img.src = '/Logo.png';
   });
   return _logoImgPromise;
 }

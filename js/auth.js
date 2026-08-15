@@ -88,7 +88,7 @@ const Auth = {
     this.role = null;
     setHash(['Reservas']);
     showView('view-choose');
-    await loadViajes(); // sin esto, setHash('Reservas') no dispara routeTo() (hash "programático")
+    await loadViajes(); // sin esto, setHash('Reservas') no dispara routeTo() (ruta "programática")
                          // y view-choose queda vacía en vez de recargar la lista de viajes
   }
 };

@@ -1,45 +1,45 @@
 // ============================================================
-// router.js — Router por hash (#/Reservas, #/ViajeX, etc.)
+// router.js — Router por History API (/Reservas, /ViajeX, etc.)
 // ============================================================
 
 let ROUTER_DRIVING = false;
 let VIAJES_CACHE = [];
-let LAST_PROGRAMMATIC_HASH = null;
+let LAST_PROGRAMMATIC_PATH = null;
 
-function buildHash(segments) {
-  return '#/' + (segments || []).map(s => encodeURIComponent(String(s || ''))).join('/');
+function buildPath(segments) {
+  return '/' + (segments || []).map(s => encodeURIComponent(String(s || ''))).join('/');
 }
 
 function setHash(segments) {
   if (ROUTER_DRIVING) return;
-  const next = buildHash(segments);
-  if (next === location.hash) return;
-  // Recordamos que este cambio de hash lo iniciamos nosotros (no el usuario
-  // tocando atrás/adelante del navegador). El listener de hashchange en
+  const next = buildPath(segments);
+  if (next === location.pathname) return;
+  // Recordamos que este cambio de ruta lo iniciamos nosotros (no el usuario
+  // tocando atrás/adelante del navegador). El listener de popstate en
   // main.js compara contra esto y evita volver a llamar a routeTo() para
-  // este mismo cambio — sin eso, cambiar location.hash dispara "hashchange"
-  // y se dispara una segunda navegación en paralelo (por eso el bottom-sheet
-  // de planta a veces no se cerraba: dos renders pisándose el loading).
-  LAST_PROGRAMMATIC_HASH = next;
-  location.hash = next;
+  // este mismo cambio — sin eso, cambiar la URL dispara una segunda
+  // navegación en paralelo (por eso el bottom-sheet de planta a veces no
+  // se cerraba: dos renders pisándose el loading).
+  LAST_PROGRAMMATIC_PATH = next;
+  history.pushState(null, '', next + location.search);
 }
 
-/** Usado por el listener de hashchange en main.js para decidir si este
- *  cambio de hash ya fue iniciado (y por lo tanto ya está siendo manejado)
+/** Usado por el listener de popstate en main.js para decidir si este
+ *  cambio de ruta ya fue iniciado (y por lo tanto ya está siendo manejado)
  *  por quien llamó a setHash(). */
 function isProgrammaticHashChange() {
-  if (LAST_PROGRAMMATIC_HASH !== null && LAST_PROGRAMMATIC_HASH === location.hash) {
-    LAST_PROGRAMMATIC_HASH = null;
+  if (LAST_PROGRAMMATIC_PATH !== null && LAST_PROGRAMMATIC_PATH === location.pathname) {
+    LAST_PROGRAMMATIC_PATH = null;
     return true;
   }
   return false;
 }
 
-function getHashSegments(h) {
-  const raw = String(h || location.hash || '').replace(/^#\/?/, '');
+function getHashSegments(p) {
+  const raw = String(p || location.pathname || '').replace(/^\/+/, '');
   if (!raw) return [];
-  return raw.split('/').map(p => {
-    try { return decodeURIComponent(p); } catch (e) { return p; }
+  return raw.split('/').map(s => {
+    try { return decodeURIComponent(s); } catch (e) { return s; }
   });
 }
 
@@ -78,8 +78,8 @@ function getPlantaFromFloorLabel(viaje, floorLabel) {
   return viaje.plantas[0] || null;
 }
 
-async function routeTo(hash) {
-  const segs = getHashSegments(hash);
+async function routeTo(path) {
+  const segs = getHashSegments(path);
   if (!segs.length) {
     setHash(['Reservas']);
     showView('view-choose');

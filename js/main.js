@@ -20,7 +20,7 @@ function _loadHeroLogo() {
   if (!img) return;
   img.addEventListener('load', () => img.classList.add('loaded'), { once: true });
   img.addEventListener('error', () => img.classList.add('loaded'), { once: true });
-  img.src = 'Logo.png';
+  img.src = '/Logo.png';
 }
 
 async function start() {
@@ -28,13 +28,13 @@ async function start() {
   await Auth.init();
   updateStaffEntryPoint();
 
-  window.addEventListener('hashchange', () => {
+  window.addEventListener('popstate', () => {
     if (ROUTER_DRIVING) return;
     if (isProgrammaticHashChange()) return; // ya lo maneja quien llamó a setHash()
-    routeTo(location.hash);
+    routeTo(location.pathname);
   }, { passive: true });
 
-  await routeTo(location.hash);
+  await routeTo(location.pathname);
   document.body.classList.add('app-ready');
   BOOTSTRAPING = false;
   hideLoading();
