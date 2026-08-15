@@ -6,10 +6,23 @@ let ROUTER_DRIVING = false;
 let VIAJES_CACHE = [];
 let LAST_PROGRAMMATIC_PATH = null;
 
-// Codifica un segmento de ruta escapando solo lo que rompería la URL
-// (/, ?, #, %) para que quede legible: sin %20 en vez de espacios ni
-// %C3%B3 en vez de tildes/ñ. Los navegadores muestran Unicode y espacios
-// directamente en la barra de direcciones sin problema.
+// Convierte un nombre para mostrar (con tildes/espacios/mayúsculas) en un
+// slug de URL limpio: "Selección de asientos" -> "seleccion-de-asientos",
+// "Planta baja" -> "planta-baja". Así la URL queda legible y sin %XX, en
+// vez de depender de que el navegador codifique espacios/Unicode (que lo
+// hace igual, mostrando %20/%C3%B3 en la barra pase lo que pase).
+function slugify(s) {
+  return String(s || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // saca tildes/diacríticos
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-') // espacios y símbolos -> guion
+    .replace(/^-+|-+$/g, '');   // sin guiones al principio/final
+}
+
+// Codifica lo que quede tras el slug (por si el nombre no tiene un slug
+// limpio disponible, ej. queda vacío) escapando solo lo estrictamente
+// necesario para no romper la URL.
 function encodePathSegment(s) {
   return String(s || '')
     .replace(/%/g, '%25')
@@ -19,7 +32,10 @@ function encodePathSegment(s) {
 }
 
 function buildPath(segments) {
-  return '/' + (segments || []).map(s => encodePathSegment(s)).join('/');
+  return '/' + (segments || []).map(s => {
+    const slug = slugify(s);
+    return slug ? slug : encodePathSegment(s);
+  }).join('/');
 }
 
 function setHash(segments) {
@@ -67,8 +83,8 @@ async function ensureViajesCache() {
 
 async function resolveViajeByName(name) {
   const viajes = await ensureViajesCache();
-  const target = (name || '').trim().toLowerCase();
-  return viajes.find(v => (v.nombre || '').trim().toLowerCase() === target) || null;
+  const target = slugify(name);
+  return viajes.find(v => slugify(v.nombre) === target) || null;
 }
 
 function getFloorLabelFromEtiqueta(etiqueta) {
@@ -153,17 +169,17 @@ async function routeTo(path) {
       const sub = (segs[1] || '').toLowerCase();
       if (sub === 'control' && segs[2]) {
         const viajes = await ApiAdmin.getAllViajes();
-        const viaje = viajes.find(v => v.nombre === segs[2]);
+        const viaje = viajes.find(v => slugify(v.nombre) === slugify(segs[2]));
         if (viaje) { await goControl(viaje); return; }
       }
       if (sub === 'editor' && segs[2]) {
         const viajes = await ApiAdmin.getAllViajes();
-        const viaje = viajes.find(v => v.nombre === segs[2]);
+        const viaje = viajes.find(v => slugify(v.nombre) === slugify(segs[2]));
         if (viaje) { await goEditor(viaje); return; }
       }
       if (sub === 'lista' && segs[2]) {
         const viajes = await ApiAdmin.getAllViajes();
-        const viaje = viajes.find(v => v.nombre === segs[2]);
+        const viaje = viajes.find(v => slugify(v.nombre) === slugify(segs[2]));
         if (viaje) { await goPassengerList(viaje); return; }
       }
       await goPanel();
