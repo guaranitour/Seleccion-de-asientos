@@ -4,32 +4,14 @@
 
 /* ===== Encabezado de bienvenida (view-choose) ===== */
 
-/* Card que envuelve saludo + título + subtítulo. Se colapsa con el scroll
-   de la lista de viajes (ver .trip-hero-card.collapsed) para dejar más
-   espacio visible cuando hay muchos viajes — el logo del topbar (fixed,
-   fuera de esta card) siempre queda visible arriba. */
+/* Card que envuelve saludo + título + subtítulo, separada del logo fijo
+   del topbar de arriba. */
 .trip-hero-card{
   background: var(--card);
   border: 1.5px solid rgba(17,24,39,.09);
   border-radius: 20px;
   padding: 18px 20px 4px;
   margin-bottom: 16px;
-  overflow: hidden;
-  max-height: 220px;
-  opacity: 1;
-  transition: max-height .28s ease, opacity .22s ease, padding .28s ease, margin .28s ease;
-}
-.trip-hero-card.collapsed{
-  max-height: 0;
-  opacity: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  margin-bottom: 0;
-  border-width: 0;
-  pointer-events: none;
-}
-@media (prefers-reduced-motion: reduce){
-  .trip-hero-card{ transition:none; }
 }
 
 .hello-greeting{
