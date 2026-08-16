@@ -203,8 +203,15 @@ function goTripMenu() {
 }
 
 window.loadViajes = loadViajes;
+/** Navega a la view de Bases y condiciones (accesible desde el menú). */
+function goBases() {
+  showView('view-bases');
+  setHash(['Bases y condiciones']);
+}
+
 window.backToChoose = backToChoose;
 window.selectViaje = selectViaje;
+window.goBases = goBases;
 window.chooseFloor = chooseFloor;
 window.goTripMenu = goTripMenu;
 window.closeFloorSheet = _closeFloorSheet;

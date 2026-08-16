@@ -146,6 +146,11 @@ async function routeTo(path) {
       return;
     }
 
+    if (head.toLowerCase() === 'bases-y-condiciones') {
+      showView('view-bases');
+      return;
+    }
+
     if (head.toLowerCase() === 'formulario') {
       const nombreViaje = segs[1];
       const viaje = await resolveViajeByName(nombreViaje);
