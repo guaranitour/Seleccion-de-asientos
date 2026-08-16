@@ -176,6 +176,31 @@
             <button class="btn success" id="basesSubmitBtn" type="submit">Enviar</button>
           </div>
         </form>
+
+        <!-- Pantalla 3: confirmación -->
+        <div class="bases-card bases-confirmed hidden" id="basesConfirmedCard">
+          <div class="bases-confirmed-icon" aria-hidden="true">
+            <svg fill="none" height="30" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24" width="30"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <h2 class="bases-confirmed-title">¡Bienvenido a Destino Guaraní!</h2>
+          <p class="bases-confirmed-text">Agradecemos que hayas aceptado las Bases y Condiciones.</p>
+
+          <div class="bases-confirmed-notice" id="basesConfirmedEmailNotice">
+            <svg aria-hidden="true" class="bases-confirmed-notice-icon" fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z"/><path d="m22 6-10 7L2 6"/>
+            </svg>
+            <span class="bases-confirmed-notice-text" id="basesConfirmedEmailText">
+              Te enviamos un correo con la información registrada para que tengas una copia. Si no lo recibiste, o ingresaste un correo incorrecto, contactá a tu agente e indicale que completaste la aceptación, así podrá facilitarte el PDF por WhatsApp.
+            </span>
+          </div>
+
+          <p class="bases-confirmed-signature">Equipo Destino Guaraní 🦾🚌</p>
+
+          <button class="btn bases-cta" onclick="backToChoose()" type="button">
+            Ir al inicio
+            <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="16"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
       </div>
     </div>
   </section>
