@@ -135,6 +135,17 @@
           <h2 class="bases-form-title">Completá tus datos</h2>
           <p class="bases-form-subtitle">Usamos esta información para confirmar tu aceptación de las Bases y Condiciones.</p>
 
+          <a class="bases-read-notice" href="https://drive.google.com/file/d/1j2VCdg6gRKpz1dpySOV9M3Fz4RGGBbzm/view" rel="noopener" target="_blank">
+            <svg aria-hidden="true" class="bases-read-notice-icon" fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h6"/>
+            </svg>
+            <span class="bases-read-notice-text">
+              <strong>Antes de continuar, leé las Bases y Condiciones.</strong>
+              Es obligatorio para poder completar este formulario. Tocá acá para abrirlas.
+            </span>
+            <svg aria-hidden="true" class="bases-read-notice-arrow" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="16"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+          </a>
+
           <div class="reserve-field" style="margin-bottom:12px;">
             <label class="reserve-field-label" for="basesNombre">Nombre y apellido</label>
             <input autocomplete="name" id="basesNombre" name="nombre" placeholder="Ej: Ana Gómez" type="text"/>
@@ -154,6 +165,11 @@
             <label class="reserve-field-label" for="basesEmail">Correo electrónico</label>
             <input autocomplete="email" id="basesEmail" name="email" placeholder="Ej: ana@correo.com" type="email"/>
           </div>
+
+          <label class="bases-checkbox-row bases-checkbox-row-confirm" for="basesConfirmLeido" id="basesConfirmLeidoRow" style="margin-top:12px;">
+            <input id="basesConfirmLeido" onchange="_clearBasesConfirmError()" type="checkbox"/>
+            <span>Leí y acepto las Bases y Condiciones</span>
+          </label>
 
           <div class="reserve-actions" style="margin-top:20px;">
             <button class="btn ghost" onclick="goBasesLanding()" type="button">Volver</button>
