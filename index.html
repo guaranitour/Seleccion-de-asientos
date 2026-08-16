@@ -80,9 +80,11 @@
   <section aria-label="Elegí tu viaje" class="view active" id="view-choose">
     <div class="home-center" style="align-items:start;">
       <div style="max-width:680px; margin:0 auto; width:100%;">
-        <p class="hello-greeting" id="helloGreeting">Hola</p>
-        <h2 class="view-title hero-title">Elegí tu viaje</h2>
-        <p class="trip-list-subtitle">Seleccioná el viaje activo para reservar tu asiento.</p>
+        <div class="trip-hero-card" id="tripHeroCard">
+          <p class="hello-greeting" id="helloGreeting">Hola</p>
+          <h2 class="view-title hero-title">Elegí tu viaje</h2>
+          <p class="trip-list-subtitle">Seleccioná el viaje activo para reservar tu asiento.</p>
+        </div>
         <div class="trip-list" id="tripList"></div>
         <a class="byc-banner" href="https://docs.google.com/forms/d/e/1FAIpQLSfhK2jUoNOnflEy_lmgM3up0k9lqosYkqNplJ6jSklpYRnIGw/viewform?usp=header" rel="noopener" target="_blank">
           ¿Aún no aceptaste las Bases y Condiciones?<br>
@@ -356,6 +358,7 @@
 <script src="/js/api.js"></script>
 <script src="/js/ui-helpers.js"></script>
 <script src="/js/nav-drawer.js"></script>
+<script src="/js/trip-hero-collapse.js"></script>
 <script src="/js/router.js"></script>
 <script src="/js/view-choose.js"></script>
 <script src="/js/seats-grid.js"></script>
