@@ -207,6 +207,8 @@ window.loadViajes = loadViajes;
 function goBases() {
   showView('view-bases');
   setHash(['Bases y condiciones']);
+  goBasesLanding();
+  if (typeof _resetBasesForm === 'function') _resetBasesForm();
 }
 
 window.backToChoose = backToChoose;

@@ -96,6 +96,31 @@ const Api = {
       return []; // fallo silencioso: el autocomplete es una ayuda, no algo crítico
     }
     return data || [];
+  },
+
+  /**
+   * Inserta una aceptación de Bases y Condiciones (tabla pública
+   * "basesycondiciones", la misma que usa el Apps Script del Sheet).
+   * Guarda solo los datos del formulario — "estado" y "estado_envio"
+   * quedan en null porque los completa el proceso de PDF/email más
+   * adelante, no la app web.
+   */
+  async aceptarBasesYCondiciones({ nombre, ci, email_disponible, email }) {
+    const { error } = await supabase
+      .schema('public')
+      .from('basesycondiciones')
+      .insert({
+        nombre,
+        ci,
+        email_disponible,
+        email: email || null,
+        estado: null,
+        estado_envio: null,
+        correo_duplicado: false,
+        link: null
+      });
+
+    if (error) throw error;
   }
 };
 

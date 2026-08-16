@@ -148,6 +148,8 @@ async function routeTo(path) {
 
     if (head.toLowerCase() === 'bases-y-condiciones') {
       showView('view-bases');
+      if (typeof goBasesLanding === 'function') goBasesLanding();
+      if (typeof _resetBasesForm === 'function') _resetBasesForm();
       return;
     }
 
