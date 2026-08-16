@@ -19,13 +19,6 @@ function showView(id) {
   // propias vistas (login/panel/control/editor).
   const staffBtn = document.getElementById('staffEntryBtn');
   if (staffBtn) staffBtn.classList.toggle('hidden', STAFF_VIEW_IDS.includes(id));
-
-  // Al entrar a "Elegí tu viaje" reseteamos la card de saludo a su estado
-  // expandido (por si quedó colapsada de una visita anterior con scroll).
-  if (id === 'view-choose') {
-    const heroCard = document.getElementById('tripHeroCard');
-    if (heroCard) heroCard.classList.remove('collapsed');
-  }
 }
 
 function toast(msg) {
