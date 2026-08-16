@@ -147,8 +147,26 @@ async function routeTo(path) {
     }
 
     if (head.toLowerCase() === 'bases-y-condiciones') {
+      const sub = (segs[1] || '').toLowerCase();
       showView('view-bases');
-      if (typeof goBasesLanding === 'function') goBasesLanding();
+
+      // "formulario" y "confirmacion" no son bookmarkeables: solo tienen
+      // sentido como resultado de navegar el flujo (goBasesForm /
+      // goBasesConfirmed actualizan la URL a mano). Entrando directo acá
+      // -recarga de página, link compartido, historial- no hay estado
+      // cargado, así que redirigimos a la landing en vez de mostrar un
+      // formulario vacío o una confirmación sin datos.
+      if (sub === 'formulario' && typeof _canShowBasesForm === 'function' && _canShowBasesForm()) {
+        goBasesForm();
+        return;
+      }
+      if (sub === 'confirmacion' && typeof _canShowBasesConfirmed === 'function' && _canShowBasesConfirmed()) {
+        goBasesConfirmed();
+        return;
+      }
+
+      setHash(['Bases y condiciones']);
+      goBasesLanding();
       if (typeof _resetBasesForm === 'function') _resetBasesForm();
       return;
     }
