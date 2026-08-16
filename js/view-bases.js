@@ -46,11 +46,14 @@ async function submitBasesForm(ev) {
   const ciEl = document.getElementById('basesCi');
   const tieneCorreoEl = document.getElementById('basesTieneCorreo');
   const emailEl = document.getElementById('basesEmail');
+  const confirmLeidoEl = document.getElementById('basesConfirmLeido');
+  const confirmLeidoRow = document.getElementById('basesConfirmLeidoRow');
 
   const nombre = nombreEl.value.trim();
   const ci = ciEl.value.trim();
   const tieneCorreo = tieneCorreoEl.checked;
   const email = emailEl.value.trim();
+  const leyoBases = confirmLeidoEl.checked;
 
   let ok = true;
   if (!nombre) { markField(nombreEl, true); ok = false; } else { markField(nombreEl, false); }
@@ -59,9 +62,15 @@ async function submitBasesForm(ev) {
     if (!_isValidEmail(email)) { markField(emailEl, true); ok = false; }
     else { markField(emailEl, false); }
   }
+  if (!leyoBases) {
+    confirmLeidoRow.classList.add('field-error-row');
+    ok = false;
+  } else {
+    confirmLeidoRow.classList.remove('field-error-row');
+  }
 
   if (!ok) {
-    toast('Revisá los datos marcados en rojo');
+    toast(!leyoBases && nombre && ci ? 'Tenés que confirmar que leíste las Bases y Condiciones' : 'Revisá los datos marcados en rojo');
     return false;
   }
 
@@ -101,7 +110,14 @@ function _resetBasesForm() {
     const el = document.getElementById(id);
     if (el) markField(el, false);
   });
+  const confirmLeidoRow = document.getElementById('basesConfirmLeidoRow');
+  if (confirmLeidoRow) confirmLeidoRow.classList.remove('field-error-row');
   _toggleBasesEmailField();
+}
+
+function _clearBasesConfirmError() {
+  const row = document.getElementById('basesConfirmLeidoRow');
+  if (row) row.classList.remove('field-error-row');
 }
 
 /** Botón "volver" del header: si estás en el formulario, vuelve a la
@@ -120,3 +136,4 @@ window.goBasesForm = goBasesForm;
 window.submitBasesForm = submitBasesForm;
 window._toggleBasesEmailField = _toggleBasesEmailField;
 window._basesGoBack = _basesGoBack;
+window._clearBasesConfirmError = _clearBasesConfirmError;
