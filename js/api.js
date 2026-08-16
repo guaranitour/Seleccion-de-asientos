@@ -101,9 +101,11 @@ const Api = {
   /**
    * Inserta una aceptación de Bases y Condiciones (tabla pública
    * "basesycondiciones", la misma que usa el Apps Script del Sheet).
-   * Guarda solo los datos del formulario — "estado" y "estado_envio"
-   * quedan en null porque los completa el proceso de PDF/email más
-   * adelante, no la app web.
+   * "estado" se marca "aceptado" directo al insertar: antes lo completaba
+   * Apps Script junto con el resto de la fila, pero ahora esa columna
+   * depende de la web en el momento de la aceptación. "estado_envio"
+   * queda en null porque el PDF/email lo sigue completando un proceso
+   * aparte más adelante.
    */
   async aceptarBasesYCondiciones({ nombre, ci, email_disponible, email }) {
     const { error } = await supabase
@@ -114,7 +116,7 @@ const Api = {
         ci,
         email_disponible,
         email: email || null,
-        estado: null,
+        estado: 'aceptado',
         estado_envio: null,
         correo_duplicado: false,
         link: null
