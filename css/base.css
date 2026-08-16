@@ -3,7 +3,7 @@
    ============================================================ */
 
 :root{
-  --bg:#f7f9fc; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
+  --bg:#f7f9fc; --card:rgba(255,255,255,.86); --card-solid:#ffffff; --text:#1f2937; --muted:#6b7280;
   --primary:#2c7be5; --success:#10b981; --shadow:0 8px 20px rgba(17,24,39,.08);
   --brandA: rgba(44,123,229,.10); --brandB: rgba(16,185,129,.08);
   --logo-w-ideal: 84vw; --logo-w-max: 360px;
@@ -19,26 +19,43 @@ body{
   margin:0;
   font-family: system-ui,-apple-system, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   color:var(--text); background-color:var(--bg); overflow-x:hidden;
-  /* Marca de agua de marca: el compás centrado y fijo detrás de todo el
-     contenido. Va en `body` (no en :root ni en .app) para que se aplique
-     una sola vez a toda la app sin tocar cada vista. background-position
-     "center 140px" lo baja un poco de la mitad de pantalla para que quede
-     más centrado respecto al contenido real (que arranca debajo del
-     topbar fijo de 76px), en vez de centrado respecto al viewport entero. */
+  position:relative;
+}
+/* Marca de agua de marca: el compás centrado y fijo detrás de todo el
+   contenido. Pseudo-elemento en vez de background-image directo en body
+   para poder controlar su propia opacity sin afectar el contenido real
+   (opacity en body heredaría a todos los hijos). z-index:-1 lo manda
+   detrás; position:fixed lo ancla a la ventana (no al documento), efecto
+   marca de agua clásico que no se mueve al hacer scroll. */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
   background-image: url('/logo-watermark.png');
   background-repeat: no-repeat;
   background-position: center 140px;
   background-size: min(78vw, 480px);
-  background-attachment: fixed;
+  opacity: .16;
+  pointer-events:none;
 }
-/* iOS Safari: `background-attachment:fixed` en body puede tildarse o
-   comportarse raro con el teclado/viewport dinámico. Ahí el fondo
-   simplemente scrollea con la página — sigue siendo marca de agua fija
-   *dentro* del documento, solo deja de estar anclada a la ventana. */
+/* iOS Safari: position:fixed en pseudo-elementos de body puede saltar con
+   el teclado/viewport dinámico. Ahí lo anclamos al documento en vez de a
+   la ventana — sigue siendo marca de agua fija, solo deja de estar
+   pegada al viewport visual durante el scroll. */
 @supports (-webkit-touch-callout: none){
-  body{ background-attachment: scroll; }
+  body::before{ position:absolute; }
 }
 *, *::before, *::after{ box-sizing:border-box; }
+
+/* Superficies "card" que usan var(--card) quedan semi-transparentes para
+   que la marca de agua del fondo se note a través; el blur mantiene el
+   texto legible encima sin perder el efecto. No se aplica a controles que
+   necesitan quedar sólidos (drawer, overlay de carga: ver más abajo). */
+.trip-hero-card, .bases-card, .trip-card, .action-card, .form{
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  backdrop-filter: blur(14px) saturate(1.3);
+}
 
 /* Bloqueo visual hasta que el router resuelva la vista inicial */
 body:not(.app-ready) .view{ display:none !important; }
@@ -197,7 +214,7 @@ input{ border:1px solid #e5e7eb; border-radius:10px; padding:12px; font-size:1re
   opacity:0; pointer-events:none; transition:opacity .15s ease; z-index:150;
 }
 .overlay.show{ opacity:1; pointer-events:auto; }
-.loader{ background:var(--card); border-radius:14px; box-shadow:var(--shadow); padding:16px 18px; display:flex; align-items:center; gap:12px; }
+.loader{ background:var(--card-solid); border-radius:14px; box-shadow:var(--shadow); padding:16px 18px; display:flex; align-items:center; gap:12px; }
 .spinner{ width:20px; height:20px; border-radius:50%; border:3px solid #c7d2fe; border-top-color:#3b82f6; animation:spin .9s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .loader-text{ font-weight:600; color:#111827; }
@@ -218,7 +235,7 @@ input{ border:1px solid #e5e7eb; border-radius:10px; padding:12px; font-size:1re
 
 .nav-drawer-panel{
   position:absolute; top:0; left:0; bottom:0; width:min(78vw, 300px);
-  background:var(--card); box-shadow:8px 0 28px rgba(17,24,39,.18);
+  background:var(--card-solid); box-shadow:8px 0 28px rgba(17,24,39,.18);
   padding:calc(14px + env(safe-area-inset-top, 0px)) 14px 14px;
   padding-bottom:calc(14px + env(safe-area-inset-bottom, 0px));
   display:flex; flex-direction:column; gap:2px;
