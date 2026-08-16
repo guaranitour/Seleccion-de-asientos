@@ -107,15 +107,59 @@
     <div class="home-center" style="align-items:start;">
       <div style="max-width:680px; margin:0 auto; width:100%;">
         <div class="select-trip-header">
-          <button class="btn ghost btn-icon" onclick="backToChoose()" type="button">
+          <button class="btn ghost btn-icon" id="basesBackBtn" onclick="_basesGoBack()" type="button">
             <svg aria-hidden="true" fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="15"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
           </button>
           <div class="select-trip-name">Bases y condiciones</div>
         </div>
 
-        <div class="bases-card">
-          Bases y condiciones
+        <!-- Pantalla 1: landing -->
+        <div class="bases-card" id="basesLanding">
+          <div class="bases-icon" aria-hidden="true">
+            <svg fill="none" height="26" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24" width="26"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h6"/></svg>
+          </div>
+          <h2 class="bases-title">Ayudanos a mejorar tu viaje</h2>
+          <p class="bases-text">En Destino guaraní queremos que cada viaje sea una gran experiencia. Completá tus datos para confirmar tu lugar.</p>
+          <button class="btn bases-cta" onclick="goBasesForm()" type="button">
+            Completar formulario
+            <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="16"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+          <p class="bases-hint">
+            <svg aria-hidden="true" fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="13"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Te toma menos de 2 minutos
+          </p>
         </div>
+
+        <!-- Pantalla 2: formulario -->
+        <form class="bases-card hidden" id="basesFormCard" novalidate onsubmit="return submitBasesForm(event)">
+          <h2 class="bases-form-title">Completá tus datos</h2>
+          <p class="bases-form-subtitle">Usamos esta información para confirmar tu aceptación de las Bases y Condiciones.</p>
+
+          <div class="reserve-field" style="margin-bottom:12px;">
+            <label class="reserve-field-label" for="basesNombre">Nombre y apellido</label>
+            <input autocomplete="name" id="basesNombre" name="nombre" placeholder="Ej: Ana Gómez" type="text"/>
+          </div>
+
+          <div class="reserve-field" style="margin-bottom:16px;">
+            <label class="reserve-field-label" for="basesCi">Cédula de identidad</label>
+            <input autocomplete="off" id="basesCi" inputmode="numeric" name="ci" oninput="onlyDigits(this)" placeholder="Ej: 4567890" type="text"/>
+          </div>
+
+          <label class="bases-checkbox-row" for="basesTieneCorreo">
+            <input id="basesTieneCorreo" onchange="_toggleBasesEmailField()" type="checkbox"/>
+            <span>Tengo correo electrónico</span>
+          </label>
+
+          <div class="reserve-field hidden" id="basesEmailWrap" style="margin-top:12px;">
+            <label class="reserve-field-label" for="basesEmail">Correo electrónico</label>
+            <input autocomplete="email" id="basesEmail" name="email" placeholder="Ej: ana@correo.com" type="email"/>
+          </div>
+
+          <div class="reserve-actions" style="margin-top:20px;">
+            <button class="btn ghost" onclick="goBasesLanding()" type="button">Volver</button>
+            <button class="btn success" id="basesSubmitBtn" type="submit">Enviar</button>
+          </div>
+        </form>
       </div>
     </div>
   </section>
@@ -381,6 +425,7 @@
 <script src="/js/ui-helpers.js"></script>
 <script src="/js/nav-drawer.js"></script>
 <script src="/js/router.js"></script>
+<script src="/js/view-bases.js"></script>
 <script src="/js/view-choose.js"></script>
 <script src="/js/seats-grid.js"></script>
 <script src="/js/view-select.js"></script>
