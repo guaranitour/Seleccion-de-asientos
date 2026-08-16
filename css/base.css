@@ -18,7 +18,25 @@ html{ scroll-padding-bottom: calc(var(--action-bar-h) + var(--safe-bottom)); }
 body{
   margin:0;
   font-family: system-ui,-apple-system, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-  color:var(--text); background:var(--bg); overflow-x:hidden;
+  color:var(--text); background-color:var(--bg); overflow-x:hidden;
+  /* Marca de agua de marca: el compás centrado y fijo detrás de todo el
+     contenido. Va en `body` (no en :root ni en .app) para que se aplique
+     una sola vez a toda la app sin tocar cada vista. background-position
+     "center 140px" lo baja un poco de la mitad de pantalla para que quede
+     más centrado respecto al contenido real (que arranca debajo del
+     topbar fijo de 76px), en vez de centrado respecto al viewport entero. */
+  background-image: url('/logo-watermark.png');
+  background-repeat: no-repeat;
+  background-position: center 140px;
+  background-size: min(78vw, 480px);
+  background-attachment: fixed;
+}
+/* iOS Safari: `background-attachment:fixed` en body puede tildarse o
+   comportarse raro con el teclado/viewport dinámico. Ahí el fondo
+   simplemente scrollea con la página — sigue siendo marca de agua fija
+   *dentro* del documento, solo deja de estar anclada a la ventana. */
+@supports (-webkit-touch-callout: none){
+  body{ background-attachment: scroll; }
 }
 *, *::before, *::after{ box-sizing:border-box; }
 
