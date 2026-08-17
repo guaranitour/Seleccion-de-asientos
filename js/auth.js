@@ -17,6 +17,14 @@ const Auth = {
       if (event === 'SIGNED_IN' && session) {
         await this._resolveRole(session.user);
         onAuthReady();
+
+        // Si el login se completó (ej. al volver del redirect de Google)
+        // estando en la pantalla de acceso staff, saltamos directo al
+        // panel en vez de dejar a la persona parada en el form de login.
+        const loginViewActive = document.getElementById('view-staff-login')?.classList.contains('active');
+        if (loginViewActive && this.isAuthorized()) {
+          goPanel();
+        }
       } else if (event === 'SIGNED_OUT') {
         this.user = null;
         this.role = null;
@@ -103,15 +111,11 @@ function onAuthReady() {
   }
 }
 
-/** Muestra/oculta el botón de acceso staff según sesión. */
+/** Actualiza el label del botón de acceso staff en el drawer según sesión. */
 function updateStaffEntryPoint() {
-  const btn = document.getElementById('staffEntryBtn');
-  if (!btn) return;
-  if (Auth.isAuthorized()) {
-    btn.textContent = Auth.isAdmin() ? '⚙ Panel admin' : '⚙ Panel staff';
-  } else {
-    btn.textContent = '⚙ Acceso staff';
-  }
+  const label = document.getElementById('staffEntryBtnLabel');
+  if (!label) return;
+  label.textContent = Auth.isAuthorized() ? 'Panel staff' : 'Acceso staff';
 }
 
 /** Punto de entrada al panel — pide login si hace falta. */
