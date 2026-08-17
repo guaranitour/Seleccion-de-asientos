@@ -13,18 +13,37 @@ const Auth = {
       await this._resolveRole(data.session.user);
     }
 
+    // Si volvemos de un redirect de OAuth, el hash/query trae los
+    // parámetros del intercambio (#access_token=... o ?code=...) y
+    // Supabase todavía puede estar procesándolos en este punto: getSession()
+    // de arriba puede no verlos todavía. Esperamos explícitamente al evento
+    // SIGNED_IN antes de dejar continuar el arranque, para que routeTo()
+    // en main.js ya vea la sesión resuelta y no caiga al fallback de
+    // "Reservas" por creer que no hay sesión.
+    const cameFromOAuthRedirect =
+      location.hash.includes('access_token') || location.search.includes('code=');
+
+    if (cameFromOAuthRedirect && !this.isLoggedIn()) {
+      await new Promise((resolve) => {
+        const timeout = setTimeout(resolve, 4000); // no bloquear el arranque para siempre si algo falla
+        const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+          if (event === 'SIGNED_IN' && session) {
+            clearTimeout(timeout);
+            sub.subscription.unsubscribe();
+            resolve();
+          }
+        });
+      });
+      if (this.user === null) {
+        const { data: retry } = await supabase.auth.getSession();
+        if (retry.session) await this._resolveRole(retry.session.user);
+      }
+    }
+
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session) {
         await this._resolveRole(session.user);
         onAuthReady();
-
-        // Si el login se completó (ej. al volver del redirect de Google)
-        // estando en la pantalla de acceso staff, saltamos directo al
-        // panel en vez de dejar a la persona parada en el form de login.
-        const loginViewActive = document.getElementById('view-staff-login')?.classList.contains('active');
-        if (loginViewActive && this.isAuthorized()) {
-          goPanel();
-        }
       } else if (event === 'SIGNED_OUT') {
         this.user = null;
         this.role = null;
@@ -85,7 +104,7 @@ const Auth = {
   async loginWithGoogle() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.origin + window.location.pathname }
+      options: { redirectTo: window.location.origin + '/Panel' }
     });
     if (error) toast('No se pudo iniciar sesión: ' + error.message);
   },
