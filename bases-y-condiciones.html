@@ -30,21 +30,23 @@
 <meta name="twitter:image" content="https://www.guaranitour.com/BYC_IMAGEN.png">
 
 <!-- Redirect inmediato a la SPA real, ruta "/bases-y-condiciones".
-     router.js ya sabe resolver esa ruta nativamente (ver el bloque
-     "bases-y-condiciones" en routeTo()), y main.js llama a
-     routeTo(location.pathname) como parte de su bootstrap normal — así
-     que alcanza con dejar la URL en /bases-y-condiciones antes de que
-     index.html cargue. Mismo patrón que ya usa 404.html para el ruteo
-     de rutas inexistentes. -->
+     IMPORTANTE: no redirigimos a "/bases-y-condiciones" (sin .html):
+     GitHub Pages puede resolver esa URL sirviendo este mismo archivo de
+     nuevo (coincide por nombre), lo que dispara este mismo script otra
+     vez → bucle infinito. En cambio, guardamos la ruta destino igual que
+     hace 404.html y mandamos directo a index.html — ese archivo, al
+     arrancar, restaura la ruta con replaceState() y routeTo() (en
+     main.js) la resuelve normalmente, sin volver a pasar por acá. -->
 <script>
-  location.replace('/bases-y-condiciones');
+  sessionStorage.setItem('gh-pages-redirect', '/bases-y-condiciones');
+  location.replace('/');
 </script>
 
 <!-- Fallback sin JS (crawlers no llegan hasta acá; personas sin JS sí) -->
-<meta http-equiv="refresh" content="0; url=/bases-y-condiciones">
+<meta http-equiv="refresh" content="0; url=/">
 </head>
 <body>
   <p>Redirigiendo a Bases y Condiciones… si no sos redirigido automáticamente,
-     <a href="/bases-y-condiciones">tocá acá</a>.</p>
+     <a href="/">tocá acá</a>.</p>
 </body>
 </html>
