@@ -37,6 +37,8 @@ async function start() {
   await routeTo(location.pathname);
   document.body.classList.add('app-ready');
   BOOTSTRAPING = false;
+  const overlay = document.getElementById('overlay');
+  if (overlay) overlay.classList.remove('overlay-boot');
   hideLoading();
 }
 
