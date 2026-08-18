@@ -214,6 +214,16 @@ input{ border:1px solid #e5e7eb; border-radius:10px; padding:12px; font-size:1re
   opacity:0; pointer-events:none; transition:opacity .15s ease; z-index:150;
 }
 .overlay.show{ opacity:1; pointer-events:auto; }
+/* Variante para el arranque de la SPA (ver main.js/start()): cubre el hueco
+   vacío que antes quedaba bajo el header mientras Auth.init()/routeTo()
+   resuelven la vista inicial. Arranca debajo del topbar (mismo alto que
+   .app) en vez de taparlo entero, para no ocultar el logo que ya está
+   animándose ahí arriba. Visible desde el primer paint vía HTML, sin
+   depender de JS ni de .show. */
+.overlay.overlay-boot{
+  top:calc(76px + env(safe-area-inset-top, 0px)); background:var(--bg);
+  opacity:1; pointer-events:auto;
+}
 .loader{ background:var(--card-solid); border-radius:14px; box-shadow:var(--shadow); padding:16px 18px; display:flex; align-items:center; gap:12px; }
 .spinner{ width:20px; height:20px; border-radius:50%; border:3px solid #c7d2fe; border-top-color:#3b82f6; animation:spin .9s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
