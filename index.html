@@ -450,11 +450,16 @@
   </div>
 </div>
 
-<!-- Overlay de carga -->
-<div aria-hidden="true" class="overlay" id="overlay">
+<!-- Overlay de carga. Arranca visible (overlay-boot show, aria-hidden="false")
+     por HTML puro, sin esperar a ningún script: cubre el hueco vacío que
+     antes quedaba bajo el header mientras Auth.init()/routeTo() resuelven
+     la vista inicial (ver main.js/start()). main.js quita "overlay-boot" y
+     lo oculta al terminar el bootstrap; de ahí en más se comporta como el
+     overlay normal, controlado por showLoading()/hideLoading(). -->
+<div aria-hidden="false" class="overlay overlay-boot show" id="overlay">
   <div class="loader">
     <div class="spinner"></div>
-    <div class="loader-text">Cargando…</div>
+    <div class="loader-text" id="overlayText">Cargando…</div>
   </div>
 </div>
 
