@@ -124,7 +124,7 @@
           </div>
           <h2 class="bases-title">Ayudanos a mejorar tu viaje</h2>
           <p class="bases-text">En Destino guaraní queremos que cada viaje sea una gran experiencia. Completá tus datos para confirmar que aceptas las Bases y Condiciones de nuestros servicios.</p>
-          <button class="btn bases-cta" onclick="goBasesForm()" type="button">
+          <button class="btn bases-cta" onclick="goBasesChoice()" type="button">
             Completar formulario
             <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="16"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
@@ -134,7 +134,28 @@
           </p>
         </div>
 
-        <!-- Pantalla 2: formulario -->
+        <!-- Pantalla 2: ¿tenés correo? -->
+        <div class="bases-card hidden" id="basesChoiceCard">
+          <h2 class="bases-form-title" style="text-align:center;">¿Tenés correo electrónico?</h2>
+          <p class="bases-form-subtitle" style="text-align:center;">Lo usamos para enviarte automáticamente el PDF de tu aceptación.</p>
+
+          <div class="bases-choice-options">
+            <button class="bases-choice-btn" onclick="chooseTieneCorreo(true)" type="button">
+              <svg aria-hidden="true" fill="none" height="22" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24" width="22"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z"/><path d="m22 6-10 7L2 6"/></svg>
+              Sí, tengo correo
+            </button>
+            <button class="bases-choice-btn bases-choice-btn-alt" onclick="chooseTieneCorreo(false)" type="button">
+              <svg aria-hidden="true" fill="none" height="22" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24" width="22"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z"/><path d="M18 8 6 16"/></svg>
+              No tengo correo
+            </button>
+          </div>
+
+          <div class="reserve-actions" style="margin-top:20px;">
+            <button class="btn ghost" onclick="goBasesLanding()" type="button">Volver</button>
+          </div>
+        </div>
+
+        <!-- Pantalla 3: formulario -->
         <form class="bases-card hidden" id="basesFormCard" novalidate onsubmit="return submitBasesForm(event)">
           <h2 class="bases-form-title">Completá tus datos</h2>
           <p class="bases-form-subtitle">Usamos esta información para confirmar tu aceptación de las Bases y Condiciones.</p>
@@ -147,7 +168,7 @@
               <strong>Antes de continuar, leé las Bases y Condiciones.</strong>
               Es obligatorio para poder completar este formulario. Tocá acá para abrirlas.
             </span>
-            <svg aria-hidden="true" class="bases-read-notice-arrow" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="16"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+            <svg aria-hidden="true" class="bases-read-notice-arrow" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="16"><path d="M7 17 17 7"/></svg>
           </a>
 
           <div class="reserve-field" style="margin-bottom:12px;">
@@ -160,29 +181,39 @@
             <input autocomplete="off" id="basesCi" inputmode="numeric" name="ci" oninput="onlyDigits(this)" placeholder="Ej: 4567890" type="text"/>
           </div>
 
-          <label class="bases-checkbox-row" for="basesTieneCorreo">
-            <input id="basesTieneCorreo" onchange="_toggleBasesEmailField()" type="checkbox"/>
-            <span>Tengo correo electrónico</span>
-          </label>
-
-          <div class="reserve-field hidden" id="basesEmailWrap" style="margin-top:12px;">
+          <!-- Campo de correo: visible y obligatorio solo si eligió "Sí" en
+               el paso anterior. chooseTieneCorreo() controla esta clase. -->
+          <div class="reserve-field hidden" id="basesEmailWrap" style="margin-bottom:12px;">
             <label class="reserve-field-label" for="basesEmail">Correo electrónico</label>
             <input autocomplete="email" id="basesEmail" name="email" placeholder="Ej: ana@correo.com" type="email"/>
             <p class="bases-email-hint">Lo usaremos para enviarte recibos y otra información importante relacionada a los datos que completaste en este formulario.</p>
           </div>
 
-          <label class="bases-checkbox-row bases-checkbox-row-confirm" for="basesConfirmLeido" id="basesConfirmLeidoRow" style="margin-top:12px;">
+          <!-- Aviso: visible solo si eligió "No" en el paso anterior. -->
+          <div class="bases-confirmed-notice hidden" id="basesNoCorreoNotice" style="margin-bottom:16px;">
+            <svg aria-hidden="true" class="bases-confirmed-notice-icon" fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z"/><path d="M18 8 6 16"/>
+            </svg>
+            <span class="bases-confirmed-notice-text">
+              <strong style="display:block; margin-bottom:4px;">Instrucciones en caso de no poseer correo electrónico</strong>
+              Estimado pasajero: a falta de un correo electrónico registrado que nos permita enviarte automáticamente el PDF con la constancia de tu aceptación de las Bases y Condiciones, te pedimos completar los datos a continuación y avisar a tu agente cuando termines.<br><br>
+              Tu agente revisará tu aceptación en nuestro sistema y te enviará el PDF por el medio de contacto que estén usando.<br><br>
+              Atentamente, Equipo Destino 🦾🚌
+            </span>
+          </div>
+
+          <label class="bases-checkbox-row bases-checkbox-row-confirm" for="basesConfirmLeido" id="basesConfirmLeidoRow" style="margin-top:4px;">
             <input id="basesConfirmLeido" onchange="_clearBasesConfirmError()" type="checkbox"/>
             <span>Leí y acepto las Bases y Condiciones</span>
           </label>
 
           <div class="reserve-actions" style="margin-top:20px;">
-            <button class="btn ghost" onclick="goBasesLanding()" type="button">Volver</button>
+            <button class="btn ghost" onclick="goBasesChoice()" type="button">Volver</button>
             <button class="btn success" id="basesSubmitBtn" type="submit">Enviar</button>
           </div>
         </form>
 
-        <!-- Pantalla 3: confirmación -->
+        <!-- Pantalla 4: confirmación -->
         <div class="bases-card bases-confirmed hidden" id="basesConfirmedCard">
           <div class="bases-confirmed-icon" aria-hidden="true">
             <svg fill="none" height="30" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24" width="30"><path d="M20 6 9 17l-5-5"/></svg>
