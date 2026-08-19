@@ -146,6 +146,27 @@
   animation: shake .3s ease;
 }
 
+/* --- Pantalla 2: "¿Tenés correo?" --- */
+.bases-choice-options{
+  display: flex; flex-direction: column; gap: 12px; margin-top: 22px;
+}
+
+.bases-choice-btn{
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; min-height: 56px; border-radius: 16px; border: 1.5px solid transparent;
+  font-size: .98rem; font-weight: 700; cursor: pointer;
+  background: linear-gradient(145deg, #d1fae5, #a7f3d0); color: #047857;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.bases-choice-btn:hover{ transform: translateY(-2px); box-shadow: 0 8px 20px rgba(4,120,87,.18); }
+.bases-choice-btn:active{ transform: translateY(0); }
+.bases-choice-btn svg{ flex-shrink: 0; }
+
+.bases-choice-btn-alt{
+  background: #f9fafb; color: var(--muted); border-color: #e5e7eb;
+}
+.bases-choice-btn-alt:hover{ box-shadow: 0 8px 20px rgba(17,24,39,.10); background: #f3f4f6; }
+
 /* ===== Lista de viajes (view-choose) ===== */
 .trip-list{ display:flex; flex-direction:column; gap:12px; }
 
