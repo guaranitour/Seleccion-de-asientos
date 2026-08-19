@@ -9,7 +9,13 @@
 // Controla qué sub-pantalla de view-bases está activa, para que el botón
 // "volver" del header y las guardas del router sepan a dónde ir sin
 // depender de leer clases .hidden del DOM.
-let _basesStep = 'landing'; // 'landing' | 'form' | 'confirmed'
+let _basesStep = 'landing'; // 'landing' | 'choice' | 'form' | 'confirmed'
+
+// Elección hecha en el paso "¿Tenés correo?" (true/false/null). Vive acá
+// en vez de leerse de un checkbox del formulario: la pregunta ahora es su
+// propio paso obligatorio, previo al formulario, no un campo opcional
+// dentro de él.
+let _basesTieneCorreo = null;
 
 /** El form solo puede reabrirse directo por URL si ya se llegó a él en
  *  esta sesión (evita un GET directo mostrando un formulario "suelto"). */
@@ -24,7 +30,7 @@ function _canShowBasesConfirmed() {
 }
 
 function _showBasesCard(id) {
-  ['basesLanding', 'basesFormCard', 'basesConfirmedCard'].forEach(cardId => {
+  ['basesLanding', 'basesChoiceCard', 'basesFormCard', 'basesConfirmedCard'].forEach(cardId => {
     const el = document.getElementById(cardId);
     if (el) el.classList.toggle('hidden', cardId !== id);
   });
@@ -36,29 +42,44 @@ function goBasesLanding() {
   _showBasesCard('basesLanding');
 }
 
-/** Muestra la pantalla 2 (formulario) dentro de view-bases. */
+/** Muestra la pantalla 2 (¿tenés correo?) dentro de view-bases. */
+function goBasesChoice() {
+  _basesStep = 'choice';
+  _showBasesCard('basesChoiceCard');
+}
+
+/** Se llama al tocar "Sí, tengo correo" / "No tengo correo" en el paso 2.
+ *  Guarda la elección y avanza al formulario ya configurado según eso:
+ *  con el campo de email visible y obligatorio, o con el aviso de "sin
+ *  correo" en su lugar. */
+function chooseTieneCorreo(tieneCorreo) {
+  _basesTieneCorreo = !!tieneCorreo;
+  const emailWrap = document.getElementById('basesEmailWrap');
+  const emailInput = document.getElementById('basesEmail');
+  const noCorreoNotice = document.getElementById('basesNoCorreoNotice');
+
+  if (emailWrap) emailWrap.classList.toggle('hidden', !_basesTieneCorreo);
+  if (noCorreoNotice) noCorreoNotice.classList.toggle('hidden', _basesTieneCorreo);
+  if (!_basesTieneCorreo && emailInput) {
+    emailInput.value = '';
+    markField(emailInput, false);
+  }
+
+  goBasesForm();
+}
+
+/** Muestra la pantalla 3 (formulario) dentro de view-bases. */
 function goBasesForm() {
   _basesStep = 'form';
   _showBasesCard('basesFormCard');
   setHash(['Bases y condiciones', 'Formulario']);
 }
 
-/** Muestra la pantalla 3 (confirmación) dentro de view-bases. */
+/** Muestra la pantalla 4 (confirmación) dentro de view-bases. */
 function goBasesConfirmed() {
   _basesStep = 'confirmed';
   _showBasesCard('basesConfirmedCard');
   setHash(['Bases y condiciones', 'Confirmacion']);
-}
-
-function _toggleBasesEmailField() {
-  const checked = document.getElementById('basesTieneCorreo').checked;
-  const wrap = document.getElementById('basesEmailWrap');
-  const emailInput = document.getElementById('basesEmail');
-  if (wrap) wrap.classList.toggle('hidden', !checked);
-  if (!checked && emailInput) {
-    emailInput.value = '';
-    markField(emailInput, false);
-  }
 }
 
 function _isValidEmail(v) {
@@ -72,14 +93,16 @@ async function submitBasesForm(ev) {
 
   const nombreEl = document.getElementById('basesNombre');
   const ciEl = document.getElementById('basesCi');
-  const tieneCorreoEl = document.getElementById('basesTieneCorreo');
   const emailEl = document.getElementById('basesEmail');
   const confirmLeidoEl = document.getElementById('basesConfirmLeido');
   const confirmLeidoRow = document.getElementById('basesConfirmLeidoRow');
 
   const nombre = nombreEl.value.trim();
   const ci = ciEl.value.trim();
-  const tieneCorreo = tieneCorreoEl.checked;
+  // La elección de "¿tenés correo?" ya se hizo en el paso anterior
+  // (chooseTieneCorreo). Si por algún motivo se llega acá sin haberla
+  // hecho (ej. navegación directa), tratamos como "no" por seguridad.
+  const tieneCorreo = _basesTieneCorreo === true;
   const email = emailEl.value.trim();
   const leyoBases = confirmLeidoEl.checked;
 
@@ -151,7 +174,11 @@ function _resetBasesForm() {
   });
   const confirmLeidoRow = document.getElementById('basesConfirmLeidoRow');
   if (confirmLeidoRow) confirmLeidoRow.classList.remove('field-error-row');
-  _toggleBasesEmailField();
+  _basesTieneCorreo = null;
+  const emailWrap = document.getElementById('basesEmailWrap');
+  const noCorreoNotice = document.getElementById('basesNoCorreoNotice');
+  if (emailWrap) emailWrap.classList.add('hidden');
+  if (noCorreoNotice) noCorreoNotice.classList.add('hidden');
 }
 
 function _clearBasesConfirmError() {
@@ -159,11 +186,15 @@ function _clearBasesConfirmError() {
   if (row) row.classList.remove('field-error-row');
 }
 
-/** Botón "volver" del header: en el formulario vuelve a la landing de
- *  esta misma view; en la landing o ya confirmado, sale a Reservas (no
- *  tiene sentido reabrir el formulario después de haber aceptado). */
+/** Botón "volver" del header: en el formulario vuelve al paso "¿tenés
+ *  correo?"; en ese paso vuelve a la landing; en la landing o ya
+ *  confirmado, sale a Reservas (no tiene sentido reabrir el flujo
+ *  después de haber aceptado). */
 function _basesGoBack() {
   if (_basesStep === 'form') {
+    goBasesChoice();
+    setHash(['Bases y condiciones']);
+  } else if (_basesStep === 'choice') {
     goBasesLanding();
     setHash(['Bases y condiciones']);
     if (typeof _resetBasesForm === 'function') _resetBasesForm();
@@ -173,11 +204,12 @@ function _basesGoBack() {
 }
 
 window.goBasesLanding = goBasesLanding;
+window.goBasesChoice = goBasesChoice;
+window.chooseTieneCorreo = chooseTieneCorreo;
 window.goBasesForm = goBasesForm;
 window.goBasesConfirmed = goBasesConfirmed;
 window._canShowBasesForm = _canShowBasesForm;
 window._canShowBasesConfirmed = _canShowBasesConfirmed;
 window.submitBasesForm = submitBasesForm;
-window._toggleBasesEmailField = _toggleBasesEmailField;
 window._basesGoBack = _basesGoBack;
 window._clearBasesConfirmError = _clearBasesConfirmError;
