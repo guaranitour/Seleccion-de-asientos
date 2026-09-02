@@ -123,6 +123,27 @@ const Api = {
       });
 
     if (error) throw error;
+  },
+
+  /**
+   * Inserta la información adicional del Paso 2 del wizard de Bases y
+   * Condiciones (tabla "reservas.bases_info_adicional"): cumpleaños
+   * (opcional) y contacto de emergencia. Vinculada a basesycondiciones
+   * por CI, no por id — mismo criterio que se usó para esa tabla.
+   */
+  async guardarInfoAdicional({ ci, cumpleanos, contacto_emergencia_nombre, contacto_emergencia_telefono, contacto_emergencia_parentesco }) {
+    const { error } = await supabase
+      .schema('reservas')
+      .from('bases_info_adicional')
+      .insert({
+        ci,
+        cumpleanos: cumpleanos || null, // 'YYYY-MM-DD' con año fijo 2000, o null si no la cargó
+        contacto_emergencia_nombre,
+        contacto_emergencia_telefono,
+        contacto_emergencia_parentesco
+      });
+
+    if (error) throw error;
   }
 };
 

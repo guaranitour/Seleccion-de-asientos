@@ -151,13 +151,16 @@ async function routeTo(path) {
       showView('view-bases');
 
       // "formulario" y "confirmacion" no son bookmarkeables: solo tienen
-      // sentido como resultado de navegar el flujo (goBasesForm /
+      // sentido como resultado de navegar el flujo (goBasesStep /
       // goBasesConfirmed actualizan la URL a mano). Entrando directo acá
       // -recarga de página, link compartido, historial- no hay estado
       // cargado, así que redirigimos a la landing en vez de mostrar un
       // formulario vacío o una confirmación sin datos.
       if (sub === 'formulario' && typeof _canShowBasesForm === 'function' && _canShowBasesForm()) {
-        goBasesForm();
+        // Re-muestra el paso donde ya estaba (evita resetear el wizard al
+        // reflejar la URL); si por algún motivo el paso no es numérico
+        // (recién llegado), arranca desde el 1.
+        goBasesStep(typeof _basesStep === 'number' ? _basesStep : 1);
         return;
       }
       if (sub === 'confirmacion' && typeof _canShowBasesConfirmed === 'function' && _canShowBasesConfirmed()) {
