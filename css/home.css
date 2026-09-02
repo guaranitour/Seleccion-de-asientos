@@ -294,3 +294,92 @@
   width:15px; height:15px; vertical-align:-2px; margin-right:4px;
   color:#e65100;
 }
+
+/* ===== Wizard de Bases y condiciones (3 pasos) ===== */
+
+/* Header de progreso: título dinámico + "Paso X de 3" + barra */
+.bases-progress{ margin-bottom: 18px; }
+
+.bases-progress-top{
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; margin-bottom: 10px;
+}
+.bases-progress-top .bases-form-title{ margin: 0; }
+
+.bases-progress-count{
+  flex-shrink: 0; font-size: .8rem; font-weight: 700; color: var(--muted);
+}
+
+.bases-progress-track{
+  height: 6px; border-radius: 999px; background: #e5e7eb; overflow: hidden;
+}
+.bases-progress-fill{
+  height: 100%; border-radius: inherit; background: var(--primary);
+  transition: width .25s ease;
+}
+
+/* Cada paso es un <fieldset> sin estilos de navegador por defecto */
+.bases-step{ border: none; margin: 0; padding: 0; min-width: 0; animation: cardIn .25s ease both; }
+
+/* Fila de selects día/mes para el cumpleaños */
+.bases-birthday-row{ display: flex; gap: 10px; }
+.bases-birthday-row select{
+  flex: 1; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px;
+  font-size: 1rem; background: #fff; color: var(--text);
+}
+.bases-birthday-row select:invalid{ color: var(--muted); }
+
+/* Botón "select" que abre el bottom-sheet de parentesco: mismo look que
+   un <input>, para que el wizard se vea homogéneo. */
+.bases-sheet-trigger{
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  width: 100%; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px;
+  font-size: 1rem; background: #fff; color: var(--text); text-align: left;
+  cursor: pointer;
+}
+.bases-sheet-trigger svg{ flex-shrink: 0; color: var(--muted); }
+.bases-sheet-trigger#basesParentescoTrigger.field-error{
+  border-color: #ef4444; box-shadow: 0 0 0 2px rgba(239,68,68,.15);
+}
+#basesParentescoLabel{ color: var(--text); }
+
+/* ===== Bottom-sheet genérico (mismo patrón que floorSheet/seatActionSheet) =====
+   Se declara acá porque view-bases.js/index.html lo necesitan y el resto
+   de .action-sheet vive en croquis.css. Si croquis.css ya define estas
+   clases, esta regla es idéntica en intención y no debería chocar. */
+.action-sheet{
+  position: fixed; inset: 0; z-index: 320;
+  display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(17,24,39,.45);
+  opacity: 0; pointer-events: none;
+  transition: opacity .18s ease;
+}
+.action-sheet.show{ opacity: 1; pointer-events: auto; }
+
+.action-sheet-content{
+  width: 100%; max-width: 480px;
+  background: var(--card-solid); border-radius: 20px 20px 0 0;
+  padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -8px 28px rgba(17,24,39,.18);
+  transform: translateY(100%);
+  transition: transform .22s ease;
+}
+.action-sheet.show .action-sheet-content{ transform: translateY(0); }
+
+.sheet-seat-pasajero{
+  font-size: 1.05rem; font-weight: 800; color: var(--text);
+  text-align: center; margin-bottom: 16px;
+}
+
+.floor-sheet-options{ display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+
+.floor-sheet-option{
+  width: 100%; min-height: 48px; border-radius: 12px;
+  border: 1.5px solid #e5e7eb; background: #f9fafb; color: var(--text);
+  font-size: .96rem; font-weight: 600; cursor: pointer;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.floor-sheet-option:hover{ background: #f3f4f6; }
+.floor-sheet-option.selected{
+  border-color: var(--primary); background: #eff6ff; color: var(--primary);
+}
