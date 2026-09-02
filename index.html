@@ -124,7 +124,7 @@
           </div>
           <h2 class="bases-title">Ayudanos a mejorar tu viaje</h2>
           <p class="bases-text">En Destino guaraní queremos que cada viaje sea una gran experiencia. Completá tus datos para confirmar que aceptas las Bases y Condiciones de nuestros servicios.</p>
-          <button class="btn bases-cta" onclick="goBasesChoice()" type="button">
+          <button class="btn bases-cta" onclick="goBasesStep(1)" type="button">
             Completar formulario
             <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="16"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
@@ -134,82 +134,143 @@
           </p>
         </div>
 
-        <!-- Pantalla 2: ¿tenés correo? -->
-        <div class="bases-card hidden" id="basesChoiceCard">
-          <h2 class="bases-form-title" style="text-align:center;">¿Tenés correo electrónico?</h2>
-          <p class="bases-form-subtitle" style="text-align:center;">Lo usamos para enviarte automáticamente el PDF de tu aceptación.</p>
-
-          <div class="bases-choice-options">
-            <button class="bases-choice-btn" onclick="chooseTieneCorreo(true)" type="button">
-              <svg aria-hidden="true" fill="none" height="22" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24" width="22"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z"/><path d="m22 6-10 7L2 6"/></svg>
-              Sí, tengo correo
-            </button>
-            <button class="bases-choice-btn bases-choice-btn-alt" onclick="chooseTieneCorreo(false)" type="button">
-              <svg aria-hidden="true" fill="none" height="22" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24" width="22"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z"/><path d="M18 8 6 16"/></svg>
-              No tengo correo
-            </button>
-          </div>
-
-          <div class="reserve-actions" style="margin-top:20px;">
-            <button class="btn ghost" onclick="goBasesLanding()" type="button">Volver</button>
-          </div>
-        </div>
-
-        <!-- Pantalla 3: formulario -->
+        <!-- Wizard: pasos 1-3, con header de progreso compartido -->
         <form class="bases-card hidden" id="basesFormCard" novalidate onsubmit="return submitBasesForm(event)">
-          <h2 class="bases-form-title">Completá tus datos</h2>
-          <p class="bases-form-subtitle">Usamos esta información para confirmar tu aceptación de las Bases y Condiciones.</p>
 
-          <a class="bases-read-notice" href="https://drive.google.com/file/d/1j2VCdg6gRKpz1dpySOV9M3Fz4RGGBbzm/view" rel="noopener" target="_blank">
-            <svg aria-hidden="true" class="bases-read-notice-icon" fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h6"/>
-            </svg>
-            <span class="bases-read-notice-text">
-              <strong>Antes de continuar, leé las Bases y Condiciones.</strong>
-              Es obligatorio para poder completar este formulario. Tocá acá para abrirlas.
-            </span>
-            <svg aria-hidden="true" class="bases-read-notice-arrow" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="16"><path d="M7 17 17 7"/></svg>
-          </a>
-
-          <div class="reserve-field" style="margin-bottom:12px;">
-            <label class="reserve-field-label" for="basesNombre">Nombre y apellido</label>
-            <input autocomplete="name" id="basesNombre" name="nombre" placeholder="Ej: Ana Gómez" type="text"/>
+          <!-- Header de progreso: título dinámico + barra + "Paso X de 3" -->
+          <div class="bases-progress" id="basesProgress">
+            <div class="bases-progress-top">
+              <h2 class="bases-form-title" id="basesStepTitle">Datos personales</h2>
+              <span class="bases-progress-count" id="basesStepCount">Paso 1 de 3</span>
+            </div>
+            <div class="bases-progress-track" aria-hidden="true">
+              <div class="bases-progress-fill" id="basesProgressFill"></div>
+            </div>
           </div>
 
-          <div class="reserve-field" style="margin-bottom:16px;">
-            <label class="reserve-field-label" for="basesCi">Cédula de identidad</label>
-            <input autocomplete="off" id="basesCi" inputmode="numeric" name="ci" oninput="onlyDigits(this)" placeholder="Ej: 4567890" type="text"/>
-          </div>
+          <!-- ───────── Paso 1: Datos personales ───────── -->
+          <fieldset class="bases-step" id="basesStep1">
+            <p class="bases-form-subtitle">Completá tus datos para identificarte en el viaje.</p>
 
-          <!-- Campo de correo: visible y obligatorio solo si eligió "Sí" en
-               el paso anterior. chooseTieneCorreo() controla esta clase. -->
-          <div class="reserve-field hidden" id="basesEmailWrap" style="margin-bottom:12px;">
-            <label class="reserve-field-label" for="basesEmail">Correo electrónico</label>
-            <input autocomplete="email" id="basesEmail" name="email" placeholder="Ej: ana@correo.com" type="email"/>
-            <p class="bases-email-hint">Lo usaremos para enviarte recibos y otra información importante relacionada a los datos que completaste en este formulario.</p>
-          </div>
+            <div class="reserve-field" style="margin-bottom:12px;">
+              <label class="reserve-field-label" for="basesNombre">Nombre y apellido</label>
+              <input autocomplete="name" id="basesNombre" name="nombre" placeholder="Ej: Ana Gómez" type="text"/>
+            </div>
 
-          <!-- Aviso: visible solo si eligió "No" en el paso anterior. -->
-          <div class="bases-confirmed-notice hidden" id="basesNoCorreoNotice" style="margin-bottom:16px;">
-            <svg aria-hidden="true" class="bases-confirmed-notice-icon" fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z"/><path d="M18 8 6 16"/>
-            </svg>
-            <span class="bases-confirmed-notice-text">
-              <strong style="display:block; margin-bottom:4px;">Instrucciones en caso de no poseer correo electrónico</strong>
-              Estimado pasajero: a falta de un correo electrónico registrado que nos permita enviarte automáticamente el PDF con la constancia de tu aceptación de las Bases y Condiciones, te pedimos completar los datos a continuación y avisar a tu agente cuando termines.<br><br>
-              Tu agente revisará tu aceptación en nuestro sistema y te enviará el PDF por el medio de contacto que estén usando.<br><br>
-              Atentamente, Equipo Destino 🦾🚌
-            </span>
-          </div>
+            <div class="reserve-field" style="margin-bottom:16px;">
+              <label class="reserve-field-label" for="basesCi">Cédula de identidad</label>
+              <input autocomplete="off" id="basesCi" inputmode="numeric" name="ci" oninput="onlyDigits(this)" placeholder="Ej: 4567890" type="text"/>
+            </div>
 
-          <label class="bases-checkbox-row bases-checkbox-row-confirm" for="basesConfirmLeido" id="basesConfirmLeidoRow" style="margin-top:4px;">
-            <input id="basesConfirmLeido" onchange="_clearBasesConfirmError()" type="checkbox"/>
-            <span>Leí y acepto las Bases y Condiciones</span>
-          </label>
+            <div class="reserve-field" id="basesEmailWrap" style="margin-bottom:8px;">
+              <label class="reserve-field-label" for="basesEmail">Correo electrónico</label>
+              <input autocomplete="email" id="basesEmail" name="email" placeholder="Ej: ana@correo.com" type="email"/>
+            </div>
+
+            <div class="bases-confirmed-notice" style="margin-bottom:14px;">
+              <svg aria-hidden="true" class="bases-confirmed-notice-icon" fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z"/><path d="m22 6-10 7L2 6"/>
+              </svg>
+              <span class="bases-confirmed-notice-text">
+                Si disponés de un correo electrónico, te enviaremos automáticamente tu constancia y otros documentos relacionados con tu viaje.
+              </span>
+            </div>
+
+            <label class="bases-checkbox-row" for="basesNoEmail" style="margin-bottom:4px;">
+              <input id="basesNoEmail" onchange="toggleBasesNoEmail(this.checked)" type="checkbox"/>
+              <span>No dispongo de correo electrónico</span>
+            </label>
+          </fieldset>
+
+          <!-- ───────── Paso 2: Información adicional ───────── -->
+          <fieldset class="bases-step hidden" id="basesStep2">
+            <p class="bases-form-subtitle">Información adicional para tu viaje.</p>
+
+            <div class="reserve-field" style="margin-bottom:6px;">
+              <span class="reserve-field-label">Cumpleaños (opcional)</span>
+              <div class="bases-birthday-row">
+                <select aria-label="Día de cumpleaños" id="basesBirthDay">
+                  <option value="">Día</option>
+                </select>
+                <select aria-label="Mes de cumpleaños" id="basesBirthMonth" onchange="_populateBirthDays()">
+                  <option value="">Mes</option>
+                  <option value="1">Enero</option>
+                  <option value="2">Febrero</option>
+                  <option value="3">Marzo</option>
+                  <option value="4">Abril</option>
+                  <option value="5">Mayo</option>
+                  <option value="6">Junio</option>
+                  <option value="7">Julio</option>
+                  <option value="8">Agosto</option>
+                  <option value="9">Septiembre</option>
+                  <option value="10">Octubre</option>
+                  <option value="11">Noviembre</option>
+                  <option value="12">Diciembre</option>
+                </select>
+              </div>
+            </div>
+            <p class="bases-email-hint" style="margin-bottom:18px;">
+              🎁 En Destino nos complace darte un presente si tu cumpleaños cae en el mes de tu viaje.
+            </p>
+
+            <div class="reserve-field" style="margin-bottom:12px;">
+              <label class="reserve-field-label" for="basesContactoNombre">Contacto de emergencia</label>
+              <input autocomplete="off" id="basesContactoNombre" placeholder="Ej: María Gómez" type="text"/>
+            </div>
+
+            <div class="reserve-field" style="margin-bottom:12px;">
+              <label class="reserve-field-label" for="basesContactoTelefono">Teléfono de emergencia</label>
+              <input autocomplete="off" id="basesContactoTelefono" inputmode="numeric" oninput="onlyDigits(this)" placeholder="Ej: 099123456" type="text"/>
+            </div>
+
+            <div class="reserve-field" style="margin-bottom:4px;">
+              <span class="reserve-field-label">Parentesco</span>
+              <button class="bases-sheet-trigger" id="basesParentescoTrigger" onclick="openParentescoSheet()" type="button">
+                <span id="basesParentescoLabel">Seleccionar…</span>
+                <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <input id="basesParentesco" type="hidden"/>
+            </div>
+          </fieldset>
+
+          <!-- ───────── Paso 3: Bases y condiciones ───────── -->
+          <fieldset class="bases-step hidden" id="basesStep3">
+            <p class="bases-form-subtitle">Usamos esta información para confirmar tu aceptación de las Bases y Condiciones.</p>
+
+            <a class="bases-read-notice" href="https://drive.google.com/file/d/1j2VCdg6gRKpz1dpySOV9M3Fz4RGGBbzm/view" rel="noopener" target="_blank">
+              <svg aria-hidden="true" class="bases-read-notice-icon" fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M9 13h6"/><path d="M9 17h6"/>
+              </svg>
+              <span class="bases-read-notice-text">
+                <strong>Antes de continuar, leé las Bases y Condiciones.</strong>
+                Es obligatorio para poder completar este formulario. Tocá acá para abrirlas.
+              </span>
+              <svg aria-hidden="true" class="bases-read-notice-arrow" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="16"><path d="M7 17 17 7"/></svg>
+            </a>
+
+            <!-- Aviso: visible solo si en el Paso 1 marcó "No dispongo de correo". -->
+            <div class="bases-confirmed-notice hidden" id="basesNoCorreoNotice" style="margin-bottom:16px;">
+              <svg aria-hidden="true" class="bases-confirmed-notice-icon" fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z"/><path d="M18 8 6 16"/>
+              </svg>
+              <span class="bases-confirmed-notice-text">
+                <strong style="display:block; margin-bottom:4px;">Instrucciones en caso de no poseer correo electrónico</strong>
+                Estimado pasajero: a falta de un correo electrónico registrado que nos permita enviarte automáticamente el PDF con la constancia de tu aceptación de las Bases y Condiciones, te pedimos avisar a tu agente cuando termines.<br><br>
+                Tu agente revisará tu aceptación en nuestro sistema y te enviará el PDF por el medio de contacto que estén usando.<br><br>
+                Atentamente, Equipo Destino 🦾🚌
+              </span>
+            </div>
+
+            <label class="bases-checkbox-row bases-checkbox-row-confirm" for="basesConfirmLeido" id="basesConfirmLeidoRow" style="margin-top:4px;">
+              <input id="basesConfirmLeido" onchange="_clearBasesConfirmError()" type="checkbox"/>
+              <span>Leí y acepto las Bases y Condiciones</span>
+            </label>
+          </fieldset>
 
           <div class="reserve-actions" style="margin-top:20px;">
-            <button class="btn ghost" onclick="goBasesChoice()" type="button">Volver</button>
-            <button class="btn success" id="basesSubmitBtn" type="submit">Enviar</button>
+            <button class="btn ghost" id="basesStepBackBtn" onclick="basesStepBack()" type="button">Volver</button>
+            <button class="btn primary" id="basesStepNextBtn" onclick="basesStepNext()" type="button">Continuar</button>
+            <button class="btn success hidden" id="basesSubmitBtn" type="submit">Enviar</button>
           </div>
         </form>
 
@@ -236,6 +297,15 @@
             Ir al inicio
             <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="16"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
+        </div>
+      </div>
+
+      <!-- Bottom-sheet: elegir parentesco (mismo patrón que floorSheet) -->
+      <div class="action-sheet" id="parentescoSheet">
+        <div class="action-sheet-content">
+          <div class="sheet-seat-pasajero">Parentesco del contacto</div>
+          <div class="floor-sheet-options" id="parentescoSheetOptions"></div>
+          <button class="btn ghost" onclick="closeParentescoSheet()" type="button" style="margin-top:8px">Cancelar</button>
         </div>
       </div>
     </div>
