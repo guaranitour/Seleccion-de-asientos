@@ -1,0 +1,5 @@
+# Cloudflare Pages: cualquier ruta que no matchee un archivo real
+# se sirve con index.html, pero manteniendo la URL original (status 200,
+# no 301/302) para que el router client-side de la SPA la resuelva.
+# Esto reemplaza el hack de 404.html + sessionStorage + replaceState.
+/*    /index.html   200
