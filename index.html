@@ -8,23 +8,6 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 
-<!-- GitHub Pages no soporta rewrites del lado del servidor para History API.
-     Este script recupera la ruta real que 404.html guardó en sessionStorage
-     antes de redirigir acá, y la restaura con replaceState ANTES de que
-     arranque el router — así la app carga en la ruta correcta sin flicker
-     ni ida-vuelta visible en la URL. Debe ir antes de cualquier otro script. -->
-<script>
-(function () {
-  var redirect = sessionStorage.getItem('gh-pages-redirect');
-  if (redirect) {
-    sessionStorage.removeItem('gh-pages-redirect');
-    if (redirect !== location.pathname + location.search + location.hash) {
-      history.replaceState(null, '', redirect);
-    }
-  }
-})();
-</script>
-
 <!-- Previsualización al compartir el link (WhatsApp, Facebook, Telegram, etc.) -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.guaranitour.com/">
