@@ -27,7 +27,7 @@ const ROUTES_META = {
   '/reservas': {
     title: 'Reservá tu asiento — Destino Guaraní',
     description: 'Elegí tu asiento para el viaje en menos de 2 minutos.',
-    image: 'https://www.guaranitour.com/RESERVAS_IMAGEN.png',
+    image: 'https://www.guaranitour.com/Preview.png',
   },
   '/bases-y-condiciones': {
     title: 'Bases y Condiciones — Destino Guaraní',
