@@ -244,7 +244,7 @@ async function confirmReservationPage() {
       if (firstInvalid) firstInvalid.focus();
       return;
     }
-    pairs.push({ code: normalize([...AppState.selected][0]), pasajero: name, ci });
+    pairs.push({ code: normalize([...AppState.selected][0]), pasajero: normalizeNombre(name), ci: normalizeCI(ci) });
 
   } else {
     const cards = document.querySelectorAll('#reservePageBody .reserve-card[data-code]');
@@ -263,7 +263,7 @@ async function confirmReservationPage() {
         invalid = true;
         if (!firstInvalid) firstInvalid = !name ? nameEl : ciEl;
       }
-      pairs.push({ code: card.dataset.code, pasajero: name, ci });
+      pairs.push({ code: card.dataset.code, pasajero: normalizeNombre(name), ci: normalizeCI(ci) });
     });
 
     if (invalid) {

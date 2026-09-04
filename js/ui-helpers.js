@@ -55,6 +55,45 @@ function onlyDigits(el) {
   el.value = el.value.replace(/\D+/g, '');
 }
 
+/**
+ * Limpia un CI para guardarlo en la base: solo dígitos, sin puntos,
+ * espacios ni guiones. onlyDigits() ya hace esto en vivo mientras se
+ * escribe, pero esta versión (pura, no toca el DOM) es la que se usa
+ * justo antes de mandar el dato al servidor — cubre el caso de un valor
+ * pegado (paste) que por algún motivo llegó con algo no numérico.
+ */
+function normalizeCI(ci) {
+  return (ci || '').toString().replace(/\D+/g, '');
+}
+
+// Palabras que van en minúscula dentro de un nombre compuesto, salvo que
+// sean la primera palabra (p. ej. "María de los Ángeles", "Juan de Dios").
+const NOMBRE_MINUSCULAS = new Set(['de', 'del', 'la', 'las', 'los', 'y']);
+
+/**
+ * Normaliza un nombre a Title Case, evitando que quede todo en mayúsculas
+ * o minúsculas por cómo lo tipeó la persona. Respeta apóstrofes y guiones
+ * (D'Angelo, Pérez-Gómez) y deja en minúscula las preposiciones/artículos
+ * típicos de nombres compuestos en español, excepto al inicio.
+ */
+function normalizeNombre(nombre) {
+  const limpio = (nombre || '').toString().trim().replace(/\s+/g, ' ');
+  if (!limpio) return '';
+
+  return limpio
+    .toLowerCase()
+    .split(' ')
+    .map((palabra, i) => {
+      if (i > 0 && NOMBRE_MINUSCULAS.has(palabra)) return palabra;
+      // Capitaliza cada segmento separado por ' o -, para D'Angelo / Pérez-Gómez
+      return palabra
+        .split(/([-'])/)
+        .map(seg => (seg === '-' || seg === "'") ? seg : seg.charAt(0).toUpperCase() + seg.slice(1))
+        .join('');
+    })
+    .join(' ');
+}
+
 function handleEnter(ev, cb) {
   if (ev.key === 'Enter') cb();
 }
@@ -178,6 +217,8 @@ window.showLoading = showLoading;
 window.hideLoading = hideLoading;
 window.normalize = normalize;
 window.onlyDigits = onlyDigits;
+window.normalizeCI = normalizeCI;
+window.normalizeNombre = normalizeNombre;
 window.handleEnter = handleEnter;
 window.markField = markField;
 window.updateTripTags = updateTripTags;
