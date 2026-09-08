@@ -1,0 +1,28 @@
+# ============================================================
+# _headers — Cloudflare Pages
+# ============================================================
+# Va en la RAÍZ del proyecto que Cloudflare Pages despliega (mismo
+# nivel que index.html). Cloudflare lo lee automáticamente en cada
+# deploy, no hace falta configurar nada en el dashboard.
+# Doc: https://developers.cloudflare.com/pages/configuration/headers/
+#
+# Nada de esto es necesario para que Cloudflare Pages funcione bien
+# de por sí — por defecto ya sirve Cache-Control: public, max-age=0,
+# must-revalidate, sin cachear agresivamente. Esto es solo para dejar
+# el comportamiento explícito y evitar el caché LOCAL del navegador
+# (el que causó el bug de "Andres Mereles" no apareciendo hasta abrir
+# en incógnito), que es distinto del caché del servidor/CDN.
+# ============================================================
+
+# Cualquier .html: nunca servir una copia vieja desde el navegador.
+# contacto-emergencia.html cambia cada vez que iteramos el flujo del
+# pasajero, y no tiene versión en el nombre — siempre debe revalidar.
+/*.html
+  Cache-Control: no-cache, must-revalidate
+
+# JS/CSS versionados por query string (?v=N en el <script src>/<link>):
+# estos SÍ pueden cachear agresivamente, porque cualquier cambio futuro
+# va a venir con una URL distinta (?v=3, ?v=4...) y por lo tanto nunca
+# choca con una copia vieja en caché.
+/js/*
+  Cache-Control: public, max-age=31536000, immutable
