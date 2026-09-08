@@ -25,10 +25,48 @@
   html, body{ height:100%; }
   body{
     margin:0; font-family: system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;
-    color:var(--text); background:var(--bg);
+    color:var(--text); background-color:var(--bg); position:relative; overflow-x:hidden;
     display:flex; justify-content:center;
-    padding: max(20px, env(safe-area-inset-top)) 16px max(20px, env(safe-area-inset-bottom));
+    padding: calc(76px + env(safe-area-inset-top, 0px) + 20px) 16px max(20px, env(safe-area-inset-bottom));
   }
+  /* Marca de agua de fondo, mismo criterio que base.css: pseudo-elemento
+     fijo detrás del contenido, para no heredar opacity a los hijos. */
+  body::before{
+    content:""; position:fixed; inset:0; z-index:-1;
+    background-image:url('/logo-watermark.png');
+    background-repeat:no-repeat; background-position:center 140px;
+    background-size:min(78vw, 480px);
+    opacity:.16; pointer-events:none;
+  }
+  @supports (-webkit-touch-callout: none){
+    body::before{ position:absolute; }
+  }
+
+  /* ===== Topbar: logo centrado, sin botón de menú ===== */
+  .topbar{
+    position:fixed; top:0; left:0; right:0; z-index:40;
+    display:flex; align-items:center; justify-content:center;
+    height:76px; padding:0 10px; padding-top:env(safe-area-inset-top, 0px);
+    background:rgba(247,249,252,.82);
+    backdrop-filter:blur(10px) saturate(1.4);
+    -webkit-backdrop-filter:blur(10px) saturate(1.4);
+    border-bottom:1px solid rgba(17,24,39,.06);
+  }
+  .topbar:has(.topbar-logo.skeleton-round){ background:rgba(247,249,252,.55); }
+  .topbar-logo-wrap{ flex:1; min-width:0; display:flex; align-items:center; justify-content:center; }
+  .topbar-logo{ height:56px; width:auto; max-width:220px; object-fit:contain; flex-shrink:0; }
+  @media (max-width:380px){ .topbar-logo{ max-width:180px; height:48px; } }
+  .topbar-logo.skeleton-round{
+    width:180px; height:48px; border-radius:14px;
+    background:linear-gradient(100deg,#eceef1 30%,#f6f7f9 50%,#eceef1 70%);
+    background-size:200% 100%;
+    animation:skeletonShimmer 1.4s ease-in-out infinite;
+  }
+  .topbar-logo.loaded{ background:none; animation:none; width:auto; height:56px; }
+  @media (max-width:380px){ .topbar-logo.loaded{ height:48px; } }
+  @keyframes skeletonShimmer{ 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+  @media (prefers-reduced-motion: reduce){ .topbar-logo.skeleton-round{ animation:none; } }
+
   .wrap{ width:100%; max-width:480px; margin:auto 0; }
 
   .card{
@@ -135,6 +173,13 @@
 </style>
 </head>
 <body>
+
+<!-- Header: solo logo centrado, sin menú -->
+<header aria-label="Cabecera" class="topbar">
+  <div class="topbar-logo-wrap">
+    <img alt="Destino Guaraní" class="topbar-logo skeleton-round" id="heroLogo"/>
+  </div>
+</header>
 
 <div class="wrap">
 
@@ -246,6 +291,18 @@
 </div>
 
 <div class="snackbar" id="snackbar"></div>
+
+<script>
+  // Misma lógica que _loadHeroLogo() en main.js: skeleton shimmer hasta
+  // que cargue (o falle), luego clase "loaded" para mostrar el PNG real.
+  (function loadHeroLogo(){
+    const img = document.getElementById('heroLogo');
+    if (!img) return;
+    img.addEventListener('load', () => img.classList.add('loaded'), { once:true });
+    img.addEventListener('error', () => img.classList.add('loaded'), { once:true });
+    img.src = '/Logo.png';
+  })();
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-client.js"></script>
