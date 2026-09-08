@@ -51,6 +51,51 @@ function markField(el, isInvalid) {
   }
 }
 
+// ── Cumpleaños: día/mes con año fijo 2000 (bisiesto, cubre 29/02) ──
+// Mismo criterio que el paso 2 de Bases y Condiciones: el año no importa,
+// solo se usa para poder calcular cuántos días tiene cada mes.
+
+function _populateBirthDays() {
+  const daySel = document.getElementById('fBirthDay');
+  const monthSel = document.getElementById('fBirthMonth');
+  if (!daySel || !monthSel) return;
+
+  const month = parseInt(monthSel.value, 10) || null;
+  const daysInMonth = month ? new Date(2000, month, 0).getDate() : 31;
+  const current = daySel.value;
+
+  daySel.innerHTML = '<option value="">Día</option>' +
+    Array.from({ length: daysInMonth }, (_, i) => i + 1)
+      .map(d => `<option value="${d}">${d}</option>`).join('');
+
+  if (current && Number(current) <= daysInMonth) daySel.value = current;
+}
+
+/** Separa una fecha 'YYYY-MM-DD' guardada en cumpleanos y carga los
+ *  selects de día/mes. El año se ignora (siempre es el fijo 2000). */
+function _precargarCumpleanos(fechaIso) {
+  if (!fechaIso) return;
+  const partes = String(fechaIso).split('-'); // ['2000', 'MM', 'DD']
+  if (partes.length !== 3) return;
+  const mes = parseInt(partes[1], 10);
+  const dia = parseInt(partes[2], 10);
+
+  const monthSel = document.getElementById('fBirthMonth');
+  if (monthSel && mes) monthSel.value = String(mes);
+  _populateBirthDays();
+  const daySel = document.getElementById('fBirthDay');
+  if (daySel && dia) daySel.value = String(dia);
+}
+
+/** Arma 'YYYY-MM-DD' (año fijo 2000) a partir de los selects, o null si
+ *  no se completó ninguno (el cumpleaños es opcional acá). */
+function _getCumpleanosSeleccionado() {
+  const dia = document.getElementById('fBirthDay').value;
+  const mes = document.getElementById('fBirthMonth').value;
+  if (!dia || !mes) return null;
+  return `2000-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+}
+
 // ── Bottom-sheet: parentesco ──
 
 function openParentescoSheet() {
@@ -88,6 +133,16 @@ function selectParentesco(opt) {
 
 function _precargar(row) {
   if (!row) return;
+
+  // Identidad: siempre se muestra si vino del link (nombre puede faltar
+  // si el pasajero no estaba en public.pasajeros al generar el link).
+  const nombreEl = document.getElementById('identityNombre');
+  const ciEl = document.getElementById('identityCi');
+  if (nombreEl) nombreEl.textContent = row.nombre || '—';
+  if (ciEl) ciEl.textContent = row.ci || '—';
+
+  _precargarCumpleanos(row.cumpleanos);
+
   if (row.contacto_emergencia_nombre) document.getElementById('fNombre').value = row.contacto_emergencia_nombre;
   if (row.contacto_emergencia_telefono) document.getElementById('fTelefono').value = row.contacto_emergencia_telefono;
   if (row.contacto_emergencia_parentesco) selectParentesco(row.contacto_emergencia_parentesco);
@@ -130,7 +185,8 @@ async function submitContacto(ev) {
       p_token: _token,
       p_nombre: document.getElementById('fNombre').value.trim(),
       p_telefono: document.getElementById('fTelefono').value.trim(),
-      p_parentesco: document.getElementById('fParentesco').value.trim()
+      p_parentesco: document.getElementById('fParentesco').value.trim(),
+      p_cumpleanos: _getCumpleanosSeleccionado()
     });
 
     if (error) throw error;
@@ -181,5 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('fTelefono').addEventListener('input', function () { onlyDigits(this); });
   document.getElementById('parentescoTrigger').addEventListener('click', openParentescoSheet);
   document.getElementById('parentescoCancelBtn').addEventListener('click', closeParentescoSheet);
+  document.getElementById('fBirthMonth').addEventListener('change', _populateBirthDays);
+  _populateBirthDays();
   init();
 });
