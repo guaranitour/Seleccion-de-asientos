@@ -94,6 +94,11 @@
     font-size:1rem; background:#fff; color:var(--text);
   }
   .field input.field-error{ border-color:var(--danger); box-shadow:0 0 0 2px rgba(239,68,68,.15); }
+  .field textarea{
+    width:100%; border:1px solid #e5e7eb; border-radius:10px; padding:12px;
+    font-size:1rem; background:#fff; color:var(--text);
+    font-family:inherit; resize:vertical; min-height:70px;
+  }
 
   /* Confirmación de identidad: nombre + CI de solo lectura, arriba del form */
   .identity-box{
@@ -250,6 +255,11 @@
       </div>
 
       <div class="field">
+        <label for="fObservaciones">Información de salud relevante</label>
+        <textarea autocomplete="off" id="fObservaciones" placeholder="¿Hay alguna condición de salud, alergia o medicación que debamos tener en cuenta?" rows="3"></textarea>
+      </div>
+
+      <div class="field">
         <label for="fNombre">Nombre y apellido</label>
         <input autocomplete="off" id="fNombre" placeholder="Ej: María Gómez" type="text" />
       </div>
@@ -308,7 +318,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/js/supabase-client.js"></script>
-<script src="/js/contacto-emergencia.js"></script>
+<script src="/js/contacto-emergencia.js?v=3"></script>
      <script>
 if (location.search.includes("debug")) {
   const script = document.createElement("script");
