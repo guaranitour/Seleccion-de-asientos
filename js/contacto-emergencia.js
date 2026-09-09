@@ -146,6 +146,7 @@ function _precargar(row) {
   if (row.contacto_emergencia_nombre) document.getElementById('fNombre').value = row.contacto_emergencia_nombre;
   if (row.contacto_emergencia_telefono) document.getElementById('fTelefono').value = row.contacto_emergencia_telefono;
   if (row.contacto_emergencia_parentesco) selectParentesco(row.contacto_emergencia_parentesco);
+  if (row.observaciones) document.getElementById('fObservaciones').value = row.observaciones;
 }
 
 // ── Validación del formulario ──
@@ -186,7 +187,8 @@ async function submitContacto(ev) {
       p_nombre: document.getElementById('fNombre').value.trim(),
       p_telefono: document.getElementById('fTelefono').value.trim(),
       p_parentesco: document.getElementById('fParentesco').value.trim(),
-      p_cumpleanos: _getCumpleanosSeleccionado()
+      p_cumpleanos: _getCumpleanosSeleccionado(),
+      p_observaciones: document.getElementById('fObservaciones').value.trim() || null
     });
 
     if (error) throw error;
