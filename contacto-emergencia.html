@@ -100,14 +100,61 @@
     font-family:inherit; resize:vertical; min-height:70px;
   }
 
-  /* Confirmación de identidad: nombre + CI de solo lectura, arriba del form */
+  /* Confirmación de identidad: tarjeta tipo "credencial" para que se
+     lea de un vistazo como un bloque propio, distinto del formulario. */
   .identity-box{
-    text-align:left; background:#f9fafb; border:1.5px solid #e5e7eb; border-radius:14px;
-    padding:12px 14px; margin-bottom:18px;
+    display:flex; align-items:center; gap:12px; text-align:left;
+    background:linear-gradient(135deg,#eff6ff,#e0e9fb);
+    border:1.5px solid #bfdbfe; border-radius:16px;
+    padding:14px 16px; margin-bottom:6px;
   }
-  .identity-row{ display:flex; justify-content:space-between; gap:10px; padding:4px 0; font-size:.9rem; }
-  .identity-label{ color:var(--muted); font-weight:600; }
-  .identity-value{ color:var(--text); font-weight:700; text-align:right; }
+  .identity-avatar{
+    flex-shrink:0; width:44px; height:44px; border-radius:50%;
+    background:var(--primary); color:#fff; font-weight:800; font-size:1rem;
+    display:grid; place-items:center;
+  }
+  .identity-info{ min-width:0; flex:1; }
+  .identity-tag{
+    display:block; font-size:.72rem; font-weight:800; letter-spacing:.04em;
+    text-transform:uppercase; color:var(--primary); margin-bottom:2px;
+  }
+  .identity-value{
+    display:block; font-weight:800; font-size:1rem; color:var(--text);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .identity-ci{ font-weight:600; font-size:.82rem; color:var(--muted); margin-top:1px; }
+
+  /* Línea simple entre la credencial del pasajero y el form.
+     Sin texto: el texto lo aportan los group-label de cada bloque. */
+  .section-divider{ height:1px; background:#e5e7eb; margin:18px 0 16px; }
+
+  .group-label{
+    margin:0 0 10px; font-size:.72rem; font-weight:800; letter-spacing:.05em;
+    text-transform:uppercase; color:var(--muted);
+  }
+
+  /* Separador entre "Sobre vos" y los datos del contacto propiamente
+     dicho. Repite explícitamente "no son tus datos" en el punto exacto
+     donde antes se generaba la confusión. */
+  .section-divider2{
+    display:flex; align-items:center; gap:10px; margin:22px 0 12px;
+  }
+  .section-divider2::before, .section-divider2::after{
+    content:""; flex:1; height:1px; background:#e5e7eb;
+  }
+  .section-divider2 span{
+    flex-shrink:0; font-size:.72rem; font-weight:800; letter-spacing:.05em;
+    text-transform:uppercase; color:var(--primary); text-align:center;
+  }
+  .section-hint{
+    display:flex; gap:8px; align-items:flex-start; text-align:left;
+    background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px;
+    padding:10px 12px; margin-bottom:16px; font-size:.83rem; line-height:1.45; color:#1e3a5f;
+  }
+  .section-hint svg{ flex-shrink:0; margin-top:1px; color:var(--primary); }
+  .section-hint strong{ color:var(--primary); }
+
+  .field-hint-inline{ font-weight:500; color:var(--muted); font-size:.8rem; }
 
   /* Cumpleaños: fila día/mes + aviso, mismo criterio visual que ByC */
   .birthday-row{ display:flex; gap:10px; }
@@ -218,17 +265,18 @@
          abrió el link, sabe de entrada que hay un error y puede avisar
          a su agente en vez de completar datos que no le corresponden. -->
     <div class="identity-box" id="identityBox">
-      <div class="identity-row">
-        <span class="identity-label">Nombre</span>
+      <div class="identity-avatar" id="identityAvatar" aria-hidden="true">—</div>
+      <div class="identity-info">
+        <span class="identity-tag">Este link pertenece a</span>
         <span class="identity-value" id="identityNombre">—</span>
-      </div>
-      <div class="identity-row">
-        <span class="identity-label">CI</span>
-        <span class="identity-value" id="identityCi">—</span>
+        <span class="identity-ci">CI: <span id="identityCi">—</span></span>
       </div>
     </div>
 
+    <div class="section-divider"></div>
+
     <form id="contactoForm" novalidate>
+      <p class="group-label">Sobre vos</p>
       <div class="field">
         <label>Cumpleaños (opcional)</label>
         <div class="birthday-row">
@@ -259,8 +307,14 @@
         <textarea autocomplete="off" id="fObservaciones" placeholder="¿Hay alguna condición de salud, alergia o medicación que debamos tener en cuenta?" rows="3"></textarea>
       </div>
 
+      <div class="section-divider2"><span>Datos de tu contacto de emergencia</span></div>
+      <div class="section-hint">
+        <svg aria-hidden="true" fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Ahora sí: datos de <strong>otra persona</strong>, a quien debemos llamar si te pasa algo en el viaje.</span>
+      </div>
+
       <div class="field">
-        <label for="fNombre">Nombre y apellido</label>
+        <label for="fNombre">Nombre y apellido <span class="field-hint-inline">(de tu contacto, no los tuyos)</span></label>
         <input autocomplete="off" id="fNombre" placeholder="Ej: María Gómez" type="text" />
       </div>
 
@@ -270,7 +324,7 @@
       </div>
 
       <div class="field">
-        <label>Parentesco</label>
+        <label>Parentesco <span class="field-hint-inline">(con vos)</span></label>
         <button class="sheet-trigger" id="parentescoTrigger" type="button">
           <span id="parentescoLabel">Seleccionar…</span>
           <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16"><path d="m6 9 6 6 6-6"/></svg>
