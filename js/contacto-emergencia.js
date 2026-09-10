@@ -19,6 +19,16 @@ function getToken() {
   return (params.get('t') || '').trim();
 }
 
+// Iniciales para el avatar de la credencial (ej: "María Gómez" → "MG").
+function _iniciales(nombre) {
+  if (!nombre) return '?';
+  const partes = nombre.trim().split(/\s+/).filter(Boolean);
+  if (partes.length === 0) return '?';
+  const primera = partes[0][0] || '';
+  const segunda = partes.length > 1 ? (partes[partes.length - 1][0] || '') : '';
+  return (primera + segunda).toUpperCase();
+}
+
 function showState(id) {
   ['stateLoading', 'stateInvalid', 'stateForm', 'stateDone'].forEach(stateId => {
     const el = document.getElementById(stateId);
@@ -138,8 +148,10 @@ function _precargar(row) {
   // si el pasajero no estaba en public.pasajeros al generar el link).
   const nombreEl = document.getElementById('identityNombre');
   const ciEl = document.getElementById('identityCi');
+  const avatarEl = document.getElementById('identityAvatar');
   if (nombreEl) nombreEl.textContent = row.nombre || '—';
   if (ciEl) ciEl.textContent = row.ci || '—';
+  if (avatarEl) avatarEl.textContent = _iniciales(row.nombre);
 
   _precargarCumpleanos(row.cumpleanos);
 
