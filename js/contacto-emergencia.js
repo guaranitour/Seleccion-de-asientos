@@ -19,14 +19,27 @@ function getToken() {
   return (params.get('t') || '').trim();
 }
 
-// Iniciales para el avatar de la credencial (ej: "María Gómez" → "MG").
-function _iniciales(nombre) {
-  if (!nombre) return '?';
-  const partes = nombre.trim().split(/\s+/).filter(Boolean);
-  if (partes.length === 0) return '?';
-  const primera = partes[0][0] || '';
-  const segunda = partes.length > 1 ? (partes[partes.length - 1][0] || '') : '';
-  return (primera + segunda).toUpperCase();
+// Primer nombre para el saludo (ej: "María José Gómez" → "María José" no,
+// solo la primera palabra: "María"). Si no hay nombre, saluda genérico.
+function _primerNombre(nombre) {
+  if (!nombre) return '';
+  return nombre.trim().split(/\s+/)[0] || '';
+}
+
+// Saludo según hora del día. Paraguay es un solo huso horario, así que
+// usamos la hora local del dispositivo directamente.
+function _saludoHora() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Buenos días';
+  if (h < 19) return 'Buenas tardes';
+  return 'Buenas noches';
+}
+
+function _pintarSaludo(nombre) {
+  const el = document.getElementById('greeting');
+  if (!el) return;
+  const primerNombre = _primerNombre(nombre);
+  el.textContent = primerNombre ? `${_saludoHora()}, ${primerNombre} 👋` : `${_saludoHora()} 👋`;
 }
 
 function showState(id) {
@@ -148,10 +161,9 @@ function _precargar(row) {
   // si el pasajero no estaba en public.pasajeros al generar el link).
   const nombreEl = document.getElementById('identityNombre');
   const ciEl = document.getElementById('identityCi');
-  const avatarEl = document.getElementById('identityAvatar');
-  if (nombreEl) nombreEl.textContent = row.nombre || '—';
+  if (nombreEl) nombreEl.textContent = _primerNombre(row.nombre);
   if (ciEl) ciEl.textContent = row.ci || '—';
-  if (avatarEl) avatarEl.textContent = _iniciales(row.nombre);
+  _pintarSaludo(row.nombre);
 
   _precargarCumpleanos(row.cumpleanos);
 
