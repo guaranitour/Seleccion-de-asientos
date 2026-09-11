@@ -287,6 +287,7 @@ async function submitBasesForm(ev) {
   const contactoNombre = document.getElementById('basesContactoNombre').value.trim();
   const contactoTelefono = document.getElementById('basesContactoTelefono').value.trim();
   const parentesco = document.getElementById('basesParentesco').value.trim();
+  const observaciones = document.getElementById('basesObservaciones').value.trim() || null;
 
   const btn = document.getElementById('basesSubmitBtn');
   AppState.busy = true;
@@ -306,7 +307,8 @@ async function submitBasesForm(ev) {
       cumpleanos,
       contacto_emergencia_nombre: contactoNombre,
       contacto_emergencia_telefono: contactoTelefono,
-      contacto_emergencia_parentesco: parentesco
+      contacto_emergencia_parentesco: parentesco,
+      observaciones
     });
 
     _setBasesConfirmedEmailNotice(!sinCorreo);
@@ -340,7 +342,7 @@ function _resetBasesForm() {
   if (!form) return;
   form.reset();
 
-  ['basesNombre', 'basesCi', 'basesEmail', 'basesContactoNombre', 'basesContactoTelefono'].forEach(id => {
+  ['basesNombre', 'basesCi', 'basesEmail', 'basesContactoNombre', 'basesContactoTelefono', 'basesObservaciones'].forEach(id => {
     const el = document.getElementById(id);
     if (el) markField(el, false);
   });

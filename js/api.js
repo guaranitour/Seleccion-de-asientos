@@ -128,10 +128,14 @@ const Api = {
   /**
    * Inserta la información adicional del Paso 2 del wizard de Bases y
    * Condiciones (tabla "reservas.bases_info_adicional"): cumpleaños
-   * (opcional) y contacto de emergencia. Vinculada a basesycondiciones
-   * por CI, no por id — mismo criterio que se usó para esa tabla.
+   * (opcional), contacto de emergencia y observaciones de salud
+   * (opcional). Vinculada a basesycondiciones por CI, no por id — mismo
+   * criterio que se usó para esa tabla. La columna "observaciones" es la
+   * misma que usa contacto-emergencia.js vía el RPC
+   * guardar_contacto_emergencia_por_token, así ambos flujos escriben al
+   * mismo lugar.
    */
-  async guardarInfoAdicional({ ci, cumpleanos, contacto_emergencia_nombre, contacto_emergencia_telefono, contacto_emergencia_parentesco }) {
+  async guardarInfoAdicional({ ci, cumpleanos, contacto_emergencia_nombre, contacto_emergencia_telefono, contacto_emergencia_parentesco, observaciones }) {
     const { error } = await supabase
       .schema('reservas')
       .from('bases_info_adicional')
@@ -140,7 +144,8 @@ const Api = {
         cumpleanos: cumpleanos || null, // 'YYYY-MM-DD' con año fijo 2000, o null si no la cargó
         contacto_emergencia_nombre,
         contacto_emergencia_telefono,
-        contacto_emergencia_parentesco
+        contacto_emergencia_parentesco,
+        observaciones: observaciones || null
       });
 
     if (error) throw error;
