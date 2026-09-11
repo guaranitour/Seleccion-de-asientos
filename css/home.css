@@ -329,6 +329,15 @@
 }
 .bases-birthday-row select:invalid{ color: var(--muted); }
 
+/* Textarea de observaciones/salud del Paso 2: mismo look que .reserve-field
+   input, ya que reserve.css no define textarea. */
+.reserve-field textarea{
+  width: 100%; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px;
+  font-size: 1rem; background: #fff; color: var(--text);
+  font-family: inherit; resize: vertical; min-height: 70px;
+}
+.reserve-field textarea::placeholder{ font-size: .85rem; color: #adb5bd; opacity: 1; }
+
 /* Botón "select" que abre el bottom-sheet de parentesco: mismo look que
    un <input>, para que el wizard se vea homogéneo. */
 .bases-sheet-trigger{
