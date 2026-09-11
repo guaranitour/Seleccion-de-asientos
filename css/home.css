@@ -334,7 +334,8 @@
 .reserve-field textarea{
   width: 100%; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px;
   font-size: 1rem; background: #fff; color: var(--text);
-  font-family: inherit; resize: vertical; min-height: 70px;
+  font-family: system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  resize: vertical; min-height: 70px;
 }
 .reserve-field textarea::placeholder{ font-size: .85rem; color: #adb5bd; opacity: 1; }
 
