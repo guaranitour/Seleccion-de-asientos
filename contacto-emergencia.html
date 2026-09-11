@@ -111,6 +111,10 @@
     font-size:1rem; background:#fff; color:var(--text);
     font-family:inherit; resize:vertical; min-height:70px;
   }
+  .field input::placeholder,
+  .field textarea::placeholder{
+    font-size:.85rem; color:#adb5bd; opacity:1;
+  }
 
   /* Línea simple entre la credencial del pasajero y el form.
      Sin texto: el texto lo aportan los group-label de cada bloque. */
@@ -281,13 +285,9 @@
       </div>
 
       <div class="section-divider2"><span>Datos de tu contacto de emergencia</span></div>
-      <div class="section-hint">
-        <svg aria-hidden="true" fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="18"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <span>Ahora sí: datos de <strong>otra persona</strong>, a quien debemos llamar si te pasa algo en el viaje.</span>
-      </div>
 
       <div class="field">
-        <label for="fNombre">Nombre y apellido <span class="field-hint-inline">(de tu contacto)</span></label>
+        <label for="fNombre">Nombre y apellido</label>
         <input autocomplete="off" id="fNombre" placeholder="Ej: María Gómez" type="text" />
       </div>
 
@@ -297,7 +297,7 @@
       </div>
 
       <div class="field">
-        <label>Parentesco <span class="field-hint-inline">(con vos)</span></label>
+        <label>Parentesco</label>
         <button class="sheet-trigger" id="parentescoTrigger" type="button">
           <span id="parentescoLabel">Seleccionar…</span>
           <svg aria-hidden="true" fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16"><path d="m6 9 6 6 6-6"/></svg>
