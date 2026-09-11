@@ -157,12 +157,6 @@ function selectParentesco(opt) {
 function _precargar(row) {
   if (!row) return;
 
-  // Identidad: siempre se muestra si vino del link (nombre puede faltar
-  // si el pasajero no estaba en public.pasajeros al generar el link).
-  const nombreEl = document.getElementById('identityNombre');
-  const ciEl = document.getElementById('identityCi');
-  if (nombreEl) nombreEl.textContent = _primerNombre(row.nombre);
-  if (ciEl) ciEl.textContent = row.ci || '—';
   _pintarSaludo(row.nombre);
 
   _precargarCumpleanos(row.cumpleanos);
