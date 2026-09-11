@@ -90,14 +90,11 @@
   h1{ margin:0 0 8px; font-size:1.2rem; font-weight:800; }
   .subtitle{ margin:0 0 22px; font-size:.9rem; line-height:1.5; color:var(--muted); }
 
-  /* Saludo del formulario: alineado a la izquierda, tono conversacional
-     en vez de "cartel" centrado. Reemplaza al título+subtitle genérico. */
   #stateForm{ text-align:left; }
-  #greeting{ font-size:1.35rem; margin:0 0 4px; }
-  .identity-line{
-    margin:0; font-size:.88rem; color:var(--muted); line-height:1.4;
+  #greeting{ font-size:1.35rem; margin:0 0 4px; text-align:center; }
+  .form-subtitle{
+    margin:0; font-size:.88rem; color:var(--muted); line-height:1.4; text-align:center;
   }
-  .identity-line strong{ color:var(--text); font-weight:700; }
 
   .field{ text-align:left; margin-bottom:14px; }
   .field label{ display:block; font-weight:700; font-size:.85rem; margin-bottom:6px; }
@@ -247,8 +244,7 @@
   <!-- Estado: formulario -->
   <div class="card hidden" id="stateForm">
     <h1 id="greeting">Hola 👋</h1>
-    <p class="identity-line">Este link pertenece a tu CI <strong id="identityCi">—</strong></p>
-    <span id="identityNombre" class="hidden"></span>
+    <p class="form-subtitle">Completá los datos de tu contacto de emergencia para tu próximo viaje.</p>
 
     <div class="section-divider"></div>
 
