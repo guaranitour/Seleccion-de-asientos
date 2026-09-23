@@ -12,7 +12,7 @@
  * Solución:
  *   Para las rutas que necesitan preview propio, si quien pide la página
  *   es un crawler conocido, respondemos con un HTML mínimo que contiene
- *   solo los meta tags og:*/twitter:* correctos. Si es un humano (o un
+ *   solo los meta tags og:* y twitter:* correctos. Si es un humano (o un
  *   bot no reconocido), dejamos pasar la request sin tocarla — Cloudflare
  *   sirve la SPA normalmente vía _redirects.
  *
