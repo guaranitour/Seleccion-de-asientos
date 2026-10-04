@@ -8,7 +8,7 @@ const ApiAdmin = {
   async getAllViajes() {
     const { data, error } = await supabase
       .from('viajes')
-      .select('id, nombre, tipo, start_at, activo, publicado_inicio, plantas(id, etiqueta, orden)')
+      .select('id, nombre, tipo, start_at, activo, publicado_inicio, destino_id, plantas(id, etiqueta, orden)')
       .order('created_at', { ascending: false });
     if (error) throw error;
     (data || []).forEach(v => {
@@ -45,6 +45,66 @@ const ApiAdmin = {
       p_seleccion_habilitada: seleccionHabilitada
     });
     if (error) throw error;
+  },
+
+  /** Asigna (o quita, con null) el destino de un viaje: de ahí toma su foto. */
+  async setViajeDestino(viajeId, destinoId) {
+    const { error } = await supabase.from('viajes').update({ destino_id: destinoId || null }).eq('id', viajeId);
+    if (error) throw error;
+  },
+
+  // ── Contenido del inicio (Panel › Inicio) ──
+
+  /** Filas de una tabla del inicio, incluidas las inactivas (RLS: staff ve todo). */
+  async listInicio(tabla, filtro) {
+    let q = supabase.from(tabla).select('*');
+    Object.entries(filtro || {}).forEach(([k, v]) => { q = q.eq(k, v); });
+    const { data, error } = await q.order('orden', { ascending: true }).order('created_at', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  },
+
+  /** Inserta (sin id) o actualiza (con id) una fila. Devuelve la fila guardada. */
+  async saveInicio(tabla, fila) {
+    const { id, created_at, ...datos } = fila;
+    const q = id
+      ? supabase.from(tabla).update(datos).eq('id', id)
+      : supabase.from(tabla).insert(datos);
+    const { data, error } = await q.select().single();
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteInicio(tabla, id) {
+    const { error } = await supabase.from(tabla).delete().eq('id', id);
+    if (error) throw error;
+  },
+
+  async getInicioConfig() {
+    const { data, error } = await supabase.from('inicio_config').select('*').eq('id', 1).maybeSingle();
+    if (error) throw error;
+    return data || { id: 1 };
+  },
+
+  async saveInicioConfig(datos) {
+    const { error } = await supabase.from('inicio_config')
+      .upsert({ ...datos, id: 1, updated_at: new Date().toISOString() });
+    if (error) throw error;
+  },
+
+  /**
+   * Achica la foto en el navegador (lado mayor <= maxLado, WebP o JPEG) y la
+   * sube al bucket público "inicio". Devuelve la URL pública.
+   */
+  async subirImagenInicio(file, carpeta, maxLado = 1600) {
+    const blob = await _achicarImagen(file, maxLado);
+    const ext = blob.type === 'image/webp' ? 'webp' : 'jpg';
+    const nombre = (crypto.randomUUID ? crypto.randomUUID() : Date.now() + '-' + Math.random().toString(36).slice(2));
+    const path = `${carpeta}/${nombre}.${ext}`;
+    const { error } = await supabase.storage.from('inicio')
+      .upload(path, blob, { contentType: blob.type, cacheControl: '31536000', upsert: false });
+    if (error) throw error;
+    return supabase.storage.from('inicio').getPublicUrl(path).data.publicUrl;
   },
 
   /** Asientos de una planta CON datos de pasajero (vía RPC: join server-side). */
@@ -91,5 +151,27 @@ const ApiAdmin = {
     return data || [];
   }
 };
+
+async function _achicarImagen(file, maxLado) {
+  if (!file || !/^image\//.test(file.type)) throw new Error('El archivo no es una imagen');
+  const img = await new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const el = new Image();
+    el.onload = () => { URL.revokeObjectURL(url); resolve(el); };
+    el.onerror = () => { URL.revokeObjectURL(url); reject(new Error('No se pudo leer la imagen')); };
+    el.src = url;
+  });
+  const escala = Math.min(1, maxLado / Math.max(img.naturalWidth, img.naturalHeight));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(img.naturalWidth * escala);
+  canvas.height = Math.round(img.naturalHeight * escala);
+  canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+  const toBlob = (tipo) => new Promise(res => canvas.toBlob(res, tipo, 0.82));
+  let blob = await toBlob('image/webp');
+  // Safari viejo no genera WebP: devuelve PNG. En ese caso, JPEG.
+  if (!blob || blob.type !== 'image/webp') blob = await toBlob('image/jpeg');
+  if (!blob) throw new Error('No se pudo procesar la imagen');
+  return blob;
+}
 
 window.ApiAdmin = ApiAdmin;

@@ -21,6 +21,7 @@ main:has(#view-staff-login.active) ~ .staff-entry,
 main:has(#view-panel.active) ~ .staff-entry,
 main:has(#view-control.active) ~ .staff-entry,
 main:has(#view-editor.active) ~ .staff-entry,
+main:has(#view-panel-inicio.active) ~ .staff-entry,
 main:has(#view-passenger-list.active) ~ .staff-entry{
   opacity:0; transform:translateY(8px); pointer-events:none;
 }
@@ -260,3 +261,59 @@ main:has(#view-passenger-list.active) ~ .staff-entry{
 .editor-row-wrap .row{ flex:1; }
 .editor-row-delete{ flex-shrink:0; padding:8px 10px; font-size:1rem; }
 .editor-add-row{ margin-top:16px; text-align:center; }
+
+/* ===== Destino del viaje (tarjeta del panel) ===== */
+.panel-trip-destino{ display:flex; flex-direction:column; gap:4px; margin-bottom:12px; font-weight:600; }
+.panel-trip-destino span{ font-size:.75rem; color:var(--muted); }
+.panel-trip-destino select, .pi-field select{
+  border:1px solid #e5e7eb; border-radius:10px; padding:10px 12px; font-size:.95rem;
+  background:#fff; color:var(--text); width:100%;
+}
+.panel-inicio-btn{ margin-top:8px; }
+
+/* ===== Panel › Inicio ===== */
+.pi-tabs{ overflow-x:auto; flex-wrap:nowrap; padding-bottom:4px; scrollbar-width:thin; }
+.pi-tabs .btn{ flex-shrink:0; }
+.pi-help{ margin:0 0 14px; font-size:.88rem; color:var(--muted); line-height:1.45; }
+.pi-add{ width:100%; justify-content:center; margin-bottom:12px; }
+.pi-empty{ padding:24px 16px; text-align:center; color:var(--muted); font-size:.9rem; background:var(--card); border-radius:14px; }
+.pi-list{ display:flex; flex-direction:column; gap:8px; }
+.pi-item{
+  display:flex; align-items:center; gap:12px; padding:12px; border-radius:14px;
+  background:var(--card-solid); box-shadow:var(--shadow); flex-wrap:wrap;
+}
+.pi-item.inactive{ opacity:.6; }
+.pi-thumb{
+  width:48px; height:48px; border-radius:12px; flex-shrink:0; display:grid; place-items:center;
+  background:#e0e7ff center/cover no-repeat; color:#3730a3; font-weight:800;
+}
+.pi-item-text{ flex:1 1 160px; min-width:0; display:flex; flex-direction:column; gap:2px; }
+.pi-item-text b{ font-size:.95rem; overflow-wrap:anywhere; }
+.pi-item-text small{ font-size:.78rem; color:var(--muted); overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+.pi-badge{ align-self:flex-start; font-size:.68rem; font-weight:700; padding:2px 8px; border-radius:999px; background:#f3f4f6; color:#6b7280; }
+.pi-item-actions{ display:flex; gap:6px; flex-shrink:0; margin-left:auto; }
+.pi-item-actions .btn.icon-only{ padding:8px 9px; min-height:38px; }
+.pi-item-actions .btn.icon-only svg{ display:block; }
+
+.pi-form .pi-field, .pi-sheet-content .pi-field{ margin-bottom:14px; }
+.pi-field textarea{
+  border:1px solid #e5e7eb; border-radius:10px; padding:12px; font:inherit; font-size:1rem;
+  background:#fff; color:var(--text); width:100%; resize:vertical;
+}
+.pi-sheet-content{ max-height:88dvh; overflow-y:auto; }
+.pi-sheet-content .sheet-seat-code{ margin-bottom:14px; }
+.pi-sheet-content .actions, .pi-form .actions{ display:flex; gap:8px; justify-content:flex-end; }
+.pi-sheet-content .actions .btn{ width:auto; flex:1; margin:0; }
+
+.pi-image{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.pi-image-preview{
+  width:132px; aspect-ratio:16/10; border-radius:12px; background:#f3f4f6 center/cover no-repeat;
+  border:1px solid #e5e7eb; display:grid; place-items:center; font-size:.78rem; color:var(--muted);
+}
+.pi-image-btns{ display:flex; gap:8px; flex-wrap:wrap; }
+.pi-image-btns .btn{ cursor:pointer; padding:9px 13px; font-size:.85rem; min-height:40px; display:inline-flex; align-items:center; }
+
+.pi-horarios{ display:flex; flex-direction:column; gap:8px; }
+.pi-horario-row{ display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto; gap:6px; align-items:center; }
+.pi-horario-row input{ padding:10px; font-size:.92rem; }
+.pi-horario-add{ align-self:flex-start; padding:8px 12px; font-size:.85rem; }

@@ -163,3 +163,22 @@
 }
 #view-home [hidden]{ display:none !important; }
 @media (min-width:620px){ .home-hero-photo{ aspect-ratio:21/9; } }
+
+/* Foto de portada cargada desde el panel: reemplaza la ilustración */
+.home-hero-photo.has-img{ background-size:cover; background-position:center; }
+.home-hero-photo.has-img svg{ display:none; }
+
+/* ===== Avisos ===== */
+.home-notice{
+  display:flex; gap:12px; padding:14px 16px; border-radius:16px;
+  background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a;
+}
+.home-notice.important{ background:#fffbeb; border-color:#fde68a; color:#78350f; }
+.home-notice b{ display:block; }
+.home-notice p{ margin:2px 0 0; font-size:.88rem; white-space:pre-line; }
+
+/* ===== Foto del destino en la tarjeta del viaje ===== */
+.home-trips .trip-card.has-photo{ padding-top:0; overflow:hidden; }
+.home-trip-photo{
+  aspect-ratio:16/6; max-width:none; margin:0 -16px 14px; background:#dbeafe center/cover no-repeat;
+}

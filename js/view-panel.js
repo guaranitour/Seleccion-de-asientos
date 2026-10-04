@@ -3,6 +3,7 @@
 // ============================================================
 
 let _panelViajesCache = [];
+let _panelDestinosCache = [];
 let _panelShowArchived = false;
 
 // Cada viaje tiene dos interruptores independientes:
@@ -21,6 +22,8 @@ async function goPanel() {
 
   const createBtn = document.getElementById('btnCreateTrip');
   if (createBtn) createBtn.style.display = Auth.isAdmin() ? 'inline-flex' : 'none';
+  const inicioBtn = document.getElementById('btnPanelInicio');
+  if (inicioBtn) inicioBtn.style.display = Auth.isAdmin() ? 'inline-flex' : 'none';
 
   _panelShowArchived = false; // el panel siempre arranca mostrando solo activos
   await loadPanelViajes();
@@ -30,7 +33,13 @@ async function goPanel() {
 async function loadPanelViajes() {
   showLoading('Cargando viajes…');
   try {
-    _panelViajesCache = await ApiAdmin.getAllViajes();
+    const [viajes, destinos] = await Promise.all([
+      ApiAdmin.getAllViajes(),
+      // Si la tabla de destinos falla, el panel igual tiene que cargar los viajes.
+      ApiAdmin.listInicio('inicio_destinos').catch(e => { console.error(e); return []; })
+    ]);
+    _panelViajesCache = viajes;
+    _panelDestinosCache = destinos;
     _renderPanelStats(_panelViajesCache);
     _renderPanelTripList();
   } catch (e) {
@@ -172,6 +181,32 @@ function _buildPanelTripCard(viaje) {
     onToggle: () => setPanelViajeVisibilidad(viaje.id, { seleccionHabilitada: !viaje.activo })
   }));
 
+  // Destino: de ahí toma la foto en el inicio. Solo si hay destinos cargados.
+  if (_panelDestinosCache.length) {
+    const dest = document.createElement('label');
+    dest.className = 'panel-trip-destino';
+    const txt = document.createElement('span');
+    txt.textContent = 'Destino (foto en el inicio)';
+    const sel = document.createElement('select');
+    const vacio = document.createElement('option');
+    vacio.value = ''; vacio.textContent = 'Sin destino';
+    sel.appendChild(vacio);
+    _panelDestinosCache.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d.id; o.textContent = d.nombre + (d.activo ? '' : ' (oculto)');
+      sel.appendChild(o);
+    });
+    sel.value = viaje.destino_id || '';
+    if (Auth.isAdmin()) {
+      sel.onchange = () => setPanelViajeDestino(viaje.id, sel.value || null);
+    } else {
+      sel.disabled = true;
+    }
+    dest.appendChild(txt);
+    dest.appendChild(sel);
+    vis.after(dest);
+  }
+
   const actions = card.querySelector('.panel-trip-actions');
 
   // Acción principal: la más usada día a día, con presencia visual propia.
@@ -220,6 +255,21 @@ function _buildVisSwitch({ label, hint, on, onToggle }) {
     btn.title = 'Solo un admin puede cambiarlo';
   }
   return btn;
+}
+
+async function setPanelViajeDestino(viajeId, destinoId) {
+  showLoading('Guardando…');
+  try {
+    await ApiAdmin.setViajeDestino(viajeId, destinoId);
+    const v = _panelViajesCache.find(x => x.id === viajeId);
+    if (v) v.destino_id = destinoId;
+    toast(destinoId ? 'Destino asignado' : 'Destino quitado');
+  } catch (e) {
+    toast('Error: ' + (e.message || 'no se pudo actualizar'));
+    _renderPanelTripList();
+  } finally {
+    hideLoading();
+  }
 }
 
 async function setPanelViajeVisibilidad(viajeId, cambios) {
@@ -287,6 +337,7 @@ async function submitCreateTrip(ev) {
 window.goPanel = goPanel;
 window.loadPanelViajes = loadPanelViajes;
 window.setPanelViajeVisibilidad = setPanelViajeVisibilidad;
+window.setPanelViajeDestino = setPanelViajeDestino;
 window.togglePanelArchivedView = togglePanelArchivedView;
 window.openCreateTripForm = openCreateTripForm;
 window.updateTripRowsHint = updateTripRowsHint;

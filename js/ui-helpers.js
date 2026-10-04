@@ -2,7 +2,7 @@
 // ui-helpers.js — Helpers de UI compartidos por todas las vistas
 // ============================================================
 
-const STAFF_VIEW_IDS = ['view-staff-login', 'view-panel', 'view-control', 'view-editor', 'view-passenger-list'];
+const STAFF_VIEW_IDS = ['view-staff-login', 'view-panel', 'view-control', 'view-editor', 'view-passenger-list', 'view-panel-inicio'];
 
 function showView(id) {
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
