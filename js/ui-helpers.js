@@ -14,6 +14,7 @@ function showView(id) {
   document.querySelectorAll('.action-sheet.show').forEach(sheet => sheet.classList.remove('show'));
   if (typeof closeNavDrawer === 'function') closeNavDrawer();
   if (typeof syncNavDrawerCurrent === 'function') syncNavDrawerCurrent(id);
+  document.body.dataset.view = id; // usado por CSS (ej. botón flotante de WhatsApp solo en el inicio)
 
   // Fallback por si el navegador no soporta el selector :has() usado en
   // panel.css para esconder el botón flotante de staff dentro de sus
