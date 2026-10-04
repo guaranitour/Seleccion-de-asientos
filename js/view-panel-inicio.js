@@ -60,7 +60,8 @@ const PI_SECCIONES = {
       { k: 'cargo', label: 'Cargo', max: 40, placeholder: 'Ej.: Coordinación a bordo' },
       { k: 'descripcion', label: 'Descripción breve', type: 'textarea', max: 140 },
       { k: 'foto_url', label: 'Foto', type: 'image', carpeta: 'equipo', maxLado: 600, hint: 'Cuadrada o vertical, con la cara centrada.' },
-      { k: 'whatsapp', label: 'WhatsApp (opcional)', type: 'tel', hint: 'Con código de país, ej.: 595981123456. Agrega el botón "Escribile".' }
+      { k: 'whatsapp', label: 'WhatsApp (opcional)', type: 'tel', hint: 'Con código de país, ej.: 595981123456. Agrega el botón "WhatsApp".' },
+      { k: 'email', label: 'Correo (opcional)', type: 'email', placeholder: 'nombre@ejemplo.com', hint: 'Agrega el botón "Correo".' }
     ],
     resumen: r => r.cargo || ''
   },
@@ -390,21 +391,21 @@ function _piBuildForm(campos, valores) {
     el,
     leer() {
       const datos = {};
-      let ok = true;
+      let faltan = false;
+      let correoMal = false;
       lectores.forEach(({ c, leer, field }) => {
         let val = leer();
         if (c.type === 'tel' && val) val = String(val).replace(/\D/g, '');
         const vacio = val === '' || val === null || (Array.isArray(val) && !val.length && c.type !== 'tags' && c.type !== 'horarios');
+        const emailInvalido = c.type === 'email' && !vacio && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
         const input = field.querySelector('input, textarea, select');
-        if (c.req && vacio) {
-          ok = false;
-          if (input) markField(input, true);
-        } else if (input) {
-          markField(input, false);
-        }
+        if (c.req && vacio) faltan = true;
+        if (emailInvalido) correoMal = true;
+        if (input) markField(input, (c.req && vacio) || emailInvalido);
         datos[c.k] = (val === '' ? null : val);
       });
-      if (!ok) { toast('Completá los campos obligatorios'); return null; }
+      if (faltan) { toast('Completá los campos obligatorios'); return null; }
+      if (correoMal) { toast('Revisá el correo: no parece válido'); return null; }
       if (datos.visible_desde && datos.visible_hasta && datos.visible_hasta <= datos.visible_desde) {
         toast('"Mostrar hasta" tiene que ser posterior a "Mostrar desde"');
         return null;

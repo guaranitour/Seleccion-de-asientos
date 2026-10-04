@@ -123,7 +123,13 @@
 .home-member h3{ margin:0; font-size:.96rem; font-weight:800; }
 .home-role{ font-size:.7rem; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--primary); }
 .home-member p{ margin:0; font-size:.82rem; color:var(--muted); line-height:1.4; }
-.home-member a{ margin-top:auto; padding-top:4px; font-size:.8rem; font-weight:700; text-decoration:none; color:#047857; }
+.home-member-links{ margin-top:auto; padding-top:6px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; }
+.home-member-links a{
+  font-size:.78rem; font-weight:700; text-decoration:none; padding:5px 10px; border-radius:999px;
+}
+.home-member-links a.wa{ background:#dcfce7; color:#047857; }
+.home-member-links a.mail{ background:#eef4fe; color:var(--primary); }
+.home-member-links a:hover{ filter:brightness(.96); }
 
 /* ===== Preguntas frecuentes ===== */
 .home-faq{ overflow:hidden; }

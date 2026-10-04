@@ -42,7 +42,7 @@ function _homeMapContenido(db) {
     },
     nosotros: cfg.nosotros || '',
     avisos: db.avisos || [],
-    equipo: (db.equipo || []).map(m => ({ nombre: m.nombre, cargo: m.cargo, descripcion: m.descripcion, foto: m.foto_url, whatsapp: m.whatsapp })),
+    equipo: (db.equipo || []).map(m => ({ nombre: m.nombre, cargo: m.cargo, descripcion: m.descripcion, foto: m.foto_url, whatsapp: m.whatsapp, email: m.email })),
     destinos: (db.destinos || []).map(d => ({ nombre: d.nombre, pais: d.pais, descripcion: d.descripcion, imagen: d.imagen_url, etiquetas: d.etiquetas || [] })),
     faq: (db.faq || []).map(f => ({ pregunta: f.titulo, respuesta: f.cuerpo }))
   };
@@ -165,10 +165,22 @@ function _renderHomeNosotros(texto, equipo) {
     card.appendChild(_homeEl('h3', '', m.nombre));
     if (m.descripcion) card.appendChild(_homeEl('p', '', m.descripcion));
     const wa = _homeWhatsappUrl(m.whatsapp);
-    if (wa) {
-      const a = _homeEl('a', '', 'Escribile');
-      a.href = wa; a.target = '_blank'; a.rel = 'noopener';
-      card.appendChild(a);
+    if (wa || m.email) {
+      const links = _homeEl('div', 'home-member-links');
+      if (wa) {
+        const a = _homeEl('a', 'wa', 'WhatsApp');
+        a.href = wa; a.target = '_blank'; a.rel = 'noopener';
+        a.setAttribute('aria-label', 'Escribir por WhatsApp a ' + m.nombre);
+        links.appendChild(a);
+      }
+      if (m.email) {
+        const a = _homeEl('a', 'mail', 'Correo');
+        a.href = 'mailto:' + m.email;
+        a.title = m.email;
+        a.setAttribute('aria-label', 'Enviar un correo a ' + m.nombre + ' (' + m.email + ')');
+        links.appendChild(a);
+      }
+      card.appendChild(links);
     }
     team.appendChild(card);
   });
