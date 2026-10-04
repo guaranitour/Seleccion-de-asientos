@@ -21,6 +21,7 @@
 
 <link href="/css/base.css" rel="stylesheet"/>
 <link href="/css/home.css" rel="stylesheet"/>
+<link href="/css/inicio.css?v=1" rel="stylesheet"/>
 <link href="/css/croquis.css" rel="stylesheet"/>
 <link href="/css/reserve.css" rel="stylesheet"/>
 <link href="/css/panel.css?v=2" rel="stylesheet"/>
@@ -38,7 +39,7 @@
       <line x1="4" x2="20" y1="7" y2="7"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="17" y2="17"/>
     </svg>
   </button>
-  <div class="topbar-logo-wrap">
+  <div class="topbar-logo-wrap" onclick="goHome()" role="link" aria-label="Ir al inicio" tabindex="0" onkeydown="if(event.key==='Enter')goHome()">
     <img alt="Destino Guaraní" class="topbar-logo skeleton-round" id="heroLogo"/>
   </div>
   <span aria-hidden="true" class="topbar-spacer"></span>
@@ -50,6 +51,10 @@
   <nav aria-label="Menú principal" class="nav-drawer-panel">
     <button aria-label="Cerrar menú" class="nav-drawer-close" onclick="closeNavDrawer()" type="button">
       <svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+    <button class="nav-drawer-item" onclick="closeNavDrawer(); goHome();" type="button">
+      <svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1Z"/></svg>
+      Inicio
     </button>
     <button class="nav-drawer-item" onclick="closeNavDrawer(); backToChoose();" type="button">
       <svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 11h18"/><path d="M8 6V4M16 6V4"/><circle cx="7.5" cy="19" r="1.5"/><circle cx="16.5" cy="19" r="1.5"/><path d="M3 15h2M19 15h2"/></svg>
@@ -68,8 +73,110 @@
 
 <main class="app" id="app">
 
+  <!-- Inicio -->
+  <section aria-label="Inicio" class="view active" id="view-home">
+    <div class="home-center" style="align-items:start;">
+      <div class="home-wrap">
+
+        <article class="home-hero">
+          <div class="home-hero-photo">
+            <svg aria-hidden="true" preserveAspectRatio="xMidYMid slice" viewBox="0 0 400 250">
+              <circle cx="312" cy="62" r="26" fill="#fde68a"/>
+              <path d="M0 150 L60 112 L110 138 L170 96 L230 132 L290 104 L350 128 L400 110 L400 250 L0 250Z" fill="#93c5fd"/>
+              <path d="M0 172 L70 140 L130 162 L200 130 L270 160 L330 140 L400 156 L400 250 L0 250Z" fill="#3b82f6"/>
+              <path d="M0 200 C80 182 150 196 220 186 C290 176 340 190 400 182 L400 250 L0 250Z" fill="#24479a"/>
+              <path d="M0 222 C90 210 170 226 250 214 C320 204 360 214 400 210 L400 250 L0 250Z" fill="#1e3a8a"/>
+            </svg>
+            <div class="home-hero-text">
+              <p id="homeGreeting">Hola</p>
+              <h1 id="homeHeroTitle">Viajá tranquilo, nosotros nos encargamos del resto</h1>
+            </div>
+          </div>
+          <div class="home-hero-body">
+            <p id="homeHeroText">Conocé nuestras salidas confirmadas y reservá tu lugar por WhatsApp.</p>
+            <div class="home-next" hidden id="homeNext">
+              <div class="home-next-icon" aria-hidden="true"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 11h18M8 6V4M16 6V4"/><circle cx="7.5" cy="19" r="1.5"/><circle cx="16.5" cy="19" r="1.5"/></svg></div>
+              <div class="home-next-info">
+                <div class="home-next-label">Próxima salida</div>
+                <div class="home-next-name" id="homeNextName"></div>
+              </div>
+              <div aria-label="Cuenta regresiva" class="home-countdown">
+                <div><b data-u="d">0</b><span>días</span></div>
+                <div><b data-u="h">00</b><span>hs</span></div>
+                <div><b data-u="m">00</b><span>min</span></div>
+              </div>
+            </div>
+            <button class="home-cta light" onclick="homeScrollTo('homeViajes')" type="button">Ver próximos viajes</button>
+          </div>
+        </article>
+
+        <section aria-labelledby="homeQuickTitle" class="home-section">
+          <div><p class="home-eyebrow">Accesos rápidos</p><h2 class="home-title" id="homeQuickTitle">¿Qué necesitás hacer?</h2></div>
+          <div class="home-quick">
+            <button class="home-tile home-glass" onclick="backToChoose()" type="button">
+              <span class="home-tile-icon blue" aria-hidden="true"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" viewBox="0 0 24 24"><path d="M5 11V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v5"/><path d="M3 11h18v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M6 18v2M18 18v2"/></svg></span>
+              <b>Elegir asiento</b><small>Disponible cuando se habilite</small>
+            </button>
+            <button class="home-tile home-glass" onclick="goBases()" type="button">
+              <span class="home-tile-icon green" aria-hidden="true"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="m9 15 2 2 4-4"/></svg></span>
+              <b>Bases y condiciones</b><small>Incluye tu contacto de emergencia</small>
+            </button>
+            <button class="home-tile home-glass" onclick="homeHablar()" type="button">
+              <span class="home-tile-icon amber" aria-hidden="true"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg></span>
+              <b>Hablar con nosotros</b><small>WhatsApp, redes, oficina</small>
+            </button>
+          </div>
+        </section>
+
+        <section aria-labelledby="homeViajesTitle" class="home-section" id="homeViajes">
+          <div><p class="home-eyebrow">Salidas confirmadas</p><h2 class="home-title" id="homeViajesTitle">Próximos viajes</h2></div>
+          <div class="home-trips" id="homeTripList"></div>
+        </section>
+
+        <section aria-labelledby="homeDestinosTitle" class="home-section" hidden id="homeDestinos">
+          <div><p class="home-eyebrow">A dónde vamos</p><h2 class="home-title" id="homeDestinosTitle">Nuestros destinos</h2></div>
+          <div aria-label="Destinos, deslizá para ver más" class="home-dest-scroll" id="homeDestinosList" tabindex="0"></div>
+        </section>
+
+        <section aria-labelledby="homePasosTitle" class="home-section">
+          <div><p class="home-eyebrow">Paso a paso</p><h2 class="home-title" id="homePasosTitle">Cómo reservar</h2></div>
+          <ol class="home-steps">
+            <li class="home-step home-glass"><b>Descubrí tu próxima salida</b><small>Consultá aquí las fechas y salidas confirmadas.</small></li>
+            <li class="home-step home-glass"><b>Reservá por WhatsApp</b><small>Escribinos y aseguramos tu lugar con el pago de la seña.</small></li>
+            <li class="home-step home-glass"><b>Aceptá las Bases y Condiciones</b><small>Con la seña abonada, confirmá tu conformidad en línea.</small></li>
+            <li class="home-step home-glass"><b>Elegí tu asiento</b><small>Te avisaremos cuando se habilite la selección para que elijas tu lugar.</small></li>
+          </ol>
+          <a class="home-cta whatsapp home-steps-cta" hidden id="homeStepsCta" rel="noopener" target="_blank">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Z"/></svg>
+            Reservar por WhatsApp
+          </a>
+        </section>
+
+        <section aria-labelledby="homeNosotrosTitle" class="home-section" hidden id="homeNosotros">
+          <div><p class="home-eyebrow">Quiénes somos</p><h2 class="home-title" id="homeNosotrosTitle">Un equipo que viaja con vos</h2></div>
+          <div class="home-about home-glass" id="homeAbout"><p></p></div>
+          <div class="home-team" id="homeTeam"></div>
+        </section>
+
+        <section aria-labelledby="homeFaqTitle" class="home-section" hidden id="homeFaq">
+          <div><p class="home-eyebrow">Dudas comunes</p><h2 class="home-title" id="homeFaqTitle">Preguntas frecuentes</h2></div>
+          <div class="home-faq home-glass" id="homeFaqList"></div>
+        </section>
+
+        <section aria-labelledby="homeContactoTitle" class="home-section" hidden id="homeContacto">
+          <div><p class="home-eyebrow">Estamos para ayudarte</p><h2 class="home-title" id="homeContactoTitle">Contacto</h2></div>
+          <div class="home-contact home-glass" id="homeContactoList"></div>
+        </section>
+
+      </div>
+    </div>
+    <a aria-label="Escribinos por WhatsApp" class="home-wa-fab" hidden id="homeWaFab" rel="noopener" target="_blank">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.2 13.6c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2Z"/></svg>
+    </a>
+  </section>
+
   <!-- Elegir viaje -->
-  <section aria-label="Elegí tu viaje" class="view active" id="view-choose">
+  <section aria-label="Elegí tu viaje" class="view" id="view-choose">
     <div class="home-center" style="align-items:start;">
       <div style="max-width:680px; margin:0 auto; width:100%;">
         <div class="trip-hero-card" id="tripHeroCard">
@@ -573,12 +680,14 @@
 <!-- Scripts (orden importa: dependencias primero) -->
 <script src="/js/supabase-client.js"></script>
 <script src="/js/state.js"></script>
-<script src="/js/api.js"></script>
+<script src="/js/api.js?v=2"></script>
 <script src="/js/ui-helpers.js"></script>
 <script src="/js/nav-drawer.js"></script>
-<script src="/js/router.js"></script>
+<script src="/js/router.js?v=2"></script>
 <script src="/js/view-bases.js"></script>
 <script src="/js/view-choose.js"></script>
+<script src="/js/inicio-contenido.js?v=1"></script>
+<script src="/js/view-home.js?v=1"></script>
 <script src="/js/seats-grid.js"></script>
 <script src="/js/view-select.js"></script>
 <script src="/js/share-card.js"></script>

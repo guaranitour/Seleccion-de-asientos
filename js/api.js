@@ -25,6 +25,29 @@ const Api = {
     return data || [];
   },
 
+  /**
+   * Viajes publicados en el inicio ("Próximos viajes"), con o sin la
+   * selección de asientos habilitada. "activo" = selección habilitada.
+   * Se omiten los que ya salieron hace más de un día.
+   */
+  async getViajesInicio() {
+    const desde = new Date(Date.now() - 86400000).toISOString();
+    const { data, error } = await supabase
+      .from('viajes')
+      .select('id, nombre, tipo, start_at, activo, plantas(id, etiqueta, orden)')
+      .eq('publicado_inicio', true)
+      .or(`start_at.is.null,start_at.gte.${desde}`)
+      .order('start_at', { ascending: true, nullsFirst: false });
+
+    if (error) throw error;
+    (data || []).forEach(v => {
+      if (Array.isArray(v.plantas)) {
+        v.plantas.sort((a, b) => (a.orden || 0) - (b.orden || 0));
+      }
+    });
+    return data || [];
+  },
+
   /** Todos los asientos de una planta (sin datos de pasajero: ya no viven aca). */
   async getAsientosByPlanta(plantaId) {
     const { data, error } = await supabase

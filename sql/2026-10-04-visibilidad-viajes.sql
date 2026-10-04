@@ -11,7 +11,7 @@
 -- Archivado = los dos apagados. Se mantiene el nombre "activo" para no
 -- romper Api.getViajes(), el router ni las políticas existentes.
 --
--- Correr una sola vez en el SQL Editor de Supabase. Es idempotente.
+-- Aplicado en Supabase el 2026-10-04. Es idempotente: se puede volver a correr.
 -- ============================================================
 
 -- 1) Columna nueva -------------------------------------------------------
@@ -21,9 +21,8 @@ alter table reservas.viajes
 -- 2) Lectura pública -----------------------------------------------------
 -- Antes: solo viajes con selección habilitada. Ahora también los
 -- publicados en el inicio (con la selección todavía cerrada).
-drop policy if exists "viajes: lectura publica" on reservas.viajes;
-create policy "viajes: lectura publica" on reservas.viajes
-  for select using (activo = true or publicado_inicio = true);
+alter policy "viajes: lectura publica" on reservas.viajes
+  using (activo = true or publicado_inicio = true);
 
 -- 3) RPC para cambiar los dos interruptores de una vez ----------------------
 -- Pasar null en un parámetro lo deja como está.
@@ -59,9 +58,6 @@ begin
           auth.uid());
 end;
 $function$;
-
-revoke all on function reservas.set_viaje_visibilidad(uuid, boolean, boolean) from public, anon;
-grant execute on function reservas.set_viaje_visibilidad(uuid, boolean, boolean) to authenticated;
 
 -- 4) reservar_asientos: respetar la selección cerrada ------------------------
 -- Hasta ahora el RPC no miraba si el viaje estaba activo. Con viajes
