@@ -23,7 +23,7 @@
 <link href="/css/home.css" rel="stylesheet"/>
 <link href="/css/croquis.css" rel="stylesheet"/>
 <link href="/css/reserve.css" rel="stylesheet"/>
-<link href="/css/panel.css" rel="stylesheet"/>
+<link href="/css/panel.css?v=2" rel="stylesheet"/>
 <link href="/css/passenger-list.css" rel="stylesheet"/>
 <link href="/css/whatsapp-mode.css" rel="stylesheet"/>
 
@@ -448,6 +448,17 @@
             <span class="field-label">Fecha y hora de salida (opcional)</span>
             <input id="newTripDate" type="datetime-local"/>
           </div>
+          <div class="field">
+            <span class="field-label">Visibilidad</span>
+            <label class="vis-check" for="newTripPublicado">
+              <input checked id="newTripPublicado" type="checkbox"/>
+              <span><b>Publicar en el inicio</b><small>Aparece en Próximos viajes</small></span>
+            </label>
+            <label class="vis-check" for="newTripSeleccion">
+              <input id="newTripSeleccion" type="checkbox"/>
+              <span><b>Habilitar selección de asientos</b><small>Podés habilitarla más adelante desde el panel</small></span>
+            </label>
+          </div>
           <div class="actions">
             <button class="btn ghost" onclick="goPanel()" type="button">Cancelar</button>
             <button class="btn primary" type="submit">Crear viaje</button>
@@ -573,8 +584,8 @@
 <script src="/js/share-card.js"></script>
 <script src="/js/view-reserve.js"></script>
 <script src="/js/auth.js"></script>
-<script src="/js/api-admin.js"></script>
-<script src="/js/view-panel.js"></script>
+<script src="/js/api-admin.js?v=2"></script>
+<script src="/js/view-panel.js?v=2"></script>
 <script src="/js/view-control.js"></script>
 <script src="/js/whatsapp-mode.js"></script>
 <script src="/js/view-editor.js"></script>

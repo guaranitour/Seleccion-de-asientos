@@ -152,6 +152,41 @@ main:has(#view-passenger-list.active) ~ .staff-entry{
   50%{ box-shadow:0 0 0 4px rgba(16,185,129,0); }
 }
 
+/* Interruptores de visibilidad: publicado en el inicio / selección de asientos */
+.panel-trip-visibility{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-bottom:12px; }
+@media (max-width:420px){ .panel-trip-visibility{ grid-template-columns:1fr; } }
+.vis-switch{
+  display:flex; align-items:center; gap:10px; width:100%; min-width:0; text-align:left;
+  padding:10px 12px; border-radius:12px; border:1px solid #e5e7eb; background:#fff;
+  color:var(--text); font:inherit; cursor:pointer; transition:border-color .2s ease, background .2s ease;
+}
+.vis-switch:hover:not(:disabled){ border-color:#cbd5e1; }
+.vis-switch.on{ background:#f0fdf4; border-color:#bbf7d0; }
+.vis-switch:disabled{ cursor:default; }
+.vis-switch-track{
+  flex-shrink:0; width:36px; height:20px; border-radius:999px; background:#d1d5db;
+  position:relative; transition:background .2s ease;
+}
+.vis-switch-thumb{
+  position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%;
+  background:#fff; box-shadow:0 1px 3px rgba(17,24,39,.25); transition:transform .2s ease;
+}
+.vis-switch.on .vis-switch-track{ background:var(--success); }
+.vis-switch.on .vis-switch-thumb{ transform:translateX(16px); }
+.vis-switch-text{ display:flex; flex-direction:column; min-width:0; }
+.vis-switch-text b{ font-size:.82rem; }
+.vis-switch-text small{ font-size:.72rem; color:var(--muted); }
+
+/* Checkboxes de visibilidad en "Nuevo viaje" */
+.vis-check{
+  display:flex; align-items:flex-start; gap:10px; padding:10px 12px; cursor:pointer;
+  border:1px solid #e5e7eb; border-radius:10px; background:#fff;
+}
+.vis-check input{ width:18px; height:18px; margin:2px 0 0; flex-shrink:0; accent-color:var(--primary); }
+.vis-check span{ display:flex; flex-direction:column; }
+.vis-check b{ font-size:.9rem; }
+.vis-check small{ font-size:.78rem; color:var(--muted); }
+
 .panel-trip-actions{ display:flex; gap:8px; flex-wrap:wrap; }
 .panel-trip-actions .btn{ padding:9px 13px; font-size:.83rem; }
 .panel-trip-actions .btn-primary-action{ flex:1 1 auto; min-width:140px; }
@@ -160,6 +195,7 @@ main:has(#view-passenger-list.active) ~ .staff-entry{
 
 @media (prefers-reduced-motion: reduce){
   .panel-trip-status.active::before{ animation:none; }
+  .vis-switch-thumb, .vis-switch-track{ transition:none; }
 }
 
 /* ===== Crear viaje ===== */

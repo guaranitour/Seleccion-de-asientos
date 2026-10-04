@@ -5,6 +5,14 @@
 let _panelViajesCache = [];
 let _panelShowArchived = false;
 
+// Cada viaje tiene dos interruptores independientes:
+//   publicado_inicio → aparece en "Próximos viajes" del inicio
+//   activo           → selección de asientos habilitada (lista de Reservas + croquis)
+// Archivado = los dos apagados.
+function _viajeVisible(v) {
+  return !!(v.activo || v.publicado_inicio);
+}
+
 async function goPanel() {
   if (!Auth.isAuthorized()) { goStaffLogin(); return; }
 
@@ -42,8 +50,8 @@ function _renderPanelTripList() {
   const list = document.getElementById('panelTripList');
   list.innerHTML = '';
 
-  const activos = _panelViajesCache.filter(v => v.activo);
-  const archivados = _panelViajesCache.filter(v => !v.activo);
+  const activos = _panelViajesCache.filter(_viajeVisible);
+  const archivados = _panelViajesCache.filter(v => !_viajeVisible(v));
 
   _renderArchivedToggle(archivados.length);
 
@@ -66,7 +74,7 @@ function _renderPanelTripList() {
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6M16 6v6M2 12h20M4 12v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6"/><path d="M2 12V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4"/></svg>
         </div>
         <h3>No hay viajes activos</h3>
-        <p>Todos los viajes están archivados. Tocá "Ver archivados" para verlos.</p>
+        <p>Todos los viajes están archivados (sin publicar y con la selección cerrada). Tocá "Ver archivados" para verlos.</p>
       </div>`;
     return;
   }
@@ -99,28 +107,29 @@ function _renderPanelStats(viajes) {
   const box = document.getElementById('panelStats');
   if (!box) return;
 
-  const activos = viajes.filter(v => v.activo).length;
-  const dobles = viajes.filter(v => v.tipo === 'doble_piso' && v.activo).length;
+  const publicados = viajes.filter(v => v.publicado_inicio).length;
+  const seleccion = viajes.filter(v => v.activo).length;
 
   box.innerHTML = `
     <div class="panel-stat accent">
-      <span class="panel-stat-value">${activos}</span>
-      <span class="panel-stat-label">Viajes activos</span>
+      <span class="panel-stat-value">${publicados}</span>
+      <span class="panel-stat-label">Publicados en inicio</span>
+    </div>
+    <div class="panel-stat">
+      <span class="panel-stat-value">${seleccion}</span>
+      <span class="panel-stat-label">Selección abierta</span>
     </div>
     <div class="panel-stat">
       <span class="panel-stat-value">${viajes.length}</span>
       <span class="panel-stat-label">Total viajes</span>
-    </div>
-    <div class="panel-stat">
-      <span class="panel-stat-value">${dobles}</span>
-      <span class="panel-stat-label">Doble piso activos</span>
     </div>`;
 }
 
 function _buildPanelTripCard(viaje) {
   const card = document.createElement('div');
   const esDoble = viaje.tipo === 'doble_piso';
-  card.className = 'panel-trip-card' + (esDoble ? ' doble-piso' : '') + (viaje.activo ? '' : ' inactive');
+  const visible = _viajeVisible(viaje);
+  card.className = 'panel-trip-card' + (esDoble ? ' doble-piso' : '') + (visible ? '' : ' inactive');
 
   const plantasLabel = viaje.plantas.map(p => p.etiqueta).join(' / ');
   const fechaLabel = viaje.start_at
@@ -143,9 +152,25 @@ function _buildPanelTripCard(viaje) {
           ${fechaLabel ? `<span class="dot-sep">${fechaLabel}</span>` : ''}
         </div>
       </div>
-      <span class="panel-trip-status ${viaje.activo ? 'active' : 'inactive'}">${viaje.activo ? 'Activo' : 'Archivado'}</span>
+      <span class="panel-trip-status ${visible ? 'active' : 'inactive'}">${visible ? 'Activo' : 'Archivado'}</span>
     </div>
+    <div class="panel-trip-visibility"></div>
     <div class="panel-trip-actions"></div>`;
+
+  // Interruptores de visibilidad. Solo el admin los cambia; el staff los ve.
+  const vis = card.querySelector('.panel-trip-visibility');
+  vis.appendChild(_buildVisSwitch({
+    label: 'Publicado en el inicio',
+    hint: viaje.publicado_inicio ? 'Se ve en Próximos viajes' : 'No aparece en el inicio',
+    on: !!viaje.publicado_inicio,
+    onToggle: () => setPanelViajeVisibilidad(viaje.id, { publicadoInicio: !viaje.publicado_inicio })
+  }));
+  vis.appendChild(_buildVisSwitch({
+    label: 'Selección de asientos',
+    hint: viaje.activo ? 'Habilitada: se pueden elegir asientos' : 'Cerrada',
+    on: !!viaje.activo,
+    onToggle: () => setPanelViajeVisibilidad(viaje.id, { seleccionHabilitada: !viaje.activo })
+  }));
 
   const actions = card.querySelector('.panel-trip-actions');
 
@@ -172,26 +197,40 @@ function _buildPanelTripCard(viaje) {
     editBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>';
     editBtn.onclick = () => goEditor(viaje);
     actions.appendChild(editBtn);
-
-    const toggleBtn = document.createElement('button');
-    toggleBtn.className = 'btn ghost icon-only';
-    toggleBtn.title = viaje.activo ? 'Archivar' : 'Reactivar';
-    toggleBtn.setAttribute('aria-label', viaje.activo ? 'Archivar' : 'Reactivar');
-    toggleBtn.innerHTML = viaje.activo
-      ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>'
-      : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
-    toggleBtn.onclick = () => togglePanelViaje(viaje.id, !viaje.activo);
-    actions.appendChild(toggleBtn);
   }
 
   return card;
 }
 
-async function togglePanelViaje(viajeId, nuevoEstado) {
-  showLoading(nuevoEstado ? 'Reactivando…' : 'Archivando…');
+function _buildVisSwitch({ label, hint, on, onToggle }) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'vis-switch' + (on ? ' on' : '');
+  btn.setAttribute('role', 'switch');
+  btn.setAttribute('aria-checked', String(on));
+  btn.innerHTML = `
+    <span class="vis-switch-track" aria-hidden="true"><span class="vis-switch-thumb"></span></span>
+    <span class="vis-switch-text"><b></b><small></small></span>`;
+  btn.querySelector('b').textContent = label;
+  btn.querySelector('small').textContent = hint;
+  if (Auth.isAdmin()) {
+    btn.onclick = onToggle;
+  } else {
+    btn.disabled = true;
+    btn.title = 'Solo un admin puede cambiarlo';
+  }
+  return btn;
+}
+
+async function setPanelViajeVisibilidad(viajeId, cambios) {
+  showLoading('Guardando…');
   try {
-    await ApiAdmin.setViajeActivo(viajeId, nuevoEstado);
-    toast(nuevoEstado ? 'Viaje reactivado' : 'Viaje archivado');
+    await ApiAdmin.setViajeVisibilidad(viajeId, cambios);
+    if (cambios.publicadoInicio !== undefined && cambios.publicadoInicio !== null) {
+      toast(cambios.publicadoInicio ? 'Publicado en el inicio' : 'Quitado del inicio');
+    } else {
+      toast(cambios.seleccionHabilitada ? 'Selección de asientos habilitada' : 'Selección de asientos cerrada');
+    }
     await loadPanelViajes();
   } catch (e) {
     toast('Error: ' + (e.message || 'no se pudo actualizar'));
@@ -222,6 +261,8 @@ async function submitCreateTrip(ev) {
   const nombre = document.getElementById('newTripName').value.trim();
   const tipo = document.getElementById('newTripType').value;
   const fecha = document.getElementById('newTripDate').value;
+  const publicadoInicio = document.getElementById('newTripPublicado').checked;
+  const seleccionHabilitada = document.getElementById('newTripSeleccion').checked;
 
   if (!nombre) {
     toast('Completá el nombre del viaje');
@@ -230,7 +271,10 @@ async function submitCreateTrip(ev) {
 
   showLoading('Creando viaje…');
   try {
-    await ApiAdmin.crearViaje(nombre, tipo, fecha ? new Date(fecha).toISOString() : null);
+    const viajeId = await ApiAdmin.crearViaje(nombre, tipo, fecha ? new Date(fecha).toISOString() : null);
+    // crear_viaje deja la selección habilitada por defecto (columna activo);
+    // acá se aplica lo que se eligió en el formulario.
+    await ApiAdmin.setViajeVisibilidad(viajeId, { publicadoInicio, seleccionHabilitada });
     toast('Viaje creado correctamente');
     goPanel();
   } catch (e) {
@@ -242,7 +286,7 @@ async function submitCreateTrip(ev) {
 
 window.goPanel = goPanel;
 window.loadPanelViajes = loadPanelViajes;
-window.togglePanelViaje = togglePanelViaje;
+window.setPanelViajeVisibilidad = setPanelViajeVisibilidad;
 window.togglePanelArchivedView = togglePanelArchivedView;
 window.openCreateTripForm = openCreateTripForm;
 window.updateTripRowsHint = updateTripRowsHint;
