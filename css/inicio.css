@@ -24,17 +24,19 @@
 .home-hero-body{ padding:16px 18px 18px; display:flex; flex-direction:column; gap:14px; }
 .home-hero-body > p{ margin:0; color:var(--muted); font-size:.95rem; line-height:1.5; }
 
-.home-next{ display:flex; align-items:center; gap:12px; padding:12px; border-radius:16px; background:#f3f7fe; border:1px solid #dbe7fb; }
+.home-next{
+  display:grid; grid-template-columns:auto minmax(0,1fr); align-items:center; gap:12px;
+  padding:12px; border-radius:16px; background:#f3f7fe; border:1px solid #dbe7fb;
+}
 .home-next-icon{ width:42px; height:42px; border-radius:12px; background:#dbeafe; color:var(--primary); display:grid; place-items:center; flex-shrink:0; }
 .home-next-icon svg{ width:22px; height:22px; }
 .home-next-info{ flex:1; min-width:0; }
 .home-next-label{ font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
-.home-next-name{ font-weight:800; overflow-wrap:anywhere; }
-.home-countdown{ display:flex; gap:6px; flex-shrink:0; font-variant-numeric:tabular-nums; }
-.home-countdown div{ background:var(--card-solid); border:1px solid #dbe7fb; border-radius:10px; min-width:42px; padding:4px 6px; text-align:center; }
-.home-countdown b{ display:block; font-size:1.05rem; line-height:1.1; color:#24479a; }
+.home-next-name{ font-weight:800; line-height:1.25; text-wrap:balance; }
+.home-countdown{ grid-column:1 / -1; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; font-variant-numeric:tabular-nums; }
+.home-countdown div{ background:var(--card-solid); border:1px solid #dbe7fb; border-radius:10px; padding:6px; text-align:center; }
+.home-countdown b{ display:block; font-size:1.2rem; line-height:1.1; color:#24479a; }
 .home-countdown span{ font-size:.62rem; color:var(--muted); font-weight:700; text-transform:uppercase; }
-@media (max-width:380px){ .home-next{ flex-wrap:wrap; } .home-countdown{ width:100%; } .home-countdown div{ flex:1; } }
 
 .home-cta{
   display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:52px;
@@ -134,9 +136,22 @@
   font-size:.76rem; font-weight:600; line-height:1.35; text-align:left;
 }
 .home-member-links a.mail svg{ width:14px; height:14px; flex-shrink:0; margin-top:1px; }
-.home-member-links a.mail span{ overflow-wrap:anywhere; }
+.home-member-links a.mail span{ white-space:nowrap; }
 .home-member-links a.mail:hover span{ text-decoration:underline; }
 .home-member-links a:hover{ filter:brightness(.96); }
+@media (max-width:560px){
+  .home-team{ grid-template-columns:1fr; }
+  .home-member{
+    display:grid; grid-template-columns:64px minmax(0,1fr); column-gap:14px; row-gap:2px;
+    align-items:start; text-align:left; padding:16px;
+  }
+  .home-member .home-avatar{ grid-row:1 / span 4; width:64px; height:64px; font-size:1.15rem; }
+  /* Pie de la tarjeta a todo el ancho: el correo entra completo en una línea */
+  .home-member-links{
+    grid-column:1 / -1; flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:space-between;
+    gap:8px 12px; margin-top:12px; padding-top:12px; border-top:1px solid rgba(17,24,39,.08);
+  }
+}
 
 /* ===== Preguntas frecuentes ===== */
 .home-faq{ overflow:hidden; }
@@ -178,6 +193,7 @@ a.home-contact-row:hover{ background:rgba(44,123,229,.04); }
 }
 .home-wa-fab svg{ width:28px; height:28px; }
 .home-wa-fab[hidden]{ display:none; }
+body:not([data-view="view-home"]) .home-wa-fab{ display:none; }
 
 /* Logo del topbar: lleva al inicio */
 .topbar-logo-wrap{ cursor:pointer; }

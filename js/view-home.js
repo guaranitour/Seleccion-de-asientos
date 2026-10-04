@@ -84,13 +84,14 @@ function _renderHomeStatic(c) {
 
   _renderHomeAvisos(c.avisos || []);
 
-  const waUrl = _homeWhatsappUrl(c.whatsapp, 'Hola, quiero reservar un lugar para un viaje.');
-  const fab = document.getElementById('homeWaFab');
-  const stepsCta = document.getElementById('homeStepsCta');
-  [fab, stepsCta].forEach(el => {
+  // Mensajes que llegan ya escritos al abrir WhatsApp.
+  const waInfo = _homeWhatsappUrl(c.whatsapp, 'Hola, quisiera información sobre un viaje.');
+  const waReserva = _homeWhatsappUrl(c.whatsapp, 'Hola, quiero reservar un lugar para un viaje.');
+  [['homeWaFab', waInfo], ['homeStepsCta', waReserva]].forEach(([id, url]) => {
+    const el = document.getElementById(id);
     if (!el) return;
-    el.hidden = !waUrl;
-    if (waUrl) el.href = waUrl;
+    el.hidden = !url;
+    if (url) el.href = url;
   });
 
   _renderHomeDestinos(c.destinos || []);
@@ -167,23 +168,13 @@ function _renderHomeNosotros(texto, equipo) {
     const wa = _homeWhatsappUrl(m.whatsapp);
     if (wa || m.email) {
       const links = _homeEl('div', 'home-member-links');
-      // El correo se muestra completo (luce el dominio propio); si no entra
-      // en una línea, corta justo antes de la @.
+      // El correo se muestra completo, en una sola línea (luce el dominio).
       if (m.email) {
         const a = _homeEl('a', 'mail');
         a.href = 'mailto:' + m.email;
         a.setAttribute('aria-label', 'Enviar un correo a ' + m.nombre + ': ' + m.email);
         a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
-        const txt = _homeEl('span');
-        const at = m.email.indexOf('@');
-        if (at > 0) {
-          txt.appendChild(document.createTextNode(m.email.slice(0, at)));
-          txt.appendChild(document.createElement('wbr'));
-          txt.appendChild(document.createTextNode(m.email.slice(at)));
-        } else {
-          txt.textContent = m.email;
-        }
-        a.appendChild(txt);
+        a.appendChild(_homeEl('span', '', m.email));
         links.appendChild(a);
       }
       if (wa) {
@@ -195,6 +186,40 @@ function _renderHomeNosotros(texto, equipo) {
       card.appendChild(links);
     }
     team.appendChild(card);
+  });
+  requestAnimationFrame(_homeAjustarCorreos);
+}
+
+/**
+ * Si un correo muy largo no entra en el ancho de la tarjeta, se achica la
+ * letra (hasta ~10px) en vez de cortarlo en dos líneas.
+ */
+function _homeAjustarCorreos() {
+  document.querySelectorAll('#homeTeam a.mail span').forEach(span => {
+    span.style.fontSize = '';
+    const link = span.parentElement;
+    const svg = link.querySelector('svg');
+    const gap = parseFloat(getComputedStyle(link).columnGap) || 0;
+    const disponible = link.parentElement.clientWidth - (svg ? svg.getBoundingClientRect().width + gap : 0);
+    let px = parseFloat(getComputedStyle(span).fontSize);
+    while (span.scrollWidth > disponible && px > 10.5) {
+      px -= 0.5;
+      span.style.fontSize = px + 'px';
+    }
+  });
+}
+
+// Se recalcula cuando la sección se hace visible o cambia de ancho (girar el
+// celular, achicar la ventana). Al primer render la vista todavía está oculta.
+if (typeof ResizeObserver === 'function') {
+  let _homeAjusteFrame = 0;
+  const _homeTeamObserver = new ResizeObserver(() => {
+    cancelAnimationFrame(_homeAjusteFrame);
+    _homeAjusteFrame = requestAnimationFrame(_homeAjustarCorreos);
+  });
+  document.addEventListener('DOMContentLoaded', () => {
+    const team = document.getElementById('homeTeam');
+    if (team) _homeTeamObserver.observe(team);
   });
 }
 
@@ -241,7 +266,7 @@ function _renderHomeContacto(c) {
   box.innerHTML = '';
 
   const filas = [];
-  const wa = _homeWhatsappUrl(c.whatsapp);
+  const wa = _homeWhatsappUrl(c.whatsapp, 'Hola, quisiera información sobre un viaje.');
   if (wa) filas.push({ red: 'whatsapp', label: 'WhatsApp', valor: '+' + String(c.whatsapp).replace(/\D/g, ''), href: wa });
   if (ct.instagram) filas.push({ red: 'instagram', label: 'Instagram', valor: '@' + ct.instagram.replace(/^@/, ''), href: 'https://instagram.com/' + encodeURIComponent(ct.instagram.replace(/^@/, '')) });
   if (ct.facebook) filas.push({ red: 'facebook', label: 'Facebook', valor: 'Destino Guaraní', href: ct.facebook });
@@ -376,7 +401,7 @@ function homeScrollTo(id) {
 function homeHablar() {
   const sec = document.getElementById('homeContacto');
   if (sec && !sec.hidden) { homeScrollTo('homeContacto'); return; }
-  const wa = _homeWhatsappUrl(_homeContenido.whatsapp);
+  const wa = _homeWhatsappUrl(_homeContenido.whatsapp, 'Hola, quisiera información sobre un viaje.');
   if (wa) { window.open(wa, '_blank', 'noopener'); return; }
   toast('Pronto vas a encontrar acá nuestros medios de contacto');
 }
