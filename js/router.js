@@ -198,6 +198,7 @@ async function routeTo(path) {
     if (head.toLowerCase() === 'panel') {
       if (!Auth.isAuthorized()) { goStaffLogin(); return; }
       const sub = (segs[1] || '').toLowerCase();
+      if (sub === 'inicio' && Auth.isAdmin()) { await goPanelInicio(); return; }
       if (sub === 'control' && segs[2]) {
         const viajes = await ApiAdmin.getAllViajes();
         const viaje = viajes.find(v => slugify(v.nombre) === slugify(segs[2]));

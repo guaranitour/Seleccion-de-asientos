@@ -34,7 +34,7 @@ const Api = {
     const desde = new Date(Date.now() - 86400000).toISOString();
     const { data, error } = await supabase
       .from('viajes')
-      .select('id, nombre, tipo, start_at, activo, plantas(id, etiqueta, orden)')
+      .select('id, nombre, tipo, start_at, activo, plantas(id, etiqueta, orden), destino:inicio_destinos(nombre, imagen_url)')
       .eq('publicado_inicio', true)
       .or(`start_at.is.null,start_at.gte.${desde}`)
       .order('start_at', { ascending: true, nullsFirst: false });
@@ -46,6 +46,32 @@ const Api = {
       }
     });
     return data || [];
+  },
+
+  /**
+   * Contenido editable del inicio (Panel › Inicio). La RLS ya filtra lo
+   * inactivo y los avisos fuera de su vigencia para el público.
+   */
+  async getInicioContenido() {
+    const orden = (q) => q.order('orden', { ascending: true }).order('created_at', { ascending: true });
+    const [config, bloques, equipo, destinos] = await Promise.all([
+      supabase.from('inicio_config').select('*').eq('id', 1).maybeSingle(),
+      orden(supabase.from('inicio_bloques').select('*').eq('activo', true)),
+      orden(supabase.from('inicio_equipo').select('*').eq('activo', true)),
+      orden(supabase.from('inicio_destinos').select('*').eq('activo', true))
+    ]);
+    [config, bloques, equipo, destinos].forEach(r => { if (r.error) throw r.error; });
+    const ahora = Date.now();
+    const vigente = b => (!b.visible_desde || new Date(b.visible_desde).getTime() <= ahora)
+                      && (!b.visible_hasta || new Date(b.visible_hasta).getTime() > ahora);
+    const bl = (bloques.data || []).filter(vigente);
+    return {
+      config: config.data || {},
+      avisos: bl.filter(b => b.tipo === 'aviso'),
+      faq: bl.filter(b => b.tipo === 'faq'),
+      equipo: equipo.data || [],
+      destinos: destinos.data || []
+    };
   },
 
   /** Todos los asientos de una planta (sin datos de pasajero: ya no viven aca). */

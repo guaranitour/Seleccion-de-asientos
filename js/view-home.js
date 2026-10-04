@@ -2,12 +2,11 @@
 // view-home.js — Página de inicio
 // ============================================================
 // "Próximos viajes" sale de reservas.viajes (publicado_inicio = true).
-// El resto del contenido sale de INICIO_CONTENIDO (inicio-contenido.js);
-// los bloques vacíos se ocultan.
+// El resto se edita en Panel › Inicio (tablas reservas.inicio_*); los
+// bloques vacíos se ocultan.
 
 let _homeCountdownTimer = null;
-
-const _WA_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.2 13.6c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2Z"/></svg>';
+let _homeContenido = {};
 
 function _homeEl(tag, className, text) {
   const el = document.createElement(tag);
@@ -30,21 +29,45 @@ async function goHome() {
   await renderHome();
 }
 
+/** Pasa lo que viene de Supabase al formato que usan los render. */
+function _homeMapContenido(db) {
+  const cfg = db.config || {};
+  return {
+    portada: { titulo: cfg.portada_titulo, texto: cfg.portada_texto, imagen: cfg.portada_imagen_url },
+    whatsapp: cfg.whatsapp || '',
+    contacto: {
+      instagram: cfg.instagram || '', facebook: cfg.facebook || '', email: cfg.email || '',
+      direccion: cfg.direccion || '', mapsUrl: cfg.maps_url || '',
+      horarios: Array.isArray(cfg.horarios) ? cfg.horarios : []
+    },
+    nosotros: cfg.nosotros || '',
+    avisos: db.avisos || [],
+    equipo: (db.equipo || []).map(m => ({ nombre: m.nombre, cargo: m.cargo, descripcion: m.descripcion, foto: m.foto_url, whatsapp: m.whatsapp })),
+    destinos: (db.destinos || []).map(d => ({ nombre: d.nombre, pais: d.pais, descripcion: d.descripcion, imagen: d.imagen_url, etiquetas: d.etiquetas || [] })),
+    faq: (db.faq || []).map(f => ({ pregunta: f.titulo, respuesta: f.cuerpo }))
+  };
+}
+
 async function renderHome() {
-  const c = window.INICIO_CONTENIDO || {};
   const greet = document.getElementById('homeGreeting');
   if (greet) greet.textContent = getGreeting();
-  _renderHomeStatic(c);
 
   showLoading('Cargando…');
   let viajes = [];
-  try {
-    viajes = await Api.getViajesInicio();
-  } catch (e) {
-    console.error(e);
+  const [rViajes, rContenido] = await Promise.allSettled([Api.getViajesInicio(), Api.getInicioContenido()]);
+  hideLoading();
+
+  if (rContenido.status === 'fulfilled') {
+    _homeContenido = _homeMapContenido(rContenido.value);
+    _renderHomeStatic(_homeContenido);
+  } else {
+    console.error(rContenido.reason);
+  }
+  if (rViajes.status === 'fulfilled') {
+    viajes = rViajes.value;
+  } else {
+    console.error(rViajes.reason);
     toast('No se pudieron cargar los próximos viajes');
-  } finally {
-    hideLoading();
   }
   _renderHomeNext(viajes.find(v => v.start_at && new Date(v.start_at).getTime() > Date.now()) || null);
   _renderHomeTrips(viajes);
@@ -55,6 +78,11 @@ function _renderHomeStatic(c) {
   const portada = c.portada || {};
   if (portada.titulo) document.getElementById('homeHeroTitle').textContent = portada.titulo;
   if (portada.texto) document.getElementById('homeHeroText').textContent = portada.texto;
+  const photo = document.getElementById('homeHeroPhoto');
+  photo.classList.toggle('has-img', !!portada.imagen);
+  photo.style.backgroundImage = portada.imagen ? `url("${encodeURI(portada.imagen)}")` : '';
+
+  _renderHomeAvisos(c.avisos || []);
 
   const waUrl = _homeWhatsappUrl(c.whatsapp, 'Hola, quiero reservar un lugar para un viaje.');
   const fab = document.getElementById('homeWaFab');
@@ -69,6 +97,21 @@ function _renderHomeStatic(c) {
   _renderHomeNosotros(c.nosotros || '', c.equipo || []);
   _renderHomeFaq(c.faq || []);
   _renderHomeContacto(c);
+}
+
+function _renderHomeAvisos(avisos) {
+  const box = document.getElementById('homeAvisos');
+  box.innerHTML = '';
+  box.hidden = !avisos.length;
+  avisos.forEach(a => {
+    const el = _homeEl('div', 'home-notice' + (a.estilo === 'importante' ? ' important' : ''));
+    el.setAttribute('role', a.estilo === 'importante' ? 'alert' : 'status');
+    const txt = _homeEl('div');
+    txt.appendChild(_homeEl('b', '', a.titulo));
+    if (a.cuerpo) txt.appendChild(_homeEl('p', '', a.cuerpo));
+    el.appendChild(txt);
+    box.appendChild(el);
+  });
 }
 
 function _renderHomeDestinos(destinos) {
@@ -224,6 +267,13 @@ function _renderHomeTrips(viajes) {
     const abierta = !!v.activo;
 
     const card = _homeEl('div', 'trip-card ' + (isDouble ? 'double-floor' : 'single-floor') + (abierta ? '' : ' closed'));
+    const foto = v.destino && v.destino.imagen_url;
+    if (foto) {
+      card.classList.add('has-photo');
+      const ph = _homeEl('div', 'home-trip-photo');
+      ph.style.backgroundImage = `url("${encodeURI(foto)}")`;
+      card.appendChild(ph);
+    }
     const head = _homeEl('div', 'trip-head');
     const left = _homeEl('div', 'trip-head-left');
     const nameWrap = _homeEl('div');
@@ -267,7 +317,7 @@ function homeScrollTo(id) {
 function homeHablar() {
   const sec = document.getElementById('homeContacto');
   if (sec && !sec.hidden) { homeScrollTo('homeContacto'); return; }
-  const wa = _homeWhatsappUrl((window.INICIO_CONTENIDO || {}).whatsapp);
+  const wa = _homeWhatsappUrl(_homeContenido.whatsapp);
   if (wa) { window.open(wa, '_blank', 'noopener'); return; }
   toast('Pronto vas a encontrar acá nuestros medios de contacto');
 }
