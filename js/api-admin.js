@@ -8,7 +8,7 @@ const ApiAdmin = {
   async getAllViajes() {
     const { data, error } = await supabase
       .from('viajes')
-      .select('id, nombre, tipo, start_at, activo, plantas(id, etiqueta, orden)')
+      .select('id, nombre, tipo, start_at, activo, publicado_inicio, plantas(id, etiqueta, orden)')
       .order('created_at', { ascending: false });
     if (error) throw error;
     (data || []).forEach(v => {
@@ -31,6 +31,19 @@ const ApiAdmin = {
 
   async setViajeActivo(viajeId, activo) {
     const { error } = await supabase.rpc('set_viaje_activo', { p_viaje_id: viajeId, p_activo: activo });
+    if (error) throw error;
+  },
+
+  /**
+   * Los dos interruptores de visibilidad de un viaje. Pasar null en uno lo
+   * deja como está. "activo" en la tabla = selección de asientos habilitada.
+   */
+  async setViajeVisibilidad(viajeId, { publicadoInicio = null, seleccionHabilitada = null }) {
+    const { error } = await supabase.rpc('set_viaje_visibilidad', {
+      p_viaje_id: viajeId,
+      p_publicado_inicio: publicadoInicio,
+      p_seleccion_habilitada: seleccionHabilitada
+    });
     if (error) throw error;
   },
 

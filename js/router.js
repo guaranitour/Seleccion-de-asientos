@@ -109,9 +109,7 @@ function getPlantaFromFloorLabel(viaje, floorLabel) {
 async function routeTo(path) {
   const segs = getHashSegments(path);
   if (!segs.length) {
-    setHash(['Reservas']);
-    showView('view-choose');
-    await loadViajes();
+    await goHome();
     return;
   }
 
@@ -119,7 +117,12 @@ async function routeTo(path) {
   ROUTER_DRIVING = true;
 
   try {
-    if (head.toLowerCase() === 'reservas' || head.toLowerCase() === 'inicio') {
+    if (head.toLowerCase() === 'inicio') {
+      await goHome();
+      return;
+    }
+
+    if (head.toLowerCase() === 'reservas') {
       if (typeof closeFloorSheet === 'function') closeFloorSheet();
       showView('view-choose');
       await loadViajes();
