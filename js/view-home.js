@@ -36,7 +36,7 @@ function _homeMapContenido(db) {
     portada: { titulo: cfg.portada_titulo, texto: cfg.portada_texto, imagen: cfg.portada_imagen_url },
     whatsapp: cfg.whatsapp || '',
     contacto: {
-      instagram: cfg.instagram || '', facebook: cfg.facebook || '', email: cfg.email || '',
+      instagram: cfg.instagram || '', facebook: cfg.facebook || '', tiktok: cfg.tiktok || '', email: cfg.email || '',
       direccion: cfg.direccion || '', mapsUrl: cfg.maps_url || '',
       horarios: Array.isArray(cfg.horarios) ? cfg.horarios : []
     },
@@ -200,6 +200,28 @@ function _renderHomeFaq(faq) {
   });
 }
 
+// Íconos de cada medio de contacto (24x24, color = currentColor).
+const _HOME_ICONOS = {
+  whatsapp: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.2 13.6c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6-.4.4c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.2Z"/></svg>',
+  instagram: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg>',
+  facebook: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 8h3V4h-3a4 4 0 0 0-4 4v2H8v4h2v8h4v-8h3l1-4h-4V8Z"/></svg>',
+  tiktok: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 3c.4 2.3 1.9 3.9 4.1 4.2v3.2a7.6 7.6 0 0 1-4.1-1.3v6.4a5.6 5.6 0 1 1-5.6-5.6c.3 0 .6 0 .9.1v3.3a2.4 2.4 0 1 0 1.5 2.2V3h3.2Z"/></svg>',
+  email: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+  oficina: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>'
+};
+
+/** TikTok: acepta el usuario (con o sin @) o el link completo del perfil. */
+function _homeTiktok(valor) {
+  const v = String(valor || '').trim();
+  if (!v) return null;
+  if (/^https?:\/\//i.test(v)) {
+    const m = v.match(/tiktok\.com\/@([^/?#]+)/i);
+    return { href: v, usuario: m ? '@' + m[1] : 'Destino Guaraní' };
+  }
+  const user = v.replace(/^@/, '');
+  return { href: 'https://www.tiktok.com/@' + encodeURIComponent(user), usuario: '@' + user };
+}
+
 function _renderHomeContacto(c) {
   const ct = c.contacto || {};
   const sec = document.getElementById('homeContacto');
@@ -208,11 +230,13 @@ function _renderHomeContacto(c) {
 
   const filas = [];
   const wa = _homeWhatsappUrl(c.whatsapp);
-  if (wa) filas.push({ label: 'WhatsApp', valor: '+' + String(c.whatsapp).replace(/\D/g, ''), href: wa });
-  if (ct.instagram) filas.push({ label: 'Instagram', valor: '@' + ct.instagram.replace(/^@/, ''), href: 'https://instagram.com/' + encodeURIComponent(ct.instagram.replace(/^@/, '')) });
-  if (ct.facebook) filas.push({ label: 'Facebook', valor: 'Destino Guaraní', href: ct.facebook });
-  if (ct.email) filas.push({ label: 'Correo', valor: ct.email, href: 'mailto:' + ct.email });
-  if (ct.direccion) filas.push({ label: ct.mapsUrl ? 'Oficina · Cómo llegar' : 'Oficina', valor: ct.direccion, href: ct.mapsUrl || '' });
+  if (wa) filas.push({ red: 'whatsapp', label: 'WhatsApp', valor: '+' + String(c.whatsapp).replace(/\D/g, ''), href: wa });
+  if (ct.instagram) filas.push({ red: 'instagram', label: 'Instagram', valor: '@' + ct.instagram.replace(/^@/, ''), href: 'https://instagram.com/' + encodeURIComponent(ct.instagram.replace(/^@/, '')) });
+  if (ct.facebook) filas.push({ red: 'facebook', label: 'Facebook', valor: 'Destino Guaraní', href: ct.facebook });
+  const tt = _homeTiktok(ct.tiktok);
+  if (tt) filas.push({ red: 'tiktok', label: 'TikTok', valor: tt.usuario, href: tt.href });
+  if (ct.email) filas.push({ red: 'email', label: 'Correo', valor: ct.email, href: 'mailto:' + ct.email });
+  if (ct.direccion) filas.push({ red: 'oficina', label: ct.mapsUrl ? 'Oficina · Cómo llegar' : 'Oficina', valor: ct.direccion, href: ct.mapsUrl || '' });
 
   filas.forEach(f => {
     const row = _homeEl(f.href ? 'a' : 'div', 'home-contact-row');
@@ -220,10 +244,20 @@ function _renderHomeContacto(c) {
       row.href = f.href;
       if (!f.href.startsWith('mailto:')) { row.target = '_blank'; row.rel = 'noopener'; }
     }
+    const ic = _homeEl('span', 'home-contact-icon ' + f.red);
+    ic.setAttribute('aria-hidden', 'true');
+    ic.innerHTML = _HOME_ICONOS[f.red] || '';
+    row.appendChild(ic);
     const txt = document.createElement('div');
     txt.appendChild(_homeEl('small', '', f.label));
     txt.appendChild(_homeEl('b', '', f.valor));
     row.appendChild(txt);
+    if (f.href) {
+      const go = _homeEl('span', 'home-contact-go');
+      go.setAttribute('aria-hidden', 'true');
+      go.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>';
+      row.appendChild(go);
+    }
     box.appendChild(row);
   });
 

@@ -167,3 +167,6 @@ where not exists (select 1 from reservas.inicio_bloques where tipo = 'faq');
 
 -- 5) 2026-10-05 (agregado): correo de cada integrante del equipo ----------------
 alter table reservas.inicio_equipo add column if not exists email text;
+
+-- 6) 2026-10-05 (agregado): TikTok en los datos de contacto ----------------------
+alter table reservas.inicio_config add column if not exists tiktok text;

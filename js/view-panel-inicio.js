@@ -90,6 +90,7 @@ const PI_SECCIONES = {
       { k: 'whatsapp', label: 'WhatsApp de reservas', type: 'tel', hint: 'Con código de país, solo números, ej.: 595981123456. Activa el botón flotante y "Reservar por WhatsApp".' },
       { k: 'instagram', label: 'Instagram', placeholder: 'usuario, sin @' },
       { k: 'facebook', label: 'Facebook', placeholder: 'https://facebook.com/…' },
+      { k: 'tiktok', label: 'TikTok', placeholder: 'usuario sin @, o el link del perfil' },
       { k: 'email', label: 'Correo', type: 'email' },
       { k: 'direccion', label: 'Dirección de la oficina' },
       { k: 'maps_url', label: 'Link de Google Maps (opcional)', placeholder: 'https://maps.app.goo.gl/…' },
