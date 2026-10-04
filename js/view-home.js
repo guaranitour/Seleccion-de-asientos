@@ -85,8 +85,8 @@ function _renderHomeStatic(c) {
   _renderHomeAvisos(c.avisos || []);
 
   // Mensajes que llegan ya escritos al abrir WhatsApp.
-  const waInfo = _homeWhatsappUrl(c.whatsapp, 'Hola, quisiera información sobre un viaje.');
-  const waReserva = _homeWhatsappUrl(c.whatsapp, 'Hola, quiero reservar un lugar para un viaje.');
+  const waInfo = _homeWhatsappUrl(c.whatsapp, 'Hola! Me gustaría recibir más info sobre un destino.');
+  const waReserva = _homeWhatsappUrl(c.whatsapp, 'Hola! Me gustaría reservar un lugar para un destino.');
   [['homeWaFab', waInfo], ['homeStepsCta', waReserva]].forEach(([id, url]) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -266,7 +266,7 @@ function _renderHomeContacto(c) {
   box.innerHTML = '';
 
   const filas = [];
-  const wa = _homeWhatsappUrl(c.whatsapp, 'Hola, quisiera información sobre un viaje.');
+  const wa = _homeWhatsappUrl(c.whatsapp, 'Hola! Me gustaría recibir más info sobre un destino.');
   if (wa) filas.push({ red: 'whatsapp', label: 'WhatsApp', valor: '+' + String(c.whatsapp).replace(/\D/g, ''), href: wa });
   if (ct.instagram) filas.push({ red: 'instagram', label: 'Instagram', valor: '@' + ct.instagram.replace(/^@/, ''), href: 'https://instagram.com/' + encodeURIComponent(ct.instagram.replace(/^@/, '')) });
   if (ct.facebook) filas.push({ red: 'facebook', label: 'Facebook', valor: 'Destino Guaraní', href: ct.facebook });
@@ -401,7 +401,7 @@ function homeScrollTo(id) {
 function homeHablar() {
   const sec = document.getElementById('homeContacto');
   if (sec && !sec.hidden) { homeScrollTo('homeContacto'); return; }
-  const wa = _homeWhatsappUrl(_homeContenido.whatsapp, 'Hola, quisiera información sobre un viaje.');
+  const wa = _homeWhatsappUrl(_homeContenido.whatsapp, 'Hola! Me gustaría recibir más info sobre un destino.');
   if (wa) { window.open(wa, '_blank', 'noopener'); return; }
   toast('Pronto vas a encontrar acá nuestros medios de contacto');
 }
