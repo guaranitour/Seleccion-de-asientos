@@ -167,17 +167,29 @@ function _renderHomeNosotros(texto, equipo) {
     const wa = _homeWhatsappUrl(m.whatsapp);
     if (wa || m.email) {
       const links = _homeEl('div', 'home-member-links');
+      // El correo se muestra completo (luce el dominio propio); si no entra
+      // en una línea, corta justo antes de la @.
+      if (m.email) {
+        const a = _homeEl('a', 'mail');
+        a.href = 'mailto:' + m.email;
+        a.setAttribute('aria-label', 'Enviar un correo a ' + m.nombre + ': ' + m.email);
+        a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
+        const txt = _homeEl('span');
+        const at = m.email.indexOf('@');
+        if (at > 0) {
+          txt.appendChild(document.createTextNode(m.email.slice(0, at)));
+          txt.appendChild(document.createElement('wbr'));
+          txt.appendChild(document.createTextNode(m.email.slice(at)));
+        } else {
+          txt.textContent = m.email;
+        }
+        a.appendChild(txt);
+        links.appendChild(a);
+      }
       if (wa) {
         const a = _homeEl('a', 'wa', 'WhatsApp');
         a.href = wa; a.target = '_blank'; a.rel = 'noopener';
         a.setAttribute('aria-label', 'Escribir por WhatsApp a ' + m.nombre);
-        links.appendChild(a);
-      }
-      if (m.email) {
-        const a = _homeEl('a', 'mail', 'Correo');
-        a.href = 'mailto:' + m.email;
-        a.title = m.email;
-        a.setAttribute('aria-label', 'Enviar un correo a ' + m.nombre + ' (' + m.email + ')');
         links.appendChild(a);
       }
       card.appendChild(links);
