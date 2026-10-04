@@ -97,6 +97,7 @@ function _renderHomeStatic(c) {
   _renderHomeNosotros(c.nosotros || '', c.equipo || []);
   _renderHomeFaq(c.faq || []);
   _renderHomeContacto(c);
+  if (typeof syncNavDrawerSections === 'function') syncNavDrawerSections();
 }
 
 function _renderHomeAvisos(avisos) {

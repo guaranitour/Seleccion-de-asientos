@@ -182,3 +182,6 @@
 .home-trip-photo{
   aspect-ratio:16/6; max-width:none; margin:0 -16px 14px; background:#dbeafe center/cover no-repeat;
 }
+
+/* Al ir a una sección desde el menú, que no quede tapada por el topbar fijo */
+.home-section{ scroll-margin-top:calc(90px + env(safe-area-inset-top, 0px)); }
