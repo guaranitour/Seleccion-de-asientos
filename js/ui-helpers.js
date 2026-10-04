@@ -13,6 +13,7 @@ function showView(id) {
   // atrás desde el navegador estando el sheet de planta abierto).
   document.querySelectorAll('.action-sheet.show').forEach(sheet => sheet.classList.remove('show'));
   if (typeof closeNavDrawer === 'function') closeNavDrawer();
+  if (typeof syncNavDrawerCurrent === 'function') syncNavDrawerCurrent(id);
 
   // Fallback por si el navegador no soporta el selector :has() usado en
   // panel.css para esconder el botón flotante de staff dentro de sus
