@@ -123,7 +123,13 @@
 .home-member h3{ margin:0; font-size:.96rem; font-weight:800; }
 .home-role{ font-size:.7rem; font-weight:800; letter-spacing:.05em; text-transform:uppercase; color:var(--primary); }
 .home-member p{ margin:0; font-size:.82rem; color:var(--muted); line-height:1.4; }
-.home-member a{ margin-top:auto; padding-top:4px; font-size:.8rem; font-weight:700; text-decoration:none; color:#047857; }
+.home-member-links{ margin-top:auto; padding-top:6px; display:flex; flex-wrap:wrap; justify-content:center; gap:6px; }
+.home-member-links a{
+  font-size:.78rem; font-weight:700; text-decoration:none; padding:5px 10px; border-radius:999px;
+}
+.home-member-links a.wa{ background:#dcfce7; color:#047857; }
+.home-member-links a.mail{ background:#eef4fe; color:var(--primary); }
+.home-member-links a:hover{ filter:brightness(.96); }
 
 /* ===== Preguntas frecuentes ===== */
 .home-faq{ overflow:hidden; }
@@ -140,6 +146,17 @@
 .home-contact-row{ display:flex; align-items:center; gap:14px; padding:14px 18px; border-top:1px solid rgba(17,24,39,.09); text-decoration:none; color:var(--text); }
 .home-contact-row:first-child{ border-top:0; }
 .home-contact-row div{ flex:1; min-width:0; }
+a.home-contact-row:hover{ background:rgba(44,123,229,.04); }
+.home-contact-icon{ width:40px; height:40px; border-radius:12px; display:grid; place-items:center; flex-shrink:0; }
+.home-contact-icon svg{ width:20px; height:20px; }
+.home-contact-icon.whatsapp{ background:#dcfce7; color:#15803d; }
+.home-contact-icon.instagram{ background:#fce7f3; color:#be185d; }
+.home-contact-icon.facebook{ background:#dbeafe; color:#1d4ed8; }
+.home-contact-icon.tiktok{ background:#111827; color:#fff; }
+.home-contact-icon.email{ background:#f3f4f6; color:#374151; }
+.home-contact-icon.oficina{ background:#fef3c7; color:#b45309; }
+.home-contact-go{ color:#9ca3af; flex-shrink:0; display:grid; }
+.home-contact-go svg{ width:18px; height:18px; }
 .home-contact-row small{ display:block; color:var(--muted); font-size:.78rem; font-weight:600; }
 .home-contact-row b{ font-size:.95rem; overflow-wrap:anywhere; }
 .home-hours{ margin:0; padding:14px 18px; border-top:1px solid rgba(17,24,39,.09); display:grid; grid-template-columns:auto 1fr; gap:4px 16px; font-size:.88rem; }
