@@ -23,7 +23,18 @@
 
 // Metadata de preview por ruta. Agregar acá cualquier ruta nueva que
 // necesite su propio og:title / og:description / og:image.
+const INICIO_META = {
+  title: 'Destino Guaraní — Somos todo lo que buscás',
+  description: 'Expresos, viajes juveniles y familiares, fiestas, safaris, culturales y ecoaventura. Conocé nuestras salidas confirmadas.',
+  image: 'https://www.guaranitour.com/inicio-preview.jpg',
+  imageWidth: 1200,
+  imageHeight: 630,
+  imageAlt: 'Tucán junto al logo de Destino Guaraní: Somos todo lo que buscás, ¡Vivir y Sentir!',
+};
+
 const ROUTES_META = {
+  '/': INICIO_META,
+  '/inicio': INICIO_META,
   '/reservas': {
     title: 'Reservá tu asiento — Destino Guaraní',
     description: 'Elegí tu asiento para el viaje en menos de 2 minutos.',
@@ -55,6 +66,13 @@ function renderPreviewHtml(url, meta) {
   const description = escapeHtml(meta.description);
   const image = escapeHtml(meta.image);
   const canonicalUrl = escapeHtml(url);
+  // Ancho/alto/alt de la imagen: WhatsApp y Facebook muestran la vista
+  // previa grande de inmediato si los conocen, sin descargarla primero.
+  const imageSize = meta.imageWidth
+    ? `\n<meta property="og:image:width" content="${meta.imageWidth}">` +
+      `\n<meta property="og:image:height" content="${meta.imageHeight}">` +
+      (meta.imageAlt ? `\n<meta property="og:image:alt" content="${escapeHtml(meta.imageAlt)}">` : '')
+    : '';
 
   return `<!DOCTYPE html>
 <html lang="es">
@@ -65,7 +83,9 @@ function renderPreviewHtml(url, meta) {
 <meta property="og:url" content="${canonicalUrl}">
 <meta property="og:title" content="${title}">
 <meta property="og:description" content="${description}">
-<meta property="og:image" content="${image}">
+<meta property="og:image" content="${image}">${imageSize}
+<meta property="og:site_name" content="Destino Guaraní">
+<meta property="og:locale" content="es_PY">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${title}">
 <meta name="twitter:description" content="${description}">
@@ -78,7 +98,10 @@ function renderPreviewHtml(url, meta) {
 export async function onRequest(context) {
   const { request, next } = context;
   const url = new URL(request.url);
-  const meta = ROUTES_META[url.pathname];
+  // Sin distinguir mayúsculas ni barra final: "/Inicio", "/inicio/" y
+  // "/inicio" comparten la misma vista previa.
+  const path = url.pathname.toLowerCase().replace(/\/+$/, '') || '/';
+  const meta = ROUTES_META[path];
 
   // Ruta sin preview propio configurado → tráfico normal, SPA de siempre.
   if (!meta) {
