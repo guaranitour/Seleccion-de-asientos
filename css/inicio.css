@@ -229,3 +229,18 @@ body:not([data-view="view-home"]) .home-wa-fab{ display:none; }
 
 /* Al ir a una sección desde el menú, que no quede tapada por el topbar fijo */
 .home-section{ scroll-margin-top:calc(90px + env(safe-area-inset-top, 0px)); }
+
+/* ===== Pie de página ===== */
+.home-footer{
+  display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center;
+  margin-top:6px; padding:22px 0 8px; border-top:1px solid rgba(17,24,39,.09);
+  color:var(--muted); font-size:.82rem;
+}
+.home-footer nav{ display:flex; flex-wrap:wrap; justify-content:center; gap:4px 6px; }
+.home-footer nav button{
+  border:0; background:none; font:inherit; font-weight:600; color:var(--text);
+  padding:6px 8px; border-radius:8px; cursor:pointer;
+}
+.home-footer nav button:hover{ color:var(--primary); background:#eef4fe; }
+.home-footer nav button[hidden]{ display:none; }
+.home-footer p{ margin:0; }

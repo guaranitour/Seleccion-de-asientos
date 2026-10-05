@@ -21,7 +21,7 @@
 
 <link href="/css/base.css?v=2" rel="stylesheet"/>
 <link href="/css/home.css" rel="stylesheet"/>
-<link href="/css/inicio.css?v=9" rel="stylesheet"/>
+<link href="/css/inicio.css?v=10" rel="stylesheet"/>
 <link href="/css/croquis.css" rel="stylesheet"/>
 <link href="/css/reserve.css" rel="stylesheet"/>
 <link href="/css/panel.css?v=4" rel="stylesheet"/>
@@ -182,6 +182,18 @@
           <div><p class="home-eyebrow">Estamos para ayudarte</p><h2 class="home-title" id="homeContactoTitle">Contacto</h2></div>
           <div class="home-contact home-glass" id="homeContactoList"></div>
         </section>
+
+        <footer class="home-footer" id="homeFooter">
+          <nav aria-label="Pie de página">
+            <button onclick="backToChoose()" type="button">Reservas</button>
+            <button data-section="homeDestinos" onclick="homeScrollTo('homeDestinos')" type="button">Destinos</button>
+            <button data-section="homeNosotros" onclick="homeScrollTo('homeNosotros')" type="button">Nosotros</button>
+            <button data-section="homeContacto" onclick="homeScrollTo('homeContacto')" type="button">Contacto</button>
+            <button onclick="goBases()" type="button">Bases y condiciones</button>
+            <button onclick="goStaffLogin()" type="button">Acceso staff</button>
+          </nav>
+          <p>© <span id="homeFooterYear">2026</span> Destino Guaraní</p>
+        </footer>
 
       </div>
     </div>
@@ -725,11 +737,11 @@
 <script src="/js/state.js"></script>
 <script src="/js/api.js?v=4"></script>
 <script src="/js/ui-helpers.js?v=4"></script>
-<script src="/js/nav-drawer.js?v=2"></script>
+<script src="/js/nav-drawer.js?v=3"></script>
 <script src="/js/router.js?v=3"></script>
 <script src="/js/view-bases.js"></script>
 <script src="/js/view-choose.js"></script>
-<script src="/js/view-home.js?v=10"></script>
+<script src="/js/view-home.js?v=11"></script>
 <script src="/js/seats-grid.js"></script>
 <script src="/js/view-select.js"></script>
 <script src="/js/share-card.js"></script>
