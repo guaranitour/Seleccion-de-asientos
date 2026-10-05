@@ -12,6 +12,7 @@ const Api = {
       .from('viajes')
       .select('id, nombre, tipo, start_at, plantas(id, etiqueta, orden)')
       .eq('activo', true)
+      .neq('tipo', 'evento') // eventos/fiestas sin bus: no tienen asientos
       .order('start_at', { ascending: true, nullsFirst: false });
 
     if (error) throw error;

@@ -21,10 +21,10 @@
 
 <link href="/css/base.css?v=2" rel="stylesheet"/>
 <link href="/css/home.css" rel="stylesheet"/>
-<link href="/css/inicio.css?v=8" rel="stylesheet"/>
+<link href="/css/inicio.css?v=9" rel="stylesheet"/>
 <link href="/css/croquis.css" rel="stylesheet"/>
 <link href="/css/reserve.css" rel="stylesheet"/>
-<link href="/css/panel.css?v=3" rel="stylesheet"/>
+<link href="/css/panel.css?v=4" rel="stylesheet"/>
 <link href="/css/passenger-list.css" rel="stylesheet"/>
 <link href="/css/whatsapp-mode.css" rel="stylesheet"/>
 
@@ -577,7 +577,7 @@
         <h2 class="view-title">Nuevo viaje</h2>
         <form class="form create-trip-form" id="createTripForm" onsubmit="submitCreateTrip(event)">
           <div class="field">
-            <span class="field-label">Nombre del viaje</span>
+            <span class="field-label">Nombre del viaje o evento</span>
             <input id="newTripName" placeholder="Ej.: Encarnación 24/02" required type="text"/>
           </div>
           <div class="field">
@@ -585,11 +585,12 @@
             <select id="newTripType" onchange="updateTripRowsHint()">
               <option value="convencional">Convencional (1 planta)</option>
               <option value="doble_piso">Doble piso (2 plantas)</option>
+              <option value="evento">Evento o fiesta (sin bus)</option>
             </select>
             <span class="field-hint" id="tripRowsHint">Se crearán 11 filas (44 asientos).</span>
           </div>
           <div class="field">
-            <span class="field-label">Fecha y hora de salida (opcional)</span>
+            <span class="field-label">Fecha y hora (opcional)</span>
             <input id="newTripDate" type="datetime-local"/>
           </div>
           <div class="field">
@@ -598,7 +599,7 @@
               <input checked id="newTripPublicado" type="checkbox"/>
               <span><b>Publicar en el inicio</b><small>Aparece en Próximos viajes</small></span>
             </label>
-            <label class="vis-check" for="newTripSeleccion">
+            <label class="vis-check" for="newTripSeleccion" id="newTripSeleccionRow">
               <input id="newTripSeleccion" type="checkbox"/>
               <span><b>Habilitar selección de asientos</b><small>Podés habilitarla más adelante desde el panel</small></span>
             </label>
@@ -722,20 +723,20 @@
 <!-- Scripts (orden importa: dependencias primero) -->
 <script src="/js/supabase-client.js"></script>
 <script src="/js/state.js"></script>
-<script src="/js/api.js?v=3"></script>
+<script src="/js/api.js?v=4"></script>
 <script src="/js/ui-helpers.js?v=4"></script>
 <script src="/js/nav-drawer.js?v=2"></script>
 <script src="/js/router.js?v=3"></script>
 <script src="/js/view-bases.js"></script>
 <script src="/js/view-choose.js"></script>
-<script src="/js/view-home.js?v=9"></script>
+<script src="/js/view-home.js?v=10"></script>
 <script src="/js/seats-grid.js"></script>
 <script src="/js/view-select.js"></script>
 <script src="/js/share-card.js"></script>
 <script src="/js/view-reserve.js"></script>
 <script src="/js/auth.js"></script>
 <script src="/js/api-admin.js?v=3"></script>
-<script src="/js/view-panel.js?v=3"></script>
+<script src="/js/view-panel.js?v=4"></script>
 <script src="/js/view-panel-inicio.js?v=3"></script>
 <script src="/js/view-control.js"></script>
 <script src="/js/whatsapp-mode.js"></script>

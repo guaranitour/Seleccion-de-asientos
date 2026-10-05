@@ -78,6 +78,10 @@
   padding:5px 10px 5px 8px; border-radius:999px;
 }
 .home-chip.open{ background:#d1fae5; color:#065f46; box-shadow:inset 3px 0 0 #10b981; }
+.home-chip.info{ background:#dcfce7; color:#047857; box-shadow:inset 3px 0 0 #22c55e; text-decoration:none; }
+.home-chip.info:hover{ background:#bbf7d0; }
+.home-trips .trip-card.event{ border-left-color:#a855f7; }
+.trip-pill.evento{ background:#f3e8ff; color:#6b21a8; }
 .home-chip.soon{ background:#f3f4f6; color:#4b5563; box-shadow:inset 3px 0 0 #9ca3af; }
 .home-empty{ padding:22px 18px; text-align:center; color:var(--muted); font-size:.92rem; }
 
