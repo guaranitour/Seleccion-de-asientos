@@ -95,10 +95,31 @@
   aspect-ratio:16/9; max-width:100%; display:flex; align-items:flex-end; padding:12px;
   background:linear-gradient(135deg,#2c7be5,#24479a) center/cover no-repeat;
 }
-.home-dest-img span{ font-size:.7rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#fff; background:rgba(17,24,39,.45); padding:4px 8px; border-radius:999px; }
+.home-dest-pills{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.home-dest-pills span{
+  display:inline-flex; align-items:center; gap:5px; color:#fff; border-radius:999px;
+  background:rgba(17,24,39,.5); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+}
+.home-dest-pais{ font-size:.7rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; padding:4px 9px; }
+.home-dest-fecha{ font-size:.68rem; font-weight:600; padding:3px 8px 3px 7px; background:rgba(255,255,255,.9) !important; color:#1f2937 !important; }
+.home-dest-fecha svg{ width:11px; height:11px; flex-shrink:0; color:var(--primary); }
 .home-dest-body{ padding:14px 16px 16px; display:flex; flex-direction:column; gap:8px; flex:1; }
 .home-dest-body h3{ margin:0; font-size:1.05rem; font-weight:800; }
 .home-dest-body p{ margin:0; font-size:.88rem; color:var(--muted); line-height:1.45; }
+.home-dest-foot{
+  display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:10px 12px;
+  margin-top:auto; padding-top:12px; border-top:1px solid rgba(17,24,39,.08);
+}
+.home-tags + .home-dest-foot{ margin-top:6px; }
+.home-dest-precio{ display:flex; flex-direction:column; flex:1 1 auto; min-width:0; line-height:1.15; }
+.home-dest-precio small{ font-size:.68rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+.home-dest-precio b{ font-size:clamp(1.02rem, 4.4vw, 1.18rem); font-weight:800; color:#24479a; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.home-dest-precio span{ font-size:.74rem; color:var(--muted); margin-top:1px; }
+.home-dest-cta{
+  flex-shrink:0; margin-left:auto; display:inline-flex; align-items:center; min-height:36px; padding:0 13px;
+  border-radius:999px; background:#111827; color:#fff; font-size:.8rem; font-weight:700; text-decoration:none;
+}
+.home-dest-cta:hover{ background:#1f2937; }
 .home-tags{ display:flex; flex-wrap:wrap; gap:6px; margin-top:auto; padding-top:4px; }
 .home-tags span{ font-size:.72rem; font-weight:700; padding:3px 8px; border-radius:999px; background:#f3f4f6; color:#4b5563; }
 @media (min-width:620px){ .home-dest-scroll{ grid-auto-columns:minmax(260px,46%); } }

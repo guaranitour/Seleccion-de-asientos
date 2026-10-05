@@ -212,6 +212,18 @@ document.addEventListener('DOMContentLoaded', () => {
   if (el) el.textContent = getGreeting();
 });
 
+// ── Precio con su moneda: 450000 PYG → "Gs. 450.000"; 350 USD → "US$ 350" ──
+const _MONEDAS = { PYG: 'Gs.', USD: 'US$', BRL: 'R$', ARS: 'AR$' };
+function formatPrecio(monto, moneda) {
+  if (monto === null || monto === undefined || monto === '') return '';
+  const n = Number(monto);
+  if (!Number.isFinite(n)) return '';
+  const decimales = (moneda && moneda !== 'PYG' && n % 1 !== 0) ? 2 : 0;
+  const num = n.toLocaleString('es-PY', { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
+  return (_MONEDAS[moneda] || _MONEDAS.PYG) + '\u00a0' + num;
+}
+
+window.formatPrecio = formatPrecio;
 window.getGreeting = getGreeting;
 window.showView = showView;
 window.toast = toast;

@@ -170,3 +170,18 @@ alter table reservas.inicio_equipo add column if not exists email text;
 
 -- 6) 2026-10-05 (agregado): TikTok en los datos de contacto ----------------------
 alter table reservas.inicio_config add column if not exists tiktok text;
+
+-- 7) 2026-10-05 (agregado): fecha y precio base de cada destino -----------------
+alter table reservas.inicio_destinos
+  add column if not exists fecha_texto text,
+  add column if not exists precio_desde numeric(12,2),
+  add column if not exists precio_moneda text not null default 'PYG',
+  add column if not exists precio_nota text;
+
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conrelid = 'reservas.inicio_destinos'::regclass and conname = 'inicio_destinos_precio_check') then
+    alter table reservas.inicio_destinos add constraint inicio_destinos_precio_check
+      check ((precio_desde is null or precio_desde >= 0) and precio_moneda in ('PYG', 'USD', 'BRL', 'ARS'));
+  end if;
+end $$;

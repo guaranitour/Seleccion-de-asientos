@@ -78,9 +78,14 @@ const PI_SECCIONES = {
       { k: 'pais', label: 'País', max: 40, placeholder: 'Ej.: Paraguay' },
       { k: 'descripcion', label: 'Descripción breve', type: 'textarea', max: 220 },
       { k: 'imagen_url', label: 'Foto', type: 'image', carpeta: 'destinos', hint: 'Horizontal, sin texto encima, con el motivo principal al centro.' },
-      { k: 'etiquetas', label: 'Etiquetas', type: 'tags', hint: 'Separadas por coma, ej.: Fin de semana, Playa' }
+      { k: 'etiquetas', label: 'Etiquetas', type: 'tags', hint: 'Separadas por coma, ej.: Fin de semana, Playa' },
+      { k: 'fecha_texto', label: 'Fecha (opcional)', max: 40, placeholder: 'Ej.: 24 al 26 de octubre', hint: 'Se muestra sobre la foto, junto al país.' },
+      { k: 'precio_desde', label: 'Precio base (opcional)', type: 'number', placeholder: 'Ej.: 450000', hint: 'Solo el número, sin puntos. Se muestra como "Desde Gs. 450.000".' },
+      { k: 'precio_moneda', label: 'Moneda', type: 'select', opciones: [['PYG', 'Guaraníes (Gs.)'], ['USD', 'Dólares (US$)'], ['BRL', 'Reales (R$)'], ['ARS', 'Pesos argentinos (AR$)']] },
+      { k: 'precio_nota', label: 'Aclaración del precio (opcional)', max: 40, placeholder: 'Ej.: por persona' }
     ],
-    resumen: r => [r.pais, (r.etiquetas || []).join(' · ')].filter(Boolean).join(' — ')
+    resumen: r => [r.pais, r.fecha_texto, r.precio_desde != null ? 'Desde ' + formatPrecio(r.precio_desde, r.precio_moneda) : '']
+      .filter(Boolean).join(' · ')
   },
   contacto: {
     tab: 'Contacto',
@@ -362,6 +367,16 @@ function _piBuildForm(campos, valores) {
       inp.id = id; inp.type = 'datetime-local'; inp.value = _piIsoALocal(v);
       field.appendChild(inp);
       leer = () => (inp.value ? new Date(inp.value).toISOString() : null);
+    } else if (c.type === 'number') {
+      const inp = document.createElement('input');
+      inp.id = id; inp.type = 'text'; inp.inputMode = 'numeric';
+      inp.value = (v === null || v === undefined) ? '' : String(Math.round(Number(v)));
+      if (c.placeholder) inp.placeholder = c.placeholder;
+      field.appendChild(inp);
+      leer = () => {
+        const n = inp.value.replace(/\D/g, '');
+        return n ? Number(n) : null;
+      };
     } else if (c.type === 'tags') {
       const inp = document.createElement('input');
       inp.id = id; inp.type = 'text'; inp.value = Array.isArray(v) ? v.join(', ') : '';

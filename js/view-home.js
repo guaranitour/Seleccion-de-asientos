@@ -43,7 +43,10 @@ function _homeMapContenido(db) {
     nosotros: cfg.nosotros || '',
     avisos: db.avisos || [],
     equipo: (db.equipo || []).map(m => ({ nombre: m.nombre, cargo: m.cargo, descripcion: m.descripcion, foto: m.foto_url, whatsapp: m.whatsapp, email: m.email })),
-    destinos: (db.destinos || []).map(d => ({ nombre: d.nombre, pais: d.pais, descripcion: d.descripcion, imagen: d.imagen_url, etiquetas: d.etiquetas || [] })),
+    destinos: (db.destinos || []).map(d => ({
+      nombre: d.nombre, pais: d.pais, descripcion: d.descripcion, imagen: d.imagen_url, etiquetas: d.etiquetas || [],
+      fecha: d.fecha_texto, precio: d.precio_desde, moneda: d.precio_moneda, precioNota: d.precio_nota
+    })),
     faq: (db.faq || []).map(f => ({ pregunta: f.titulo, respuesta: f.cuerpo }))
   };
 }
@@ -127,7 +130,18 @@ function _renderHomeDestinos(destinos) {
     const card = _homeEl('article', 'home-dest home-glass');
     const img = _homeEl('div', 'home-dest-img');
     if (d.imagen) img.style.backgroundImage = `url("${encodeURI(d.imagen)}")`;
-    if (d.pais) img.appendChild(_homeEl('span', '', d.pais));
+    // País y fecha: dos píldoras sobre la foto; la fecha, un poco más discreta.
+    if (d.pais || d.fecha) {
+      const pills = _homeEl('div', 'home-dest-pills');
+      if (d.pais) pills.appendChild(_homeEl('span', 'home-dest-pais', d.pais));
+      if (d.fecha) {
+        const f = _homeEl('span', 'home-dest-fecha');
+        f.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>';
+        f.appendChild(document.createTextNode(d.fecha));
+        pills.appendChild(f);
+      }
+      img.appendChild(pills);
+    }
     const body = _homeEl('div', 'home-dest-body');
     body.appendChild(_homeEl('h3', '', d.nombre));
     if (d.descripcion) body.appendChild(_homeEl('p', '', d.descripcion));
@@ -135,6 +149,26 @@ function _renderHomeDestinos(destinos) {
       const tags = _homeEl('div', 'home-tags');
       d.etiquetas.forEach(t => tags.appendChild(_homeEl('span', '', t)));
       body.appendChild(tags);
+    }
+    // Precio base al pie de la tarjeta, con un acceso a consultar por WhatsApp.
+    const precio = formatPrecio(d.precio, d.moneda);
+    const waDest = _homeWhatsappUrl(_homeContenido.whatsapp, 'Hola! Me gustaría recibir más info sobre ' + d.nombre + '.');
+    if (precio || waDest) {
+      const foot = _homeEl('div', 'home-dest-foot');
+      if (precio) {
+        const pr = _homeEl('div', 'home-dest-precio');
+        pr.appendChild(_homeEl('small', '', 'Desde'));
+        pr.appendChild(_homeEl('b', '', precio));
+        if (d.precioNota) pr.appendChild(_homeEl('span', '', d.precioNota));
+        foot.appendChild(pr);
+      }
+      if (waDest) {
+        const a = _homeEl('a', 'home-dest-cta', 'Consultar');
+        a.href = waDest; a.target = '_blank'; a.rel = 'noopener';
+        a.setAttribute('aria-label', 'Consultar por WhatsApp sobre ' + d.nombre);
+        foot.appendChild(a);
+      }
+      body.appendChild(foot);
     }
     card.appendChild(img);
     card.appendChild(body);
