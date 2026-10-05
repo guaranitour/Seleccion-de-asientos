@@ -312,6 +312,9 @@ function _renderHomeContacto(c) {
 }
 
 // ── Próxima salida (portada) ──
+const _HOME_ICONO_BUS = '<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 11h18M8 6V4M16 6V4"/><circle cx="7.5" cy="19" r="1.5"/><circle cx="16.5" cy="19" r="1.5"/></svg>';
+const _HOME_ICONO_EVENTO = '<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/><path d="m12 13 1.1 2.2 2.4.3-1.8 1.7.5 2.3-2.2-1.2-2.2 1.2.5-2.3-1.8-1.7 2.4-.3Z"/></svg>';
+
 function _renderHomeNext(viaje) {
   const box = document.getElementById('homeNext');
   if (_homeCountdownTimer) { clearInterval(_homeCountdownTimer); _homeCountdownTimer = null; }
@@ -319,6 +322,10 @@ function _renderHomeNext(viaje) {
   if (!viaje) return;
 
   document.getElementById('homeNextName').textContent = viaje.nombre;
+  const icono = box.querySelector('.home-next-icon');
+  if (icono) icono.innerHTML = viaje.tipo === 'evento' ? _HOME_ICONO_EVENTO : _HOME_ICONO_BUS;
+  const label = box.querySelector('.home-next-label');
+  if (label) label.textContent = viaje.tipo === 'evento' ? 'Próximo evento' : 'Próxima salida';
 
   const target = new Date(viaje.start_at).getTime();
   const pad = n => String(n).padStart(2, '0');
@@ -347,10 +354,11 @@ function _renderHomeTrips(viajes) {
   }
 
   viajes.forEach(v => {
+    const esEvento = v.tipo === 'evento';
     const isDouble = v.tipo === 'doble_piso';
-    const abierta = !!v.activo;
+    const abierta = !!v.activo && !esEvento;
 
-    const card = _homeEl('div', 'trip-card ' + (isDouble ? 'double-floor' : 'single-floor') + (abierta ? '' : ' closed'));
+    const card = _homeEl('div', 'trip-card ' + (esEvento ? 'event' : (isDouble ? 'double-floor' : 'single-floor')) + (abierta ? '' : ' closed'));
     const foto = v.destino && v.destino.imagen_url;
     if (foto) {
       card.classList.add('has-photo');
@@ -365,7 +373,8 @@ function _renderHomeTrips(viajes) {
     nameWrap.appendChild(_homeEl('h3', '', v.nombre));
     left.appendChild(nameWrap);
     const right = _homeEl('div', 'trip-head-right');
-    right.appendChild(_homeEl('span', 'trip-pill' + (isDouble ? ' doble' : ''), isDouble ? 'Doble piso' : 'Convencional'));
+    if (esEvento) right.appendChild(_homeEl('span', 'trip-pill evento', 'Evento'));
+    else right.appendChild(_homeEl('span', 'trip-pill' + (isDouble ? ' doble' : ''), isDouble ? 'Doble piso' : 'Convencional'));
     head.appendChild(left);
     head.appendChild(right);
     card.appendChild(head);
@@ -377,8 +386,18 @@ function _renderHomeTrips(viajes) {
       cd.dataset.startAt = v.start_at;
       meta.appendChild(cd);
     }
-    meta.appendChild(_homeEl('span', 'home-chip ' + (abierta ? 'open' : 'soon'),
-      abierta ? 'Elegí tu asiento' : 'Selección de asientos próximamente'));
+    if (esEvento) {
+      // Sin bus ni asientos: en vez del estado de la selección, un acceso a WhatsApp.
+      const waEvento = _homeWhatsappUrl(_homeContenido.whatsapp, 'Hola! Me gustaría recibir más info sobre ' + v.nombre + '.');
+      if (waEvento) {
+        const a = _homeEl('a', 'home-chip info', 'Más info por WhatsApp');
+        a.href = waEvento; a.target = '_blank'; a.rel = 'noopener';
+        meta.appendChild(a);
+      }
+    } else {
+      meta.appendChild(_homeEl('span', 'home-chip ' + (abierta ? 'open' : 'soon'),
+        abierta ? 'Elegí tu asiento' : 'Selección de asientos próximamente'));
+    }
     card.appendChild(meta);
 
     if (abierta) {

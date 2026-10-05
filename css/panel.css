@@ -317,3 +317,11 @@ main:has(#view-passenger-list.active) ~ .staff-entry{
 .pi-horario-row{ display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) auto; gap:6px; align-items:center; }
 .pi-horario-row input{ padding:10px; font-size:.92rem; }
 .pi-horario-add{ align-self:flex-start; padding:8px 12px; font-size:.85rem; }
+
+/* Evento o fiesta sin bus */
+.panel-trip-card.evento{ border-left-color:#a855f7; }
+.panel-trip-card.evento .panel-trip-icon{
+  background:linear-gradient(145deg, #faf5ff, #f3e8ff); color:#7e22ce;
+  box-shadow:0 3px 10px rgba(126,34,206,.16), inset 0 1px 0 rgba(255,255,255,.6);
+}
+.vis-check[hidden]{ display:none; }

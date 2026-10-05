@@ -137,15 +137,18 @@ function _renderPanelStats(viajes) {
 function _buildPanelTripCard(viaje) {
   const card = document.createElement('div');
   const esDoble = viaje.tipo === 'doble_piso';
+  const esEvento = viaje.tipo === 'evento';
   const visible = _viajeVisible(viaje);
-  card.className = 'panel-trip-card' + (esDoble ? ' doble-piso' : '') + (visible ? '' : ' inactive');
+  card.className = 'panel-trip-card' + (esDoble ? ' doble-piso' : '') + (esEvento ? ' evento' : '') + (visible ? '' : ' inactive');
 
   const plantasLabel = viaje.plantas.map(p => p.etiqueta).join(' / ');
   const fechaLabel = viaje.start_at
     ? new Date(viaje.start_at).toLocaleString('es-PY', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
     : null;
 
-  const busIconPaths = esDoble
+  const busIconPaths = esEvento
+    ? '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/><path d="m12 13 1.1 2.2 2.4.3-1.8 1.7.5 2.3-2.2-1.2-2.2 1.2.5-2.3-1.8-1.7 2.4-.3Z"/>'
+    : esDoble
     ? '<path d="M4 17h1a2 2 0 0 0 4 0h6a2 2 0 0 0 4 0h1"/><path d="M4 17V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v11"/><path d="M4 11h16"/>'
     : '<path d="M4 17h1a2 2 0 0 0 4 0h6a2 2 0 0 0 4 0h1"/><path d="M18 17H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h9l3 5v5a2 2 0 0 1-2 2Z"/>';
 
@@ -157,7 +160,7 @@ function _buildPanelTripCard(viaje) {
       <div class="panel-trip-info">
         <div class="panel-trip-name">${viaje.nombre}</div>
         <div class="panel-trip-meta">
-          <span>${esDoble ? 'Doble piso' : 'Convencional'} — ${plantasLabel}</span>
+          <span>${esEvento ? 'Evento (sin bus)' : (esDoble ? 'Doble piso' : 'Convencional') + ' — ' + plantasLabel}</span>
           ${fechaLabel ? `<span class="dot-sep">${fechaLabel}</span>` : ''}
         </div>
       </div>
@@ -174,7 +177,7 @@ function _buildPanelTripCard(viaje) {
     on: !!viaje.publicado_inicio,
     onToggle: () => setPanelViajeVisibilidad(viaje.id, { publicadoInicio: !viaje.publicado_inicio })
   }));
-  vis.appendChild(_buildVisSwitch({
+  if (!esEvento) vis.appendChild(_buildVisSwitch({
     label: 'Selección de asientos',
     hint: viaje.activo ? 'Habilitada: se pueden elegir asientos' : 'Cerrada',
     on: !!viaje.activo,
@@ -209,29 +212,32 @@ function _buildPanelTripCard(viaje) {
 
   const actions = card.querySelector('.panel-trip-actions');
 
-  // Acción principal: la más usada día a día, con presencia visual propia.
-  const controlBtn = document.createElement('button');
-  controlBtn.className = 'btn primary btn-icon btn-primary-action';
-  controlBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Ver ocupación';
-  controlBtn.onclick = () => goControl(viaje);
-  actions.appendChild(controlBtn);
+  // Eventos sin bus: no tienen croquis, ocupación ni lista de pasajeros.
+  if (!esEvento) {
+    // Acción principal: la más usada día a día, con presencia visual propia.
+    const controlBtn = document.createElement('button');
+    controlBtn.className = 'btn primary btn-icon btn-primary-action';
+    controlBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Ver ocupación';
+    controlBtn.onclick = () => goControl(viaje);
+    actions.appendChild(controlBtn);
 
-  const paxBtn = document.createElement('button');
-  paxBtn.className = 'btn ghost icon-only';
-  paxBtn.title = 'Lista de pasajeros';
-  paxBtn.setAttribute('aria-label', 'Lista de pasajeros');
-  paxBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
-  paxBtn.onclick = () => goPassengerList(viaje);
-  actions.appendChild(paxBtn);
+    const paxBtn = document.createElement('button');
+    paxBtn.className = 'btn ghost icon-only';
+    paxBtn.title = 'Lista de pasajeros';
+    paxBtn.setAttribute('aria-label', 'Lista de pasajeros');
+    paxBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+    paxBtn.onclick = () => goPassengerList(viaje);
+    actions.appendChild(paxBtn);
 
-  if (Auth.isAdmin()) {
-    const editBtn = document.createElement('button');
-    editBtn.className = 'btn ghost icon-only';
-    editBtn.title = 'Editar estructura';
-    editBtn.setAttribute('aria-label', 'Editar estructura');
-    editBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>';
-    editBtn.onclick = () => goEditor(viaje);
-    actions.appendChild(editBtn);
+    if (Auth.isAdmin()) {
+      const editBtn = document.createElement('button');
+      editBtn.className = 'btn ghost icon-only';
+      editBtn.title = 'Editar estructura';
+      editBtn.setAttribute('aria-label', 'Editar estructura');
+      editBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>';
+      editBtn.onclick = () => goEditor(viaje);
+      actions.appendChild(editBtn);
+    }
   }
 
   return card;
@@ -300,10 +306,14 @@ function openCreateTripForm() {
 function updateTripRowsHint() {
   const tipo = document.getElementById('newTripType').value;
   const hint = document.getElementById('tripRowsHint');
+  const selRow = document.getElementById('newTripSeleccionRow');
+  if (selRow) selRow.hidden = tipo === 'evento';
   if (!hint) return;
-  hint.textContent = tipo === 'doble_piso'
-    ? 'Se crearán 10 filas en planta alta (40 asientos) y 5 en planta baja (20 asientos).'
-    : 'Se crearán 11 filas (44 asientos).';
+  hint.textContent = tipo === 'evento'
+    ? 'Sin bus ni asientos: aparece en el inicio, pero no en Selección de asientos.'
+    : tipo === 'doble_piso'
+      ? 'Se crearán 10 filas en planta alta (40 asientos) y 5 en planta baja (20 asientos).'
+      : 'Se crearán 11 filas (44 asientos).';
 }
 
 async function submitCreateTrip(ev) {
@@ -312,7 +322,7 @@ async function submitCreateTrip(ev) {
   const tipo = document.getElementById('newTripType').value;
   const fecha = document.getElementById('newTripDate').value;
   const publicadoInicio = document.getElementById('newTripPublicado').checked;
-  const seleccionHabilitada = document.getElementById('newTripSeleccion').checked;
+  const seleccionHabilitada = tipo !== 'evento' && document.getElementById('newTripSeleccion').checked;
 
   if (!nombre) {
     toast('Completá el nombre del viaje');
