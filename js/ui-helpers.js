@@ -223,6 +223,14 @@ function formatPrecio(monto, moneda) {
   return (_MONEDAS[moneda] || _MONEDAS.PYG) + '\u00a0' + num;
 }
 
+// ── Fecha 'AAAA-MM-DD' (columna date) → 'DD/MM/AAAA', sin pasar por Date
+//    para que la zona horaria no la corra un día. ──
+function formatFechaCorta(iso) {
+  const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : '';
+}
+
+window.formatFechaCorta = formatFechaCorta;
 window.formatPrecio = formatPrecio;
 window.getGreeting = getGreeting;
 window.showView = showView;

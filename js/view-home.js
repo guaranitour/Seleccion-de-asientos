@@ -45,7 +45,7 @@ function _homeMapContenido(db) {
     equipo: (db.equipo || []).map(m => ({ nombre: m.nombre, cargo: m.cargo, descripcion: m.descripcion, foto: m.foto_url, whatsapp: m.whatsapp, email: m.email })),
     destinos: (db.destinos || []).map(d => ({
       nombre: d.nombre, pais: d.pais, descripcion: d.descripcion, imagen: d.imagen_url, etiquetas: d.etiquetas || [],
-      fecha: d.fecha_texto, precio: d.precio_desde, moneda: d.precio_moneda, precioNota: d.precio_nota
+      fecha: formatFechaCorta(d.fecha), precio: d.precio_desde, moneda: d.precio_moneda, precioNota: d.precio_nota
     })),
     faq: (db.faq || []).map(f => ({ pregunta: f.titulo, respuesta: f.cuerpo }))
   };

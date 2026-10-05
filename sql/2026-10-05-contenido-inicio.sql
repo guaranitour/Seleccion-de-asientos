@@ -185,3 +185,13 @@ begin
       check ((precio_desde is null or precio_desde >= 0) and precio_moneda in ('PYG', 'USD', 'BRL', 'ARS'));
   end if;
 end $$;
+
+-- 8) 2026-10-05 (agregado): la fecha del destino pasa a ser una fecha real
+--    (se muestra DD/MM/AAAA). La columna estaba vacía al convertirla.
+do $$
+begin
+  if exists (select 1 from information_schema.columns where table_schema = 'reservas' and table_name = 'inicio_destinos' and column_name = 'fecha_texto') then
+    alter table reservas.inicio_destinos alter column fecha_texto type date using null;
+    alter table reservas.inicio_destinos rename column fecha_texto to fecha;
+  end if;
+end $$;

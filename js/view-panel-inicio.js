@@ -79,12 +79,12 @@ const PI_SECCIONES = {
       { k: 'descripcion', label: 'Descripción breve', type: 'textarea', max: 220 },
       { k: 'imagen_url', label: 'Foto', type: 'image', carpeta: 'destinos', hint: 'Horizontal, sin texto encima, con el motivo principal al centro.' },
       { k: 'etiquetas', label: 'Etiquetas', type: 'tags', hint: 'Separadas por coma, ej.: Fin de semana, Playa' },
-      { k: 'fecha_texto', label: 'Fecha (opcional)', max: 40, placeholder: 'Ej.: 24 al 26 de octubre', hint: 'Se muestra sobre la foto, junto al país.' },
+      { k: 'fecha', label: 'Fecha (opcional)', type: 'date', hint: 'Se muestra sobre la foto, junto al país, como DD/MM/AAAA.' },
       { k: 'precio_desde', label: 'Precio base (opcional)', type: 'number', placeholder: 'Ej.: 450000', hint: 'Solo el número, sin puntos. Se muestra como "Desde Gs. 450.000".' },
       { k: 'precio_moneda', label: 'Moneda', type: 'select', opciones: [['PYG', 'Guaraníes (Gs.)'], ['USD', 'Dólares (US$)'], ['BRL', 'Reales (R$)'], ['ARS', 'Pesos argentinos (AR$)']] },
       { k: 'precio_nota', label: 'Aclaración del precio (opcional)', max: 40, placeholder: 'Ej.: por persona' }
     ],
-    resumen: r => [r.pais, r.fecha_texto, r.precio_desde != null ? 'Desde ' + formatPrecio(r.precio_desde, r.precio_moneda) : '']
+    resumen: r => [r.pais, formatFechaCorta(r.fecha), r.precio_desde != null ? 'Desde ' + formatPrecio(r.precio_desde, r.precio_moneda) : '']
       .filter(Boolean).join(' · ')
   },
   contacto: {
@@ -367,6 +367,11 @@ function _piBuildForm(campos, valores) {
       inp.id = id; inp.type = 'datetime-local'; inp.value = _piIsoALocal(v);
       field.appendChild(inp);
       leer = () => (inp.value ? new Date(inp.value).toISOString() : null);
+    } else if (c.type === 'date') {
+      const inp = document.createElement('input');
+      inp.id = id; inp.type = 'date'; inp.value = v ? String(v).slice(0, 10) : '';
+      field.appendChild(inp);
+      leer = () => inp.value || null;
     } else if (c.type === 'number') {
       const inp = document.createElement('input');
       inp.id = id; inp.type = 'text'; inp.inputMode = 'numeric';
