@@ -212,6 +212,26 @@ document.addEventListener('DOMContentLoaded', () => {
   if (el) el.textContent = getGreeting();
 });
 
+// ── Precio con su moneda: 450000 PYG → "Gs. 450.000"; 350 USD → "US$ 350" ──
+const _MONEDAS = { PYG: 'Gs.', USD: 'US$', BRL: 'R$', ARS: 'AR$' };
+function formatPrecio(monto, moneda) {
+  if (monto === null || monto === undefined || monto === '') return '';
+  const n = Number(monto);
+  if (!Number.isFinite(n)) return '';
+  const decimales = (moneda && moneda !== 'PYG' && n % 1 !== 0) ? 2 : 0;
+  const num = n.toLocaleString('es-PY', { minimumFractionDigits: decimales, maximumFractionDigits: decimales });
+  return (_MONEDAS[moneda] || _MONEDAS.PYG) + '\u00a0' + num;
+}
+
+// ── Fecha 'AAAA-MM-DD' (columna date) → 'DD/MM/AAAA', sin pasar por Date
+//    para que la zona horaria no la corra un día. ──
+function formatFechaCorta(iso) {
+  const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : '';
+}
+
+window.formatFechaCorta = formatFechaCorta;
+window.formatPrecio = formatPrecio;
 window.getGreeting = getGreeting;
 window.showView = showView;
 window.toast = toast;
