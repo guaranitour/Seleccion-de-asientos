@@ -51,6 +51,8 @@ function _homeMapContenido(db) {
 async function renderHome() {
   const greet = document.getElementById('homeGreeting');
   if (greet) greet.textContent = getGreeting();
+  const year = document.getElementById('homeFooterYear');
+  if (year) year.textContent = new Date().getFullYear();
 
   showLoading('Cargando…');
   let viajes = [];

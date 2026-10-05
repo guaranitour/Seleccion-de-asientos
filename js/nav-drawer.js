@@ -44,9 +44,9 @@ function syncNavDrawerCurrent(viewId) {
   });
 }
 
-/** Muestra en el menú solo las secciones del inicio que tienen contenido. */
+/** Muestra en el menú (y en el pie del inicio) solo las secciones que tienen contenido. */
 function syncNavDrawerSections() {
-  document.querySelectorAll('#navDrawer .nav-drawer-item[data-section]').forEach(btn => {
+  document.querySelectorAll('#navDrawer .nav-drawer-item[data-section], #homeFooter [data-section]').forEach(btn => {
     const sec = document.getElementById(btn.dataset.section);
     btn.hidden = !sec || sec.hidden;
   });
