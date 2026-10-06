@@ -264,7 +264,10 @@ function _renderHomeNosotros(texto, equipo) {
     if (m.cargo) card.appendChild(_homeEl('div', 'home-role', m.cargo));
     card.appendChild(_homeEl('h3', '', m.nombre));
     if (m.descripcion) card.appendChild(_homeEl('p', '', m.descripcion));
-    const wa = _homeWhatsappUrl(m.whatsapp);
+    // Mensaje ya escrito, saludando por el nombre: "Hola Ana! Me gustaría…"
+    const primerNombre = String(m.nombre || '').trim().split(/\s+/)[0] || '';
+    const wa = _homeWhatsappUrl(m.whatsapp,
+      'Hola' + (primerNombre ? ' ' + primerNombre : '') + '! Me gustaría recibir más info sobre un destino.');
     if (wa || m.email) {
       const links = _homeEl('div', 'home-member-links');
       // El correo se muestra completo, en una sola línea (luce el dominio).
