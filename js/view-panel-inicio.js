@@ -13,7 +13,7 @@ const PI_SECCIONES = {
       { k: 'portada_titulo', label: 'Título de la portada', req: true, max: 90 },
       { k: 'portada_texto', label: 'Texto debajo del título', type: 'textarea', max: 220 },
       { k: 'portada_imagen_url', label: 'Foto de la portada', type: 'image', carpeta: 'portada', hint: 'Horizontal, sin texto encima. Si no cargás una, se muestra la ilustración.' },
-      { k: 'nosotros', label: 'Quiénes somos', type: 'textarea', rows: 5, hint: 'Párrafo breve sobre la empresa. Vacío = no se muestra.' }
+      { k: 'nosotros', label: 'Quiénes somos', type: 'textarea', rows: 5, max: 400, hint: 'La primera oración se muestra destacada: que sea corta y diga quiénes son. Lo ideal: 2 o 3 oraciones en total. Vacío = no se muestra.' }
     ]
   },
   avisos: {

@@ -176,6 +176,68 @@ function _renderHomeDestinos(destinos) {
   });
 }
 
+/**
+ * "Quiénes somos": la primera oración va como frase destacada y el resto
+ * como texto secundario; si es largo, se recorta con "Leer más". El nombre
+ * de la marca escrito en mayúsculas se muestra como "Destino Guaraní".
+ */
+function _renderHomeAbout(texto) {
+  const lead = document.getElementById('homeAboutLead');
+  const body = document.getElementById('homeAboutBody');
+  const more = document.getElementById('homeAboutMore');
+  const limpio = String(texto || '').trim();
+
+  const m = limpio.match(/^([\s\S]+?[.!?])\s+([\s\S]+)$/);
+  let primera = m ? m[1] : limpio;
+  let resto = m ? m[2] : '';
+  // Una primera oración muy larga no funciona como destacado: va todo como cuerpo.
+  if (primera.length > 140) { resto = limpio; primera = ''; }
+
+  const conMarca = (el, txt) => {
+    el.textContent = '';
+    txt.split(/(destino\s+guaran[ií])/i).forEach((parte, i) => {
+      if (i % 2) el.appendChild(_homeEl('strong', 'home-about-brand', 'Destino Guaraní'));
+      else if (parte) el.appendChild(document.createTextNode(parte));
+    });
+  };
+  conMarca(lead, primera);
+  conMarca(body, resto);
+  lead.hidden = !primera;
+  body.hidden = !resto;
+
+  // "Leer más" solo si el cuerpo pasa de 3 líneas. Se mide cuando la tarjeta
+  // ya es visible (al primer render la vista todavía está oculta).
+  _homeAboutAbierto = false;
+  more.setAttribute('aria-expanded', 'false');
+  more.textContent = 'Leer más';
+  more.onclick = () => {
+    _homeAboutAbierto = !_homeAboutAbierto;
+    body.classList.toggle('clamped', !_homeAboutAbierto);
+    more.setAttribute('aria-expanded', String(_homeAboutAbierto));
+    more.textContent = _homeAboutAbierto ? 'Leer menos' : 'Leer más';
+  };
+  _homeMedirAbout();
+}
+
+let _homeAboutAbierto = false;
+function _homeMedirAbout() {
+  const body = document.getElementById('homeAboutBody');
+  const more = document.getElementById('homeAboutMore');
+  if (!body || body.hidden || _homeAboutAbierto || !body.offsetParent) return;
+  body.classList.add('clamped');
+  const corta = body.scrollHeight > body.clientHeight + 2;
+  body.classList.toggle('clamped', corta);
+  more.hidden = !corta;
+}
+
+if (typeof ResizeObserver === 'function') {
+  const _homeAboutObserver = new ResizeObserver(() => requestAnimationFrame(_homeMedirAbout));
+  document.addEventListener('DOMContentLoaded', () => {
+    const about = document.getElementById('homeAbout');
+    if (about) _homeAboutObserver.observe(about);
+  });
+}
+
 function _renderHomeNosotros(texto, equipo) {
   const sec = document.getElementById('homeNosotros');
   const about = document.getElementById('homeAbout');
@@ -183,10 +245,11 @@ function _renderHomeNosotros(texto, equipo) {
   sec.hidden = !texto && !equipo.length;
 
   about.hidden = !texto;
-  about.querySelector('p').textContent = texto;
+  _renderHomeAbout(texto);
 
   team.innerHTML = '';
   team.hidden = !equipo.length;
+  document.getElementById('homeTeamLabel').hidden = !equipo.length || !texto;
   equipo.forEach(m => {
     const card = _homeEl('article', 'home-member home-glass');
     const av = _homeEl('div', 'home-avatar');

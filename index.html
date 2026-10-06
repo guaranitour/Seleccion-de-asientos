@@ -29,7 +29,7 @@
 
 <link href="/css/base.css?v=2" rel="stylesheet"/>
 <link href="/css/home.css" rel="stylesheet"/>
-<link href="/css/inicio.css?v=12" rel="stylesheet"/>
+<link href="/css/inicio.css?v=14" rel="stylesheet"/>
 <link href="/css/croquis.css" rel="stylesheet"/>
 <link href="/css/reserve.css" rel="stylesheet"/>
 <link href="/css/panel.css?v=4" rel="stylesheet"/>
@@ -177,7 +177,13 @@
 
         <section aria-labelledby="homeNosotrosTitle" class="home-section" hidden id="homeNosotros">
           <div><p class="home-eyebrow">Quiénes somos</p><h2 class="home-title" id="homeNosotrosTitle">Un equipo que viaja con vos</h2></div>
-          <div class="home-about home-glass" id="homeAbout"><p></p></div>
+          <div class="home-about home-glass" id="homeAbout">
+            <img alt="" aria-hidden="true" class="home-about-mark" src="/logo-watermark.png" width="40" height="36">
+            <p class="home-about-lead" id="homeAboutLead"></p>
+            <p class="home-about-body" id="homeAboutBody"></p>
+            <button class="home-about-more" hidden id="homeAboutMore" type="button" aria-expanded="false" aria-controls="homeAboutBody">Leer más</button>
+          </div>
+          <p class="home-team-label" hidden id="homeTeamLabel">Nuestro equipo</p>
           <div class="home-team" id="homeTeam"></div>
         </section>
 
@@ -749,7 +755,7 @@
 <script src="/js/router.js?v=3"></script>
 <script src="/js/view-bases.js"></script>
 <script src="/js/view-choose.js"></script>
-<script src="/js/view-home.js?v=13"></script>
+<script src="/js/view-home.js?v=14"></script>
 <script src="/js/seats-grid.js"></script>
 <script src="/js/view-select.js"></script>
 <script src="/js/share-card.js"></script>
@@ -757,7 +763,7 @@
 <script src="/js/auth.js"></script>
 <script src="/js/api-admin.js?v=3"></script>
 <script src="/js/view-panel.js?v=4"></script>
-<script src="/js/view-panel-inicio.js?v=5"></script>
+<script src="/js/view-panel-inicio.js?v=6"></script>
 <script src="/js/view-control.js"></script>
 <script src="/js/whatsapp-mode.js"></script>
 <script src="/js/view-editor.js"></script>
