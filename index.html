@@ -28,7 +28,7 @@
 <meta name="twitter:image" content="https://www.guaranitour.com/inicio-preview.jpg">
 
 <link href="/css/base.css?v=2" rel="stylesheet"/>
-<link href="/css/home.css" rel="stylesheet"/>
+<link href="/css/home.css?v=3" rel="stylesheet"/>
 <link href="/css/inicio.css?v=14" rel="stylesheet"/>
 <link href="/css/croquis.css" rel="stylesheet"/>
 <link href="/css/reserve.css" rel="stylesheet"/>
@@ -214,24 +214,26 @@
   </section>
 
   <!-- Elegir viaje -->
-  <section aria-label="Elegí tu viaje" class="view" id="view-choose">
-    <div class="home-center" style="align-items:start;">
-      <div style="max-width:680px; margin:0 auto; width:100%;">
-        <div class="trip-hero-card" id="tripHeroCard">
-          <p class="hello-greeting" id="helloGreeting">Hola</p>
-          <h2 class="view-title hero-title">Elegí tu viaje</h2>
-          <p class="trip-list-subtitle">Seleccioná el viaje activo para reservar tu asiento.</p>
-        </div>
-        <div class="trip-list" id="tripList"></div>
-        <a class="byc-banner" href="#" onclick="goBases(); return false;">
-          ¿Aún no aceptaste las Bases y Condiciones?<br>
-          <svg aria-hidden="true" class="byc-banner-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/>
-            <line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/>
-          </svg>
-          ¡Hacelo acá!
-        </a>
-      </div>
+  <section aria-label="Elegí tu asiento" class="view" id="view-choose">
+    <div class="rv-wrap">
+      <header class="rv-head">
+        <p class="hello-greeting" id="helloGreeting">Hola</p>
+        <h2 class="rv-title">Elegí tu asiento</h2>
+        <p class="rv-sub">Buscá tu salida y reservá el lugar que más te guste. Los asientos se actualizan en tiempo real.</p>
+      </header>
+
+      <div class="rv-list" id="tripList"></div>
+
+      <!-- Recordatorio discreto: la mayoría ya aceptó las bases al llegar acá -->
+      <a class="rv-byc" href="#" onclick="goBases(); return false;">
+        <span aria-hidden="true" class="rv-byc-ic"><svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="m9 15 2 2 4-4"/></svg></span>
+        <span class="rv-byc-txt">¿Todavía no aceptaste las Bases y Condiciones?</span>
+        <span class="rv-byc-go">Aceptarlas →</span>
+      </a>
+
+      <p class="rv-help">¿No ves tu viaje? La selección se habilita días antes del viaje.<br>
+        <a hidden id="rvWhatsapp" rel="noopener" target="_blank">Escribinos por WhatsApp</a>
+      </p>
     </div>
   </section>
 
@@ -749,12 +751,12 @@
 <!-- Scripts (orden importa: dependencias primero) -->
 <script src="/js/supabase-client.js"></script>
 <script src="/js/state.js"></script>
-<script src="/js/api.js?v=4"></script>
-<script src="/js/ui-helpers.js?v=6"></script>
+<script src="/js/api.js?v=5"></script>
+<script src="/js/ui-helpers.js?v=7"></script>
 <script src="/js/nav-drawer.js?v=3"></script>
 <script src="/js/router.js?v=3"></script>
 <script src="/js/view-bases.js"></script>
-<script src="/js/view-choose.js"></script>
+<script src="/js/view-choose.js?v=2"></script>
 <script src="/js/view-home.js?v=15"></script>
 <script src="/js/seats-grid.js"></script>
 <script src="/js/view-select.js"></script>

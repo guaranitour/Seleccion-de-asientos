@@ -10,7 +10,7 @@ const Api = {
   async getViajes() {
     const { data, error } = await supabase
       .from('viajes')
-      .select('id, nombre, tipo, start_at, plantas(id, etiqueta, orden)')
+      .select('id, nombre, tipo, start_at, plantas(id, etiqueta, orden), destino:inicio_destinos(imagen_url)')
       .eq('activo', true)
       .neq('tipo', 'evento') // eventos/fiestas sin bus: no tienen asientos
       .order('start_at', { ascending: true, nullsFirst: false });
@@ -31,6 +31,13 @@ const Api = {
    * selección de asientos habilitada. "activo" = selección habilitada.
    * Se omiten los que ya salieron hace más de un día.
    */
+  /** Solo el WhatsApp de reservas (para el "Escribinos" de la lista de viajes). */
+  async getWhatsappReservas() {
+    const { data, error } = await supabase.from('inicio_config').select('whatsapp').eq('id', 1).maybeSingle();
+    if (error) throw error;
+    return (data && data.whatsapp) || '';
+  },
+
   async getViajesInicio() {
     const desde = new Date(Date.now() - 86400000).toISOString();
     const { data, error } = await supabase

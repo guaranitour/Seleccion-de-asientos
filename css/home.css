@@ -393,3 +393,74 @@
 .floor-sheet-option.selected{
   border-color: var(--primary); background: #eff6ff; color: var(--primary);
 }
+
+/* ============================================================
+   Elegí tu asiento (view-choose) — rediseño 2026-10
+   ============================================================ */
+.rv-wrap{ max-width:680px; margin:0 auto; width:100%; padding:0 16px 40px; display:flex; flex-direction:column; gap:16px; }
+.rv-head .hello-greeting{ margin-bottom:2px; }
+.rv-title{ margin:0; font-size:1.5rem; font-weight:800; line-height:1.2; letter-spacing:-.01em; color:var(--text); }
+.rv-sub{ margin:6px 0 0; font-size:.93rem; line-height:1.5; color:var(--muted); max-width:52ch; }
+
+.rv-list{ display:flex; flex-direction:column; gap:14px; }
+.rv-list .empty-state{ background:var(--card); border:1.5px solid rgba(17,24,39,.09); border-radius:20px; }
+
+.rv-trip{
+  background:var(--card-solid); border:1.5px solid rgba(17,24,39,.09); border-radius:20px;
+  overflow:hidden; box-shadow:var(--shadow); animation:cardIn .35s ease both;
+}
+.rv-photo{
+  position:relative; aspect-ratio:16/7; max-width:100%; cursor:pointer;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(255,255,255,.18) 0 18%, transparent 19% 30%, rgba(255,255,255,.12) 31% 32%, transparent 33%),
+    linear-gradient(135deg, #2c7be5, #24479a);
+}
+.rv-photo.doble:not(.has-img){
+  background:
+    radial-gradient(circle at 85% 20%, rgba(255,255,255,.18) 0 18%, transparent 19% 30%, rgba(255,255,255,.12) 31% 32%, transparent 33%),
+    linear-gradient(135deg, #6366f1, #24479a);
+}
+.rv-photo.has-img{ background-size:cover; background-position:center; }
+@media (min-width:620px){ .rv-photo{ aspect-ratio:16/5; } }
+.rv-photo::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(17,24,39,0) 40%, rgba(17,24,39,.45)); }
+.rv-type, .rv-countdown{
+  position:absolute; z-index:1; bottom:10px; display:inline-flex; align-items:center; gap:6px;
+  font-size:.72rem; font-weight:800; padding:5px 10px; border-radius:999px;
+}
+.rv-type{ left:12px; background:rgba(255,255,255,.92); color:#3730a3; letter-spacing:.02em; }
+.rv-type.doble{ color:#92400e; }
+.rv-type svg{ width:14px; height:14px; }
+.rv-countdown{ right:12px; background:rgba(17,24,39,.55); color:#fff; font-variant-numeric:tabular-nums; }
+
+.rv-body{ padding:14px 16px 16px; display:flex; flex-direction:column; gap:10px; }
+.rv-body h3{ margin:0; font-size:1.12rem; font-weight:800; line-height:1.3; text-wrap:balance; overflow-wrap:anywhere; }
+.rv-meta{ display:flex; flex-wrap:wrap; gap:6px 14px; font-size:.86rem; color:#374151; }
+.rv-meta span{ display:inline-flex; align-items:center; gap:6px; }
+.rv-meta svg{ width:16px; height:16px; color:var(--primary); flex-shrink:0; }
+.rv-cta{
+  display:flex; align-items:center; justify-content:center; gap:8px; min-height:50px; margin-top:2px;
+  border:0; border-radius:999px; background:#111827; color:#fff; font:inherit; font-size:.95rem; font-weight:700; cursor:pointer;
+  transition:background-color .15s ease, transform .12s ease;
+}
+.rv-cta:hover{ background:#1f2937; }
+.rv-cta:active{ transform:scale(.99); }
+.rv-cta:focus-visible{ outline:3px solid rgba(44,123,229,.45); outline-offset:2px; }
+.rv-hint{ margin:-2px 0 0; font-size:.76rem; color:var(--muted); text-align:center; }
+
+.rv-byc{
+  display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:16px; text-decoration:none;
+  background:var(--card); border:1.5px solid rgba(17,24,39,.09); color:var(--text);
+}
+.rv-byc:hover{ border-color:#c7d2e3; }
+.rv-byc:focus-visible{ outline:3px solid rgba(44,123,229,.45); outline-offset:2px; }
+.rv-byc-ic{ width:34px; height:34px; border-radius:10px; display:grid; place-items:center; flex-shrink:0; background:#d1fae5; color:#047857; }
+.rv-byc-ic svg{ width:18px; height:18px; }
+.rv-byc-txt{ flex:1; min-width:0; font-size:.86rem; font-weight:600; line-height:1.35; }
+.rv-byc-go{ font-size:.82rem; font-weight:700; color:var(--primary); white-space:nowrap; }
+
+.rv-help{ margin:0; text-align:center; font-size:.86rem; line-height:1.5; color:var(--muted); }
+.rv-help a{ color:#047857; font-weight:700; text-decoration:none; }
+.rv-help a:hover{ text-decoration:underline; }
+.rv-help a[hidden]{ display:none; }
+
+@media (prefers-reduced-motion:reduce){ .rv-trip{ animation:none; } .rv-cta{ transition:none; } }

@@ -24,6 +24,7 @@ function _arrowSvg() {
 
 async function loadViajes() {
   showLoading('Cargando viajes…');
+  _loadReservasWhatsapp();
   try {
     const viajes = await Api.getViajes();
     VIAJES_CACHE = viajes;
@@ -36,8 +37,8 @@ async function loadViajes() {
       list.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon" aria-hidden="true">${_busSvg()}</div>
-          <h3>No hay viajes disponibles en este momento</h3>
-          <p>Nos estaremos viendo próximamente en nuevos destinos 🌍</p>
+          <h3>Todavía no hay selección de asientos habilitada</h3>
+          <p>Te avisamos cuando se habilite la de tu viaje.</p>
         </div>`;
       return;
     }
@@ -50,66 +51,97 @@ async function loadViajes() {
   }
 }
 
+/** Link "Escribinos por WhatsApp" del pie: solo si hay número cargado en el panel. */
+async function _loadReservasWhatsapp() {
+  const link = document.getElementById('rvWhatsapp');
+  if (!link) return;
+  try {
+    const num = String(await Api.getWhatsappReservas()).replace(/\D/g, '');
+    link.hidden = !num;
+    if (num) link.href = 'https://wa.me/' + num + '?text=' + encodeURIComponent('Hola! No encuentro mi viaje en la selección de asientos.');
+  } catch (e) {
+    link.hidden = true;
+  }
+}
+
+// "Sáb 24/10/2026" y "22:00"
+function _rvFecha(iso) {
+  const d = new Date(iso);
+  const dia = d.toLocaleDateString('es-PY', { weekday: 'short' }).replace('.', '');
+  const fecha = d.toLocaleDateString('es-PY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  return dia.charAt(0).toUpperCase() + dia.slice(1) + ' ' + fecha;
+}
+function _rvHora(iso) {
+  return new Date(iso).toLocaleTimeString('es-PY', { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+
+function _rvEl(tag, className, text) {
+  const el = document.createElement(tag);
+  if (className) el.className = className;
+  if (text !== undefined && text !== null) el.textContent = text;
+  return el;
+}
+
+const _RV_ICON_CAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>';
+const _RV_ICON_HORA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+
+/**
+ * Tarjeta de viaje: foto del destino (o fondo de marca), tipo de bus y
+ * cuenta regresiva sobre la foto; nombre completo, fecha y hora de salida,
+ * y un botón explícito para elegir asiento.
+ */
 function _buildTripCard(viaje) {
   const isDouble = viaje.tipo === 'doble_piso';
+  const card = _rvEl('article', 'rv-trip');
 
-  const card = document.createElement('div');
-  card.className = 'trip-card ' + (isDouble ? 'double-floor' : 'single-floor');
-  card.tabIndex = 0;
-
-  const head = document.createElement('div');
-  head.className = 'trip-head';
-
-  const headLeft = document.createElement('div');
-  headLeft.className = 'trip-head-left';
-
-  const iconEl = document.createElement('div');
-  iconEl.className = 'trip-bus-icon' + (isDouble ? ' floors-icon' : '');
-  iconEl.innerHTML = isDouble ? _doubleBusSvg() : _busSvg();
-
-  const nameWrap = document.createElement('div');
-  nameWrap.style.cssText = 'min-width:0;flex:1';
-  const nameEl = document.createElement('h3');
-  nameEl.textContent = viaje.nombre;
-  nameWrap.appendChild(nameEl);
-
-  const pillEl = document.createElement('span');
-  pillEl.className = 'trip-pill' + (isDouble ? ' doble' : '');
-  pillEl.textContent = isDouble ? 'Doble piso' : 'Convencional';
-
-  headLeft.appendChild(iconEl);
-  headLeft.appendChild(nameWrap);
-
-  const arrowEl = document.createElement('div');
-  arrowEl.className = 'trip-arrow';
-  arrowEl.innerHTML = _arrowSvg();
-
-  const headRight = document.createElement('div');
-  headRight.className = 'trip-head-right';
-  headRight.appendChild(pillEl);
-  headRight.appendChild(arrowEl);
-
-  head.appendChild(headLeft);
-  head.appendChild(headRight);
-  card.appendChild(head);
-
+  // ── Foto ──
+  const photo = _rvEl('div', 'rv-photo' + (isDouble ? ' doble' : ''));
+  const foto = viaje.destino && viaje.destino.imagen_url;
+  if (foto) {
+    photo.classList.add('has-img');
+    photo.style.backgroundImage = `url("${encodeURI(foto)}")`;
+  }
+  const type = _rvEl('span', 'rv-type' + (isDouble ? ' doble' : ''));
+  type.innerHTML = isDouble ? _doubleBusSvg() : _busSvg();
+  type.appendChild(document.createTextNode(isDouble ? 'Doble piso' : 'Convencional'));
+  photo.appendChild(type);
   if (viaje.start_at) {
     const info = getCountdownText(viaje.start_at);
     if (info) {
-      const cdWrap = document.createElement('div');
-      cdWrap.className = 'trip-countdown-wrap';
-      const cd = document.createElement('div');
-      cd.className = 'trip-countdown ' + info.status;
-      cd.textContent = info.text;
+      const cd = _rvEl('span', 'rv-countdown', info.text);
+      cd.dataset.countdown = '';
       cd.dataset.startAt = viaje.start_at;
-      cdWrap.appendChild(cd);
-      card.appendChild(cdWrap);
+      photo.appendChild(cd);
     }
   }
+  card.appendChild(photo);
 
-  card.onclick = () => selectViaje(viaje).catch(err => { console.error(err); toast('No se pudo abrir el viaje'); });
-  card.onkeypress = (ev) => { if (ev.key === 'Enter') selectViaje(viaje).catch(err => { console.error(err); toast('No se pudo abrir el viaje'); }); };
+  // ── Cuerpo ──
+  const body = _rvEl('div', 'rv-body');
+  body.appendChild(_rvEl('h3', '', viaje.nombre));
+  if (viaje.start_at) {
+    const meta = _rvEl('div', 'rv-meta');
+    const f = _rvEl('span'); f.innerHTML = _RV_ICON_CAL; f.appendChild(document.createTextNode(_rvFecha(viaje.start_at)));
+    const h = _rvEl('span'); h.innerHTML = _RV_ICON_HORA; h.appendChild(document.createTextNode('Salida ' + _rvHora(viaje.start_at) + ' hs'));
+    meta.appendChild(f); meta.appendChild(h);
+    body.appendChild(meta);
+  }
 
+  const abrir = () => selectViaje(viaje).catch(err => { console.error(err); toast('No se pudo abrir el viaje'); });
+  const cta = _rvEl('button', 'rv-cta', isDouble ? 'Elegir planta y asiento' : 'Elegir asiento');
+  cta.type = 'button';
+  cta.insertAdjacentHTML('beforeend', _arrowSvg());
+  cta.onclick = abrir;
+  body.appendChild(cta);
+
+  if (isDouble && Array.isArray(viaje.plantas) && viaje.plantas.length > 1) {
+    const plantas = viaje.plantas.map(p => /alta/i.test(p.etiqueta) ? p.etiqueta + ' con vista panorámica' : p.etiqueta);
+    body.appendChild(_rvEl('p', 'rv-hint', plantas.join(' · ')));
+  }
+  card.appendChild(body);
+
+  // La foto también abre el viaje (el botón es el acceso con teclado).
+  photo.onclick = abrir;
   return card;
 }
 

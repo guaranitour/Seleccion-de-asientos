@@ -178,23 +178,27 @@ function getCountdownText(startAtIso) {
   const hours = Math.floor((diff % 86400000) / 3600000);
   const mins = Math.floor((diff % 3600000) / 60000);
 
+  // Texto legible ("Sale en 17 días") en vez de "Faltan 17d 2h".
   let text;
-  if (days > 0) text = `Faltan ${days}d ${hours}h`;
-  else if (hours > 0) text = `Faltan ${hours}h ${mins}m`;
-  else text = `Faltan ${mins}m`;
+  if (days > 1) text = `Sale en ${days} días`;
+  else if (days === 1) text = 'Sale en 1 día';
+  else if (hours > 0) text = `Sale en ${hours} h ${mins} min`;
+  else text = `Sale en ${mins} min`;
 
   return { text, status: 'future' };
 }
 
 setInterval(() => {
-  document.querySelectorAll('.trip-countdown').forEach(el => {
+  document.querySelectorAll('.trip-countdown, [data-countdown]').forEach(el => {
     const startAt = el.dataset.startAt;
     if (!startAt) return;
     const info = getCountdownText(startAt);
     if (!info) return;
-    el.textContent = info.text;
-    el.classList.toggle('live', info.status === 'live');
-    el.classList.toggle('future', info.status === 'future');
+    if (el.textContent !== info.text) el.textContent = info.text;
+    if (el.classList.contains('trip-countdown')) {
+      el.classList.toggle('live', info.status === 'live');
+      el.classList.toggle('future', info.status === 'future');
+    }
   });
 }, 1000);
 
