@@ -107,20 +107,28 @@ const Api = {
   },
 
   /** Suscribe a cambios en tiempo real de los asientos de una planta. */
-  subscribeToPlanta(plantaId, onChange) {
-    const channel = supabase
-      .channel('asientos-planta-' + plantaId)
+  /**
+   * Canal en vivo de una planta:
+   *  - postgres_changes: reservas confirmadas (cambios en reservas.asientos).
+   *  - presence: asientos que cada visitante tiene marcados y todavía no
+   *    reservó. No se guarda nada en la base; si la persona cierra la
+   *    página o pierde conexión, su presencia desaparece sola.
+   * presence = { key, onSync(estado), onReady() }
+   */
+  subscribeToPlanta(plantaId, onChange, presence) {
+    const opts = presence && presence.key ? { config: { presence: { key: presence.key } } } : undefined;
+    let channel = supabase.channel('asientos-planta-' + plantaId, opts)
       .on(
         'postgres_changes',
         { event: '*', schema: 'reservas', table: 'asientos', filter: 'planta_id=eq.' + plantaId },
-        function (payload) {
-          console.log('[Realtime] Evento recibido:', payload); // TEMP: quitar luego del diagnostico
-          onChange(payload);
-        }
-      )
-      .subscribe(function (status, err) {
-        console.log('[Realtime] Estado de la suscripcion:', status, err || ''); // TEMP: quitar luego del diagnostico
-      });
+        onChange
+      );
+    if (presence && presence.onSync) {
+      channel = channel.on('presence', { event: 'sync' }, () => presence.onSync(channel.presenceState()));
+    }
+    channel.subscribe((status) => {
+      if (status === 'SUBSCRIBED' && presence && presence.onReady) presence.onReady();
+    });
     return channel;
   },
 

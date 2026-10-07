@@ -152,8 +152,21 @@ function buildGrid(targetId, options) {
         seatNumber++;
 
         if (targetId === 'grid-select') {
-          if (state === 'libre') btn.onclick = () => toggleSeat(code, btn);
-          else btn.disabled = true;
+          if (state === 'libre' && AppState.selected.has(norm)) {
+            btn.classList.add('seleccionado');
+            btn.onclick = () => toggleSeat(code, btn);
+          } else if (state === 'libre' && seatHoldIsTakenByOther(norm)) {
+            // Otra persona lo tiene marcado y todavía no confirmó
+            btn.classList.remove('libre');
+            btn.classList.add('retenido');
+            const label = btn.textContent;
+            btn.setAttribute('aria-label', `Asiento ${code} (${label}): otra persona lo está eligiendo`);
+            btn.onclick = () => toast(`Otra persona está eligiendo el asiento ${label}. Probá con otro.`);
+          } else if (state === 'libre') {
+            btn.onclick = () => toggleSeat(code, btn);
+          } else {
+            btn.disabled = true;
+          }
         } else {
           btn.disabled = true;
         }
@@ -211,10 +224,15 @@ function toggleSeat(code, el) {
     AppState.selected.delete(key);
     el.classList.remove('seleccionado');
   } else {
+    if (seatHoldIsTakenByOther(key)) {
+      toast('Otra persona está eligiendo ese asiento. Probá con otro.');
+      return;
+    }
     AppState.selected.add(key);
     el.classList.add('seleccionado');
   }
   syncSelectedCounter();
+  seatHoldSync(); // avisa a los demás qué asientos tengo marcados
 }
 
 async function refreshSelectGrid() {
@@ -230,6 +248,7 @@ function subscribeSeatsRealtime() {
   unsubscribeRealtime();
   if (!AppState.planta) return;
 
+  seatHoldReset();
   AppState.realtimeChannel = Api.subscribeToPlanta(AppState.planta.id, (payload) => {
     const row = payload.new || payload.old;
     if (!row) return;
@@ -245,6 +264,7 @@ function subscribeSeatsRealtime() {
       if (row.estado === 'ocupado' && AppState.selected.has(norm)) {
         AppState.selected.delete(norm);
         toast(`El asiento ${AppState.numLabels.get(norm) || norm} ya fue reservado por otra persona`);
+        seatHoldSync();
       }
     }
 
@@ -254,7 +274,7 @@ function subscribeSeatsRealtime() {
       : null;
 
     if (visibleGridId) buildGrid(visibleGridId, { hideMissing: true });
-  });
+  }, seatHoldPresenceOptions());
 }
 
 window.refreshSeats = refreshSeats;
