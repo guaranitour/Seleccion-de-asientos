@@ -47,6 +47,7 @@ function resetViajeState() {
 }
 
 function unsubscribeRealtime() {
+  if (typeof seatHoldReset === 'function') seatHoldReset();
   if (AppState.realtimeChannel) {
     supabase.removeChannel(AppState.realtimeChannel);
     AppState.realtimeChannel = null;

@@ -21,11 +21,13 @@ function startSelectionPage() {
   if (!AppState.selected || AppState.selected.size === 0) { toast('Elegí al menos un asiento'); return; }
   showView('view-reserve');
   renderReservePage();
+  seatHoldRefreshPill(); // el tiempo restante pasa arriba del formulario
   setHash(['Formulario', AppState.viaje.nombre]);
 }
 
 function backToSelect() {
   showView('view-select');
+  seatHoldRefreshPill();
 }
 
 /** Renderiza el formulario de datos del/los pasajero(s). */
@@ -281,6 +283,7 @@ async function confirmReservationPage() {
     renderConfirmedPage(pairs);
     showView('view-confirmed');
     AppState.selected = new Set();
+    seatHoldSync(); // ya están reservados: dejo de marcarlos como "en proceso"
   } catch (e) {
     console.error(e);
     toast(e && e.message ? e.message : 'No se pudo reservar. Puede que alguien más haya tomado ese asiento.');

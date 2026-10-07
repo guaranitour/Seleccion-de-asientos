@@ -10,7 +10,7 @@ const Api = {
   async getViajes() {
     const { data, error } = await supabase
       .from('viajes')
-      .select('id, nombre, tipo, start_at, plantas(id, etiqueta, orden)')
+      .select('id, nombre, tipo, start_at, plantas(id, etiqueta, orden), destino:inicio_destinos(imagen_url)')
       .eq('activo', true)
       .neq('tipo', 'evento') // eventos/fiestas sin bus: no tienen asientos
       .order('start_at', { ascending: true, nullsFirst: false });
@@ -31,6 +31,13 @@ const Api = {
    * selección de asientos habilitada. "activo" = selección habilitada.
    * Se omiten los que ya salieron hace más de un día.
    */
+  /** Solo el WhatsApp de reservas (para el "Escribinos" de la lista de viajes). */
+  async getWhatsappReservas() {
+    const { data, error } = await supabase.from('inicio_config').select('whatsapp').eq('id', 1).maybeSingle();
+    if (error) throw error;
+    return (data && data.whatsapp) || '';
+  },
+
   async getViajesInicio() {
     const desde = new Date(Date.now() - 86400000).toISOString();
     const { data, error } = await supabase
@@ -100,20 +107,28 @@ const Api = {
   },
 
   /** Suscribe a cambios en tiempo real de los asientos de una planta. */
-  subscribeToPlanta(plantaId, onChange) {
-    const channel = supabase
-      .channel('asientos-planta-' + plantaId)
+  /**
+   * Canal en vivo de una planta:
+   *  - postgres_changes: reservas confirmadas (cambios en reservas.asientos).
+   *  - presence: asientos que cada visitante tiene marcados y todavía no
+   *    reservó. No se guarda nada en la base; si la persona cierra la
+   *    página o pierde conexión, su presencia desaparece sola.
+   * presence = { key, onSync(estado), onReady() }
+   */
+  subscribeToPlanta(plantaId, onChange, presence) {
+    const opts = presence && presence.key ? { config: { presence: { key: presence.key } } } : undefined;
+    let channel = supabase.channel('asientos-planta-' + plantaId, opts)
       .on(
         'postgres_changes',
         { event: '*', schema: 'reservas', table: 'asientos', filter: 'planta_id=eq.' + plantaId },
-        function (payload) {
-          console.log('[Realtime] Evento recibido:', payload); // TEMP: quitar luego del diagnostico
-          onChange(payload);
-        }
-      )
-      .subscribe(function (status, err) {
-        console.log('[Realtime] Estado de la suscripcion:', status, err || ''); // TEMP: quitar luego del diagnostico
-      });
+        onChange
+      );
+    if (presence && presence.onSync) {
+      channel = channel.on('presence', { event: 'sync' }, () => presence.onSync(channel.presenceState()));
+    }
+    channel.subscribe((status) => {
+      if (status === 'SUBSCRIBED' && presence && presence.onReady) presence.onReady();
+    });
     return channel;
   },
 
