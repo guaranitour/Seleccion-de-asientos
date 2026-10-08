@@ -225,7 +225,7 @@ function basesStepNext() {
 
 /** Botón "volver" del header: dentro del wizard retrocede un paso; en el
  *  paso 1 vuelve a la landing; en la landing o ya confirmado, sale a
- *  Reservas (no tiene sentido reabrir el flujo después de haber aceptado). */
+ *  Inicio (no tiene sentido reabrir el flujo después de haber aceptado). */
 function _basesGoBack() {
   if (typeof _basesStep === 'number' && _basesStep > 1) {
     basesStepBack();
@@ -234,7 +234,7 @@ function _basesGoBack() {
     setHash(['Bases y condiciones']);
     _resetBasesForm();
   } else {
-    backToChoose();
+    goHome();
   }
 }
 
