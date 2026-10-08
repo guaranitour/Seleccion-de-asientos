@@ -125,13 +125,7 @@ async function exportPassengerListImages() {
     const hojas = data.hojas || [];
     if (!hojas.length) throw new Error('El generador no devolvió PDFs');
 
-    for (const hoja of hojas) {
-      _descargarBase64Pdf(hoja.base64, hoja.filename);
-      // Pequeña pausa entre descargas: algunos navegadores mobile
-      // (Samsung Browser incluido) descartan descargas disparadas
-      // demasiado rápido una tras otra.
-      await new Promise(r => setTimeout(r, 400));
-    }
+    await _entregarPdfs(hojas);
 
     const diag = (data.diagnostico || []).join(' | ');
     toast((hojas.length === 1 ? 'PDF generado' : `${hojas.length} PDFs generados`) + (diag ? ' — ' + diag : ''));
@@ -178,10 +172,7 @@ async function exportChoferListImages() {
     const hojas = data.hojas || [];
     if (!hojas.length) throw new Error('El generador no devolvió PDFs');
 
-    for (const hoja of hojas) {
-      _descargarBase64Pdf(hoja.base64, hoja.filename);
-      await new Promise(r => setTimeout(r, 400));
-    }
+    await _entregarPdfs(hojas);
 
     const diag = (data.diagnostico || []).join(' | ');
     toast((hojas.length === 1 ? 'PDF generado' : `${hojas.length} PDFs generados`) + (diag ? ' — ' + diag : ''));
@@ -195,6 +186,69 @@ async function exportChoferListImages() {
   } finally {
     hideLoading();
   }
+}
+
+/**
+ * Entrega los PDFs generados al usuario.
+ * - 1 PDF, o escritorio: descarga directa (con pausa entre descargas).
+ * - Varios PDFs en celular: el navegador solo permite una descarga por
+ *   gesto del usuario (las demás se descartan sin aviso), así que se
+ *   muestra un panel con un botón por PDF; cada toque es un gesto nuevo.
+ */
+async function _entregarPdfs(hojas) {
+  const esTactil = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+  if (hojas.length === 1 || !esTactil) {
+    for (const hoja of hojas) {
+      _descargarBase64Pdf(hoja.base64, hoja.filename);
+      await new Promise(r => setTimeout(r, 400));
+    }
+    return;
+  }
+  hideLoading();
+  await _mostrarPanelDescargas(hojas);
+}
+
+function _mostrarPanelDescargas(hojas) {
+  return new Promise(resolve => {
+    const ov = document.createElement('div');
+    ov.className = 'overlay show';
+    ov.setAttribute('role', 'dialog');
+    ov.setAttribute('aria-modal', 'true');
+    ov.style.zIndex = '400';
+
+    const box = document.createElement('div');
+    box.className = 'loader';
+    box.style.cssText = 'flex-direction:column;align-items:stretch;gap:10px;width:min(88vw,360px);';
+
+    const title = document.createElement('div');
+    title.className = 'loader-text';
+    title.textContent = `${hojas.length} PDFs listos — tocá cada uno para descargarlo`;
+    box.appendChild(title);
+
+    hojas.forEach(hoja => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn primary';
+      btn.textContent = '⬇ ' + hoja.filename;
+      btn.style.cssText = 'overflow-wrap:anywhere;text-align:left;';
+      btn.onclick = () => {
+        _descargarBase64Pdf(hoja.base64, hoja.filename);
+        btn.className = 'btn ghost';
+        btn.textContent = '✓ ' + hoja.filename;
+      };
+      box.appendChild(btn);
+    });
+
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'btn ghost';
+    close.textContent = 'Cerrar';
+    close.onclick = () => { ov.remove(); resolve(); };
+    box.appendChild(close);
+
+    ov.appendChild(box);
+    document.body.appendChild(ov);
+  });
 }
 
 function _descargarBase64Pdf(base64, filename) {
@@ -211,7 +265,8 @@ function _descargarBase64Pdf(base64, filename) {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  // Revocar de inmediato puede cortar la descarga en navegadores móviles.
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
 window.goPassengerList = goPassengerList;
