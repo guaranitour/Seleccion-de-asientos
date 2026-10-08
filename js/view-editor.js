@@ -41,11 +41,31 @@ function _renderEditorPlantaTabs() {
   });
 }
 
+// Misma numeración que la vista de control: continúa entre plantas y
+// los asientos inhabilitados no consumen número.
+async function _computeEditorSeatOffset() {
+  const { viaje, planta } = EditorState;
+  if (!viaje || !planta || viaje.plantas.length <= 1) return 0;
+  let offset = 0;
+  for (const p of viaje.plantas.filter(x => (x.orden || 0) < (planta.orden || 0))) {
+    try {
+      const rows = await ApiAdmin.getAsientosByPlanta(p.id);
+      offset += _countNumerableSeatsControl(rows);
+    } catch (e) {
+      console.error('_computeEditorSeatOffset error:', e);
+    }
+  }
+  return offset;
+}
+
 async function refreshEditorGrid() {
   showLoading('Cargando estructura…');
   try {
-    const rows = await ApiAdmin.getAsientosByPlanta(EditorState.planta.id);
-    _renderEditorGrid(rows);
+    const [rows, offset] = await Promise.all([
+      ApiAdmin.getAsientosByPlanta(EditorState.planta.id),
+      _computeEditorSeatOffset()
+    ]);
+    _renderEditorGrid(rows, offset);
   } catch (e) {
     toast('Error al cargar estructura');
   } finally {
@@ -53,7 +73,7 @@ async function refreshEditorGrid() {
   }
 }
 
-function _renderEditorGrid(seats) {
+function _renderEditorGrid(seats, seatOffset) {
   const grid = document.getElementById('grid-editor');
   grid.innerHTML = '';
 
@@ -64,6 +84,7 @@ function _renderEditorGrid(seats) {
   });
 
   const filas = Array.from(rowsMap.keys()).sort((a, b) => a - b);
+  let seatNumber = 1 + (seatOffset || 0);
 
   filas.forEach(fila => {
     const rowWrap = document.createElement('div');
@@ -88,7 +109,7 @@ function _renderEditorGrid(seats) {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'seat ' + (seat.estado === 'inhabilitado' ? 'inhabilitado' : seat.estado);
-      btn.textContent = letra;
+      if (seat.estado !== 'inhabilitado') btn.textContent = seatNumber++;
       if (seat.estado === 'ocupado') {
         btn.disabled = true;
         btn.title = 'Ocupado — no se puede editar hasta liberar';
