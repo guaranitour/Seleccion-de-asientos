@@ -27,16 +27,24 @@
 <meta name="twitter:description" content="Expresos, viajes juveniles y familiares, fiestas, safaris, culturales y ecoaventura. Conocé nuestras salidas confirmadas.">
 <meta name="twitter:image" content="https://www.guaranitour.com/inicio-preview.jpg">
 
+<link rel="preconnect" href="https://pmxwpmxiemhbeliywhpj.supabase.co" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preload" href="/logo-header.png" as="image" fetchpriority="high">
+<script>
+// Portada de la última visita: se precarga antes de que el JS consulte Supabase.
+try{var _h=JSON.parse(localStorage.getItem("homeHero")||"null");if(_h&&_h.imagen){var _l=document.createElement("link");_l.rel="preload";_l.as="image";_l.href=encodeURI(_h.imagen);_l.setAttribute("fetchpriority","high");document.head.appendChild(_l);}}catch(e){}
+</script>
+
 <link href="/css/base.css?v=2" rel="stylesheet"/>
 <link href="/css/home.css?v=3" rel="stylesheet"/>
-<link href="/css/inicio.css?v=14" rel="stylesheet"/>
+<link href="/css/inicio.css?v=15" rel="stylesheet"/>
 <link href="/css/croquis.css?v=3" rel="stylesheet"/>
 <link href="/css/reserve.css" rel="stylesheet"/>
 <link href="/css/panel.css?v=4" rel="stylesheet"/>
 <link href="/css/passenger-list.css" rel="stylesheet"/>
 <link href="/css/whatsapp-mode.css" rel="stylesheet"/>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -48,7 +56,7 @@
     </svg>
   </button>
   <div class="topbar-logo-wrap" onclick="goHome()" role="link" aria-label="Ir al inicio" tabindex="0" onkeydown="if(event.key==='Enter')goHome()">
-    <img alt="Destino Guaraní" class="topbar-logo skeleton-round" id="heroLogo"/>
+    <img alt="Destino Guaraní" class="topbar-logo" id="heroLogo" src="/logo-header.png" width="445" height="112" decoding="async" fetchpriority="high"/>
   </div>
   <span aria-hidden="true" class="topbar-spacer"></span>
 </header>
@@ -108,6 +116,8 @@
               <path d="M0 200 C80 182 150 196 220 186 C290 176 340 190 400 182 L400 250 L0 250Z" fill="#24479a"/>
               <path d="M0 222 C90 210 170 226 250 214 C320 204 360 214 400 210 L400 250 L0 250Z" fill="#1e3a8a"/>
             </svg>
+            <img alt="" class="home-hero-img" id="homeHeroImg" decoding="async" fetchpriority="high" hidden/>
+            <script>try{var _c=JSON.parse(localStorage.getItem("homeHero")||"null");if(_c&&_c.imagen){var _i=document.getElementById("homeHeroImg");_i.src=encodeURI(_c.imagen);_i.hidden=false;document.getElementById("homeHeroPhoto").classList.add("has-img");}}catch(e){}</script>
             <div class="home-hero-text">
               <p id="homeGreeting">Hola</p>
               <h1 id="homeHeroTitle">Viajá tranquilo, nosotros nos encargamos del resto</h1>
@@ -750,29 +760,29 @@
 </a>
 
 <!-- Scripts (orden importa: dependencias primero) -->
-<script src="/js/supabase-client.js"></script>
-<script src="/js/state.js?v=2"></script>
-<script src="/js/api.js?v=6"></script>
-<script src="/js/ui-helpers.js?v=7"></script>
-<script src="/js/nav-drawer.js?v=3"></script>
-<script src="/js/router.js?v=3"></script>
-<script src="/js/view-bases.js?v=2"></script>
-<script src="/js/view-choose.js?v=2"></script>
-<script src="/js/view-home.js?v=15"></script>
-<script src="/js/seats-presence.js?v=3"></script>
-<script src="/js/seats-grid.js?v=2"></script>
-<script src="/js/view-select.js"></script>
-<script src="/js/share-card.js"></script>
-<script src="/js/view-reserve.js?v=3"></script>
-<script src="/js/auth.js"></script>
-<script src="/js/api-admin.js?v=3"></script>
-<script src="/js/view-panel.js?v=4"></script>
-<script src="/js/view-panel-inicio.js?v=6"></script>
-<script src="/js/view-control.js"></script>
-<script src="/js/whatsapp-mode.js"></script>
-<script src="/js/view-editor.js?v=2"></script>
-<script src="/js/view-passenger-list.js?v=2"></script>
-<script src="/js/main.js"></script>
+<script defer src="/js/supabase-client.js"></script>
+<script defer src="/js/state.js?v=2"></script>
+<script defer src="/js/api.js?v=6"></script>
+<script defer src="/js/ui-helpers.js?v=7"></script>
+<script defer src="/js/nav-drawer.js?v=3"></script>
+<script defer src="/js/router.js?v=3"></script>
+<script defer src="/js/view-bases.js?v=2"></script>
+<script defer src="/js/view-choose.js?v=2"></script>
+<script defer src="/js/view-home.js?v=16"></script>
+<script defer src="/js/seats-presence.js?v=3"></script>
+<script defer src="/js/seats-grid.js?v=2"></script>
+<script defer src="/js/view-select.js"></script>
+<script defer src="/js/share-card.js"></script>
+<script defer src="/js/view-reserve.js?v=3"></script>
+<script defer src="/js/auth.js"></script>
+<script defer src="/js/api-admin.js?v=3"></script>
+<script defer src="/js/view-panel.js?v=4"></script>
+<script defer src="/js/view-panel-inicio.js?v=6"></script>
+<script defer src="/js/view-control.js"></script>
+<script defer src="/js/whatsapp-mode.js"></script>
+<script defer src="/js/view-editor.js?v=2"></script>
+<script defer src="/js/view-passenger-list.js?v=2"></script>
+<script defer src="/js/main.js?v=2"></script>
   <script>
   let _toastTimer = null;
   function showToast(msg, tipo = "success", duracion = 3000) {

@@ -15,16 +15,7 @@
   }
 })();
 
-function _loadHeroLogo() {
-  const img = document.getElementById('heroLogo');
-  if (!img) return;
-  img.addEventListener('load', () => img.classList.add('loaded'), { once: true });
-  img.addEventListener('error', () => img.classList.add('loaded'), { once: true });
-  img.src = '/Logo.png';
-}
-
 async function start() {
-  _loadHeroLogo();
   await Auth.init();
   updateStaffEntryPoint();
 

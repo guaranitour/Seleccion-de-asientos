@@ -84,8 +84,21 @@ function _renderHomeStatic(c) {
   if (portada.titulo) document.getElementById('homeHeroTitle').textContent = portada.titulo;
   if (portada.texto) document.getElementById('homeHeroText').textContent = portada.texto;
   const photo = document.getElementById('homeHeroPhoto');
+  const heroImg = document.getElementById('homeHeroImg');
   photo.classList.toggle('has-img', !!portada.imagen);
-  photo.style.backgroundImage = portada.imagen ? `url("${encodeURI(portada.imagen)}")` : '';
+  if (portada.imagen) {
+    const src = encodeURI(portada.imagen);
+    if (heroImg.getAttribute('src') !== src) heroImg.src = src;
+    heroImg.hidden = false;
+  } else {
+    heroImg.hidden = true;
+    heroImg.removeAttribute('src');
+  }
+  // Se recuerda para precargarla en la próxima visita (ver <head> de index.html).
+  try {
+    if (portada.imagen) localStorage.setItem('homeHero', JSON.stringify({ imagen: portada.imagen }));
+    else localStorage.removeItem('homeHero');
+  } catch (e) {}
 
   _renderHomeAvisos(c.avisos || []);
 
