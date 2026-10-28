@@ -87,6 +87,62 @@ const PI_SECCIONES = {
     resumen: r => [r.pais, formatFechaCorta(r.fecha), r.precio_desde != null ? 'Desde ' + formatPrecio(r.precio_desde, r.precio_moneda) : '']
       .filter(Boolean).join(' · ')
   },
+  tahyi: {
+    tab: 'TAHÝI',
+    tipo: 'config',
+    ayuda: 'Textos de "Nuestro propósito" en la página TAHÝI. El botón "Sumarme por WhatsApp" usa el WhatsApp de Contacto.',
+    campos: [
+      { k: 'tahyi_proposito_titulo', label: 'Frase destacada', max: 140, placeholder: 'Queremos que esa huella sea buena para la gente y los lugares que visitamos.', hint: 'Vacío = se muestra la frase de ejemplo.' },
+      { k: 'tahyi_proposito_texto', label: 'Texto', type: 'textarea', rows: 4, max: 500, hint: 'Cómo nació TAHÝI, a quién ayuda y por qué. Vacío = no se muestra.' }
+    ]
+  },
+  tahyi_acciones: {
+    tab: 'TAHÝI · Acciones',
+    tipo: 'lista',
+    tabla: 'tahyi_acciones',
+    nuevo: { tipo: 'voluntariado' },
+    singular: 'acción',
+    ayuda: '"Próximas acciones" de TAHÝI. Pasada la fecha dejan de mostrarse solas. Sin acciones, la sección no aparece.',
+    campos: [
+      { k: 'titulo', label: 'Nombre de la acción', req: true, max: 80, placeholder: 'Ej.: Jornada de reforestación' },
+      { k: 'tipo', label: 'Tipo', type: 'select', opciones: [['voluntariado', 'Voluntariado (botón "Anotarme")'], ['colecta', 'Colecta / campaña (botón "Cómo donar")']] },
+      { k: 'fecha', label: 'Fecha (opcional)', type: 'date', hint: 'Vacía = sin fecha fija (no vence).' },
+      { k: 'hora', label: 'Hora (opcional)', max: 30, placeholder: 'Ej.: 08:00' },
+      { k: 'lugar', label: 'Lugar o comunidad (opcional)', max: 80 },
+      { k: 'detalle', label: 'Detalle (opcional)', type: 'textarea', max: 220, placeholder: 'Ej.: Recibimos ropa, útiles y alimentos no perecederos.' }
+    ],
+    resumen: r => [r.tipo === 'colecta' ? 'Colecta' : 'Voluntariado', formatFechaCorta(r.fecha), r.lugar].filter(Boolean).join(' · ')
+  },
+  tahyi_galeria: {
+    tab: 'TAHÝI · Galería',
+    tipo: 'lista',
+    tabla: 'tahyi_galeria',
+    nuevo: {},
+    singular: 'foto',
+    ayuda: 'Fotos de las acciones de TAHÝI. Sin fotos, la galería no aparece.',
+    imagen: 'imagen_url',
+    campos: [
+      { k: 'imagen_url', label: 'Foto', type: 'image', req: true, carpeta: 'tahyi-galeria', hint: 'Horizontal.' },
+      { k: 'titulo', label: 'Título', req: true, max: 60 },
+      { k: 'detalle', label: 'Lugar y fecha (opcional)', max: 60, placeholder: 'Ej.: San Bernardino · marzo 2026' }
+    ],
+    resumen: r => r.detalle || ''
+  },
+  tahyi_aliados: {
+    tab: 'TAHÝI · Aliados',
+    tipo: 'lista',
+    tabla: 'tahyi_aliados',
+    nuevo: {},
+    singular: 'aliado',
+    ayuda: 'Empresas y organizaciones que acompañan a TAHÝI. Sin aliados, la sección no aparece.',
+    imagen: 'logo_url',
+    campos: [
+      { k: 'nombre', label: 'Nombre', req: true, max: 60 },
+      { k: 'logo_url', label: 'Logo (opcional)', type: 'image', carpeta: 'tahyi-aliados', maxLado: 600, hint: 'Mejor con fondo transparente o blanco. Sin logo se muestra el nombre.' },
+      { k: 'link', label: 'Sitio o red social (opcional)', max: 200, placeholder: 'https://…' }
+    ],
+    resumen: r => r.link || ''
+  },
   contacto: {
     tab: 'Contacto',
     tipo: 'config',

@@ -82,6 +82,34 @@ const Api = {
     };
   },
 
+  /**
+   * Contenido de la página TAHÝI. Si una tabla todavía no existe (falta
+   * correr sql/2026-10-28-tahyi.sql) esa sección queda vacía y se oculta.
+   */
+  async getTahyiContenido() {
+    const orden = (q) => q.order('orden', { ascending: true }).order('created_at', { ascending: true });
+    const hoy = new Date();
+    const hoyIso = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+    const [config, acciones, galeria, aliados] = await Promise.all([
+      supabase.from('inicio_config').select('*').eq('id', 1).maybeSingle(),
+      supabase.from('tahyi_acciones').select('*').eq('activo', true)
+        .or(`fecha.is.null,fecha.gte.${hoyIso}`)
+        .order('fecha', { ascending: true, nullsFirst: false }).order('orden', { ascending: true }),
+      orden(supabase.from('tahyi_galeria').select('*').eq('activo', true)),
+      orden(supabase.from('tahyi_aliados').select('*').eq('activo', true))
+    ]);
+    const filas = (r, nombre) => {
+      if (r.error) { console.error('TAHÝI ' + nombre + ':', r.error); return []; }
+      return r.data || [];
+    };
+    return {
+      config: (!config.error && config.data) || {},
+      acciones: filas(acciones, 'acciones'),
+      galeria: filas(galeria, 'galería'),
+      aliados: filas(aliados, 'aliados')
+    };
+  },
+
   /** Todos los asientos de una planta (sin datos de pasajero: ya no viven aca). */
   async getAsientosByPlanta(plantaId) {
     const { data, error } = await supabase
