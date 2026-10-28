@@ -31,6 +31,7 @@ const NAV_ITEM_POR_VISTA = {
   'view-home': 'inicio',
   'view-choose': 'seleccion', 'view-select': 'seleccion', 'view-reserve': 'seleccion', 'view-confirmed': 'seleccion',
   'view-bases': 'bases',
+  'view-tahyi': 'tahyi',
   'view-staff-login': 'staff', 'view-panel': 'staff', 'view-create-trip': 'staff', 'view-control': 'staff',
   'view-editor': 'staff', 'view-passenger-list': 'staff', 'view-panel-inicio': 'staff'
 };

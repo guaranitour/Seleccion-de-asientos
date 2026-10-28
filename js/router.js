@@ -122,6 +122,11 @@ async function routeTo(path) {
       return;
     }
 
+    if (head.toLowerCase() === 'tahyi') {
+      await goTahyi();
+      return;
+    }
+
     if (head.toLowerCase() === 'reservas') {
       if (typeof closeFloorSheet === 'function') closeFloorSheet();
       showView('view-choose');
