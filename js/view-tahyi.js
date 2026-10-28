@@ -62,7 +62,7 @@ async function renderTahyi() {
 
 // Portada: cada campo vacío conserva el texto que trae index.html.
 function _renderTahyiHero(cfg) {
-  [['tahyiHeroEtiqueta', cfg.tahyi_hero_etiqueta], ['tahyiHeroSobretitulo', cfg.tahyi_hero_sobretitulo],
+  [['tahyiHeroEtiqueta', cfg.tahyi_hero_etiqueta],
    ['tahyiHeroTitulo', cfg.tahyi_hero_titulo], ['tahyiHeroLema', cfg.tahyi_hero_lema], ['tahyiHeroTexto', cfg.tahyi_hero_texto]]
     .forEach(([id, v]) => { if (v) document.getElementById(id).textContent = v; });
   const img = document.getElementById('tahyiHeroImg');

@@ -94,7 +94,6 @@ const PI_SECCIONES = {
     campos: [
       { k: 'tahyi_hero_imagen_url', label: 'Foto de la portada', type: 'image', carpeta: 'tahyi-portada', hint: 'Horizontal, sin texto encima. Vacía = ilustración verde.' },
       { k: 'tahyi_hero_etiqueta', label: 'Etiqueta (arriba a la izquierda)', max: 30, placeholder: 'Iniciativa social' },
-      { k: 'tahyi_hero_sobretitulo', label: 'Frase sobre el título', max: 60, placeholder: 'Tahýi = hormiga en guaraní' },
       { k: 'tahyi_hero_titulo', label: 'Título', max: 30, placeholder: 'TAHÝI' },
       { k: 'tahyi_hero_lema', label: 'Lema', max: 90, placeholder: 'Juntos, como las hormigas, llegamos más lejos' },
       { k: 'tahyi_hero_texto', label: 'Texto debajo de la foto', type: 'textarea', rows: 3, max: 240, placeholder: 'Nuestra iniciativa social y comunitaria…' },
