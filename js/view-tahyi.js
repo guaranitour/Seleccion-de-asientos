@@ -30,6 +30,8 @@ async function goTahyi() {
 }
 
 async function renderTahyi() {
+  const year = document.getElementById('tahyiFooterYear');
+  if (year) year.textContent = new Date().getFullYear();
   showLoading('Cargando…');
   let c = { config: {}, acciones: [], galeria: [], aliados: [] };
   try {

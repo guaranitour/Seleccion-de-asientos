@@ -79,6 +79,7 @@ body[data-view="view-tahyi"] .topbar{ overflow:hidden; }
 .tahyi-hero-photo::after{ background:linear-gradient(180deg,rgba(17,24,39,0) 15%,rgba(17,24,39,.72) 100%); }
 .tahyi-hero-text h1{ font-size:clamp(2rem,9vw,2.6rem); }
 .tahyi-hero-text .tahyi-lema{ margin:4px 0 0; font-size:1rem; font-weight:700; line-height:1.3; opacity:1; }
+.tahyi-firma{ margin:0; text-align:center; color:var(--muted); font-size:.82rem; }
 .tahyi-hero-btns{ display:flex; gap:10px; }
 .tahyi-hero-btns .home-cta{ flex:1; padding:0 14px; }
 
@@ -153,4 +154,3 @@ a.tahyi-aliado:hover{ border-color:var(--tahyi); }
 .tahyi-cta .home-cta{ grid-column:1 / -1; justify-self:start; }
 @media (max-width:360px){ .tahyi-cta-art{ width:88px; height:88px; } .tahyi-cta-art svg{ width:76px; } }
 
-.tahyi-firma{ margin:0; text-align:center; color:var(--muted); font-size:.82rem; }
