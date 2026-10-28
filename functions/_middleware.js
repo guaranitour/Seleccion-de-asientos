@@ -32,7 +32,17 @@ const INICIO_META = {
   imageAlt: 'Tucán junto al logo de Destino Guaraní: Somos todo lo que buscás, ¡Vivir y Sentir!',
 };
 
+const TAHYI_META = {
+  title: 'TAHÝI — Iniciativa social de Destino Guarani',
+  description: 'Ambiental, humanitario y de integración. Sumate a las acciones y colectas de TAHÝI.',
+  image: 'https://www.guaranitour.com/tahyi-preview.jpg',
+  imageWidth: 1200,
+  imageHeight: 630,
+  imageAlt: 'TAHÝI: hormiga con una hoja. Ambiental, humanitario e integración.',
+};
+
 const ROUTES_META = {
+  '/tahyi': TAHYI_META,
   '/': INICIO_META,
   '/inicio': INICIO_META,
   '/reservas': {
