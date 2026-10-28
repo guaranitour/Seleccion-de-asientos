@@ -1,7 +1,7 @@
 // ============================================================
 // view-tahyi.js — TAHÝI, iniciativa social y comunitaria (/tahyi)
 // ============================================================
-// Lo fijo (portada, ejes, cómo ayudar) está en index.html. Lo editable
+// Lo fijo (ejes) y los valores por defecto de la portada están en index.html. Lo editable
 // sale de Panel › Inicio (tablas reservas.tahyi_*): "Próximas acciones",
 // "Galería" y "Aliados" se ocultan si no tienen nada cargado.
 
@@ -49,6 +49,7 @@ async function renderTahyi() {
   body.textContent = cfg.tahyi_proposito_texto || '';
   body.hidden = !cfg.tahyi_proposito_texto;
 
+  _renderTahyiHero(cfg);
   _renderTahyiAcciones(c.acciones);
   _renderTahyiGaleria(c.galeria);
   _renderTahyiAliados(c.aliados);
@@ -57,6 +58,23 @@ async function renderTahyi() {
   const cta = document.getElementById('tahyiCtaWa');
   cta.hidden = !wa;
   if (wa) cta.href = wa;
+}
+
+// Portada: cada campo vacío conserva el texto que trae index.html.
+function _renderTahyiHero(cfg) {
+  [[tahyiHeroEtiqueta, cfg.tahyi_hero_etiqueta], [tahyiHeroSobretitulo, cfg.tahyi_hero_sobretitulo],
+   [tahyiHeroTitulo, cfg.tahyi_hero_titulo], [tahyiHeroLema, cfg.tahyi_hero_lema], [tahyiHeroTexto, cfg.tahyi_hero_texto]]
+    .forEach(([id, v]) => { if (v) document.getElementById(id).textContent = v; });
+  const img = document.getElementById(tahyiHeroImg);
+  const url = cfg.tahyi_hero_imagen_url;
+  if (url) {
+    const src = encodeURI(url);
+    if (img.getAttribute(src) !== src) img.src = src;
+  } else {
+    img.removeAttribute(src);
+  }
+  img.hidden = !url;
+  document.getElementById(tahyiHeroPhoto).classList.toggle(con-foto, !!url);
 }
 
 function _renderTahyiAcciones(acciones) {

@@ -65,6 +65,8 @@ body[data-view="view-tahyi"] .topbar{ overflow:hidden; }
 #view-tahyi .home-eyebrow{ color:var(--tahyi); }
 
 .tahyi-hero-photo{ background:var(--tahyi-bg); }
+/* Con foto cargada desde el panel, la ilustración sobra. */
+.tahyi-hero-photo.con-foto .tahyi-hero-art{ display:none; }
 .tahyi-tag{
   position:absolute; top:14px; left:14px; z-index:1;
   display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px;

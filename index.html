@@ -43,7 +43,7 @@ try{var _h=JSON.parse(localStorage.getItem("homeHero")||"null");if(_h&&_h.imagen
 <link href="/css/panel.css?v=4" rel="stylesheet"/>
 <link href="/css/passenger-list.css" rel="stylesheet"/>
 <link href="/css/whatsapp-mode.css" rel="stylesheet"/>
-<link href="/css/tahyi.css?v=1" rel="stylesheet"/>
+<link href="/css/tahyi.css?v=2" rel="stylesheet"/>
 
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -240,23 +240,24 @@ try{var _h=JSON.parse(localStorage.getItem("homeHero")||"null");if(_h&&_h.imagen
       <div class="home-wrap">
 
         <article class="home-hero">
-          <div class="home-hero-photo tahyi-hero-photo">
-            <svg aria-hidden="true" preserveAspectRatio="xMidYMid slice" viewBox="0 0 400 250">
+          <div class="home-hero-photo tahyi-hero-photo" id="tahyiHeroPhoto">
+            <svg aria-hidden="true" class="tahyi-hero-art" preserveAspectRatio="xMidYMid slice" viewBox="0 0 400 250">
               <circle cx="318" cy="60" r="26" fill="#fde68a"/>
               <path d="M0 150 L60 116 L110 140 L170 100 L230 134 L290 108 L350 130 L400 112 L400 250 L0 250Z" fill="#6ee7b7"/>
               <path d="M0 176 L70 144 L130 166 L200 134 L270 162 L330 144 L400 158 L400 250 L0 250Z" fill="#10b981"/>
               <path d="M0 204 C80 186 150 200 220 190 C290 180 340 194 400 186 L400 250 L0 250Z" fill="#047857"/>
               <path d="M0 226 C90 214 170 230 250 218 C320 208 360 218 400 214 L400 250 L0 250Z" fill="#065f46"/>
             </svg>
-            <span class="tahyi-tag"><svg aria-hidden="true" class="" viewBox="-40 -44 68 68"><g stroke="#4b5563" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="#fff"><path fill="none" stroke="#9ca3af" d="M-12 0 L-19 9 L-23 22 M-8 1 L-1 10 L-4 22 M-4 0 L9 8 L15 22"/><ellipse cx="14" cy="-3" rx="11" ry="8.5"/><path fill="none" stroke="#9ca3af" d="M10 -10.5 Q6 -3 10 5 M16 -11 Q12 -3 16 5.2"/><circle cx="1" cy="-2" r="2.6"/><path d="M-17 -6 C-12 -10 -4 -8 -2 -3 C-4 1 -12 2 -17 -1 Z"/><ellipse cx="-24" cy="-7" rx="7.5" ry="6.5"/><circle cx="-25" cy="-9" r="1.6" fill="#4b5563"/><path fill="none" d="M-31 -4 Q-34 0 -30 1 M-26 -13 Q-28 -22 -36 -25 M-22 -13 Q-20 -24 -26 -30 M-15 -1 L-24 8 L-30 22 M-5 -1 L5 9 L10 22 M-10 0 L-8 10 L-13 22"/></g><g transform="translate(-6,-25) rotate(-30) scale(1.2)"><path d="M0 16 C-9 8 -9 -8 0 -17 C9 -8 9 8 0 16Z" fill="#3f6d24" stroke="#2d5016" stroke-width=".8"/><path d="M0 19 L0 -14" stroke="#a3d977" stroke-width="1.2" fill="none"/></g></svg>Iniciativa social</span>
+            <img alt="" class="home-hero-img" decoding="async" fetchpriority="high" hidden id="tahyiHeroImg"/>
+            <span class="tahyi-tag"><svg aria-hidden="true" class="" viewBox="-40 -44 68 68"><g stroke="#4b5563" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="#fff"><path fill="none" stroke="#9ca3af" d="M-12 0 L-19 9 L-23 22 M-8 1 L-1 10 L-4 22 M-4 0 L9 8 L15 22"/><ellipse cx="14" cy="-3" rx="11" ry="8.5"/><path fill="none" stroke="#9ca3af" d="M10 -10.5 Q6 -3 10 5 M16 -11 Q12 -3 16 5.2"/><circle cx="1" cy="-2" r="2.6"/><path d="M-17 -6 C-12 -10 -4 -8 -2 -3 C-4 1 -12 2 -17 -1 Z"/><ellipse cx="-24" cy="-7" rx="7.5" ry="6.5"/><circle cx="-25" cy="-9" r="1.6" fill="#4b5563"/><path fill="none" d="M-31 -4 Q-34 0 -30 1 M-26 -13 Q-28 -22 -36 -25 M-22 -13 Q-20 -24 -26 -30 M-15 -1 L-24 8 L-30 22 M-5 -1 L5 9 L10 22 M-10 0 L-8 10 L-13 22"/></g><g transform="translate(-6,-25) rotate(-30) scale(1.2)"><path d="M0 16 C-9 8 -9 -8 0 -17 C9 -8 9 8 0 16Z" fill="#3f6d24" stroke="#2d5016" stroke-width=".8"/><path d="M0 19 L0 -14" stroke="#a3d977" stroke-width="1.2" fill="none"/></g></svg><span id="tahyiHeroEtiqueta">Iniciativa social</span></span>
             <div class="home-hero-text tahyi-hero-text">
-              <p>Tahýi = hormiga en guaraní</p>
-              <h1>TAHÝI</h1>
-              <p class="tahyi-lema">Juntos, como las hormigas, llegamos más lejos</p>
+              <p id="tahyiHeroSobretitulo">Tahýi = hormiga en guaraní</p>
+              <h1 id="tahyiHeroTitulo">TAHÝI</h1>
+              <p class="tahyi-lema" id="tahyiHeroLema">Juntos, como las hormigas, llegamos más lejos</p>
             </div>
           </div>
           <div class="home-hero-body">
-            <p>Nuestra iniciativa social y comunitaria: devolvemos a las comunidades que nos reciben en cada viaje, con el trabajo de muchos.</p>
+            <p id="tahyiHeroTexto">Nuestra iniciativa social y comunitaria: devolvemos a las comunidades que nos reciben en cada viaje, con el trabajo de muchos.</p>
             <div class="tahyi-hero-btns">
               <button class="home-cta" onclick="tahyiScrollTo('tahyiSumate')" type="button">Quiero sumarme</button>
               <button class="home-cta light" hidden id="tahyiVerAcciones" onclick="tahyiScrollTo('tahyiAcciones')" type="button">Ver acciones</button>
@@ -300,22 +301,12 @@ try{var _h=JSON.parse(localStorage.getItem("homeHero")||"null");if(_h&&_h.imagen
           <div aria-label="Fotos, deslizá para ver más" class="tahyi-galeria" id="tahyiGaleriaList" tabindex="0"></div>
         </section>
 
-        <section aria-labelledby="tahyiSumateTitle" class="home-section" id="tahyiSumate">
-          <div><p class="home-eyebrow">Sumá tu granito</p><h2 class="home-title" id="tahyiSumateTitle">Cómo podés ayudar</h2></div>
-          <ol class="home-steps">
-            <li class="home-step home-glass"><b>Sé voluntario</b><small>Sumate a una acción con tu tiempo.</small></li>
-            <li class="home-step home-glass"><b>Doná</b><small>Útiles, ropa o alimentos en la oficina.</small></li>
-            <li class="home-step home-glass"><b>Viajá solidario</b><small>Llevá una donación en tu próximo viaje.</small></li>
-            <li class="home-step home-glass"><b>Compartí</b><small>Difundí las campañas en tus redes.</small></li>
-          </ol>
-        </section>
-
         <section aria-labelledby="tahyiAliadosTitle" class="home-section" hidden id="tahyiAliados">
           <div><p class="home-eyebrow">Gracias por caminar con nosotros</p><h2 class="home-title" id="tahyiAliadosTitle">Aliados</h2></div>
           <div class="tahyi-aliados" id="tahyiAliadosList"></div>
         </section>
 
-        <section aria-labelledby="tahyiCtaTitle" class="tahyi-cta">
+        <section aria-labelledby="tahyiCtaTitle" class="tahyi-cta" id="tahyiSumate">
           <div>
             <h2 id="tahyiCtaTitle">¿Querés ser parte de TAHÝI?</h2>
             <p>Escribinos y te contamos cómo sumarte a la próxima acción.</p>
@@ -879,7 +870,7 @@ try{var _h=JSON.parse(localStorage.getItem("homeHero")||"null");if(_h&&_h.imagen
 <script defer src="/js/view-bases.js?v=2"></script>
 <script defer src="/js/view-choose.js?v=2"></script>
 <script defer src="/js/view-home.js?v=16"></script>
-<script defer src="/js/view-tahyi.js?v=1"></script>
+<script defer src="/js/view-tahyi.js?v=2"></script>
 <script defer src="/js/seats-presence.js?v=3"></script>
 <script defer src="/js/seats-grid.js?v=2"></script>
 <script defer src="/js/view-select.js"></script>
