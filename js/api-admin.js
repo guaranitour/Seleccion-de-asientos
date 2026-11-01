@@ -8,7 +8,7 @@ const ApiAdmin = {
   async getAllViajes() {
     const { data, error } = await supabase
       .from('viajes')
-      .select('id, nombre, tipo, start_at, activo, publicado_inicio, destino_id, plantas(id, etiqueta, orden)')
+      .select('id, nombre, tipo, start_at, activo, publicado_inicio, destino_id, app_viaje_id, plantas(id, etiqueta, orden)')
       .order('created_at', { ascending: false });
     if (error) throw error;
     (data || []).forEach(v => {
@@ -51,6 +51,26 @@ const ApiAdmin = {
   async setViajeDestino(viajeId, destinoId) {
     const { error } = await supabase.from('viajes').update({ destino_id: destinoId || null }).eq('id', viajeId);
     if (error) throw error;
+  },
+
+  /** Enlaza (o desenlaza, con null) un viaje de la web con uno de la app (public.viajes). */
+  async setViajeAppEnlace(viajeId, appViajeId) {
+    const { error } = await supabase.from('viajes').update({ app_viaje_id: appViajeId || null }).eq('id', viajeId);
+    if (error) throw error;
+  },
+
+  /** Viajes activos de la app, para el selector de enlace. */
+  async getViajesAppActivos() {
+    const { data, error } = await supabase.rpc('viajes_app_activos');
+    if (error) throw error;
+    return data || [];
+  },
+
+  /** Total a pagar y abonado por CI del viaje de la app enlazado: [{ ci, total, abonado }]. */
+  async getPagosViajeApp(viajeId) {
+    const { data, error } = await supabase.rpc('pagos_viaje_app', { p_viaje: viajeId });
+    if (error) throw error;
+    return data || [];
   },
 
   // ── Contenido del inicio (Panel › Inicio) ──

@@ -83,15 +83,46 @@ async function _loadAllPassengers() {
     });
   }
 
+  await _adjuntarPagosApp(passengers);
   PaxListState.passengers = passengers;
   const maxNumero = seatNumber - 1; // total de lugares numerables (ocupados o no) del viaje
   PaxListState.sheetsCount = Math.max(1, Math.ceil(maxNumero / PAX_ROWS_PER_SHEET));
 }
 
+/** Si el viaje está enlazado a uno de la app, cruza por CI (solo dígitos) y
+ *  agrega abonado / por_abonar a cada pasajero. Si falla o no hay cruce,
+ *  esos campos no se mandan y la planilla los deja vacíos como siempre. */
+async function _adjuntarPagosApp(passengers) {
+  const viaje = PaxListState.viaje;
+  PaxListState.pagosApp = { enlazado: !!(viaje && viaje.app_viaje_id), cruzados: 0 };
+  if (!PaxListState.pagosApp.enlazado) return;
+  let pagos = [];
+  try {
+    pagos = await ApiAdmin.getPagosViajeApp(viaje.id);
+  } catch (e) {
+    console.error(e);
+    toast('No se pudieron traer los pagos de la app');
+    return;
+  }
+  const porCi = new Map(pagos.map(p => [String(p.ci), p]));
+  passengers.forEach(p => {
+    const reg = porCi.get(String(p.documento || '').replace(/\D/g, ''));
+    if (!reg) return;
+    const total = Number(reg.total) || 0;
+    const abonado = Number(reg.abonado) || 0;
+    p.abonado = abonado;
+    p.por_abonar = Math.max(0, total - abonado);
+    PaxListState.pagosApp.cruzados++;
+  });
+}
+
 function _renderSummary() {
   const total = PaxListState.passengers.length;
   document.getElementById('paxMeta').textContent =
-    `${total} pasajero${total === 1 ? '' : 's'} — se generará${PaxListState.sheetsCount === 1 ? '' : 'n'} ${PaxListState.sheetsCount} PDF${PaxListState.sheetsCount === 1 ? '' : 's'} (${PAX_ROWS_PER_SHEET} por hoja)`;
+    `${total} pasajero${total === 1 ? '' : 's'} — se generará${PaxListState.sheetsCount === 1 ? '' : 'n'} ${PaxListState.sheetsCount} PDF${PaxListState.sheetsCount === 1 ? '' : 's'} (${PAX_ROWS_PER_SHEET} por hoja)`
+    + (PaxListState.pagosApp && PaxListState.pagosApp.enlazado
+      ? ` · pagos de la app: ${PaxListState.pagosApp.cruzados} de ${total} encontrados por CI`
+      : '');
 }
 
 /** Pide al Apps Script que genere los PDFs y los descarga. */
@@ -160,7 +191,8 @@ async function exportChoferListImages() {
       body: JSON.stringify({
         tipo: 'chofer',
         viaje: viaje.nombre,
-        pasajeros: PaxListState.passengers
+        // La lista del chofer no lleva montos: no los mandamos.
+        pasajeros: PaxListState.passengers.map(p => ({ numero: p.numero, documento: p.documento, nombre: p.nombre }))
       })
     });
 

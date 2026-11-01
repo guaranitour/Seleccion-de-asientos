@@ -4,6 +4,7 @@
 
 let _panelViajesCache = [];
 let _panelDestinosCache = [];
+let _panelViajesAppCache = [];
 let _panelShowArchived = false;
 
 // Cada viaje tiene dos interruptores independientes:
@@ -33,11 +34,14 @@ async function goPanel() {
 async function loadPanelViajes() {
   showLoading('Cargando viajes…');
   try {
-    const [viajes, destinos] = await Promise.all([
+    const [viajes, destinos, viajesApp] = await Promise.all([
       ApiAdmin.getAllViajes(),
       // Si la tabla de destinos falla, el panel igual tiene que cargar los viajes.
-      ApiAdmin.listInicio('inicio_destinos').catch(e => { console.error(e); return []; })
+      ApiAdmin.listInicio('inicio_destinos').catch(e => { console.error(e); return []; }),
+      // Viajes activos de la app (para enlazar y traer lo abonado). Opcional.
+      ApiAdmin.getViajesAppActivos().catch(e => { console.error(e); return []; })
     ]);
+    _panelViajesAppCache = viajesApp;
     _panelViajesCache = viajes;
     _panelDestinosCache = destinos;
     _renderPanelStats(_panelViajesCache);
@@ -210,6 +214,34 @@ function _buildPanelTripCard(viaje) {
     vis.after(dest);
   }
 
+  // Viaje de la app (Guarani Tour App): permite traer Abonado / Por abonar
+  // a la lista de pasajeros. Solo en viajes con bus y visible para admin.
+  if (Auth.isAdmin() && (_panelViajesAppCache.length || viaje.app_viaje_id)) {
+    const lab = document.createElement('label');
+    lab.className = 'panel-trip-destino';
+    const txt = document.createElement('span');
+    txt.textContent = 'Viaje en la app (pagos en la lista)';
+    const sel = document.createElement('select');
+    const vacio = document.createElement('option');
+    vacio.value = ''; vacio.textContent = 'Sin enlazar';
+    sel.appendChild(vacio);
+    const lista = _panelViajesAppCache.slice();
+    if (viaje.app_viaje_id && !lista.some(a => a.id === viaje.app_viaje_id)) {
+      lista.push({ id: viaje.app_viaje_id, nombre: 'Viaje #' + viaje.app_viaje_id + ' (ya no activo)' });
+    }
+    lista.forEach(a => {
+      const o = document.createElement('option');
+      o.value = a.id;
+      o.textContent = a.nombre + (a.fecha_salida ? ' · ' + formatFechaCorta(a.fecha_salida) : '');
+      sel.appendChild(o);
+    });
+    sel.value = viaje.app_viaje_id || '';
+    sel.onchange = () => setPanelViajeAppEnlace(viaje.id, sel.value ? Number(sel.value) : null);
+    lab.appendChild(txt);
+    lab.appendChild(sel);
+    card.querySelector('.panel-trip-actions').before(lab);
+  }
+
   const actions = card.querySelector('.panel-trip-actions');
 
   // Eventos sin bus: no tienen croquis, ocupación ni lista de pasajeros.
@@ -270,6 +302,21 @@ async function setPanelViajeDestino(viajeId, destinoId) {
     const v = _panelViajesCache.find(x => x.id === viajeId);
     if (v) v.destino_id = destinoId;
     toast(destinoId ? 'Destino asignado' : 'Destino quitado');
+  } catch (e) {
+    toast('Error: ' + (e.message || 'no se pudo actualizar'));
+    _renderPanelTripList();
+  } finally {
+    hideLoading();
+  }
+}
+
+async function setPanelViajeAppEnlace(viajeId, appViajeId) {
+  showLoading('Guardando…');
+  try {
+    await ApiAdmin.setViajeAppEnlace(viajeId, appViajeId);
+    const v = _panelViajesCache.find(x => x.id === viajeId);
+    if (v) v.app_viaje_id = appViajeId;
+    toast(appViajeId ? 'Viaje de la app enlazado' : 'Enlace quitado');
   } catch (e) {
     toast('Error: ' + (e.message || 'no se pudo actualizar'));
     _renderPanelTripList();
