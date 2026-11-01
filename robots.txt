@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /panel
+Disallow: /formulario
+Disallow: /seleccion-de-asientos
+
+Sitemap: https://www.guaranitour.com/sitemap.xml
