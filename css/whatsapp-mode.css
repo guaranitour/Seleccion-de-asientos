@@ -250,6 +250,13 @@
    la barra de selección no tape la última fila de asientos. Usamos un
    valor holgado (110px) porque en pantallas angostas (<420px) la barra
    pasa a dos filas y crece; mejor sobrar espacio que tapar asientos. ── */
+/* El FAB flota abajo a la derecha aunque el modo esté apagado: dejamos
+   espacio al final de la vista para poder desplazar el último asiento
+   fuera de su alcance. */
+#view-control {
+  padding-bottom: calc(90px + var(--safe-bottom, 0px));
+}
+
 body.wa-mode-on #view-control {
   padding-bottom: calc(110px + var(--safe-bottom, 0px));
 }
